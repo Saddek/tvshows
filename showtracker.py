@@ -167,9 +167,16 @@ def get_show(showid):
 @app.route('/user/shows/<showid>', methods=['PUT'])
 @requires_auth
 def add_show(showid):
-    series.addShowToUser(request.authorization.username, showid)
-    
-    return jsonify(result='Success')
+    shouldAdd = not series.userHasShow(request.authorization.username, showid)
+
+    if shouldAdd:
+        series.addShowToUser(request.authorization.username, showid)
+
+    response = jsonify(series.getShowInfo(request.authorization.username, showid))
+
+    response.status_code = 201 if shouldAdd else 200
+
+    return response
 
 @app.route('/user/shows/<showid>/last_seen', methods=['PUT'])
 @requires_auth
@@ -185,14 +192,17 @@ def change_show(showid):
 
     series.setLastSeen(request.authorization.username, showid, lastSeen)
 
-    return jsonify(result='Successa')
+    return Response(status=204)
 
 @app.route('/user/shows/<showid>', methods=['DELETE'])
 @requires_auth
 def delete_show(showid):
+    if not series.userHasShow(request.authorization.username, showid):
+        abort(404)
+    
     series.deleteShowFromUser(request.authorization.username, showid)
 
-    return jsonify(result='Success')
+    return Response(status=204)
 
 if __name__ == "__main__":
     app.run(debug=True)
