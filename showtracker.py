@@ -59,13 +59,13 @@ class SeriesDatabase:
 
             pipe.execute()
 
-        count = self.db.sadd('user:%s:shows' % user, showId)
+        count = self.db.zadd('user:%s:shows' % user, 0, showId)
         if count == 1:
             self.db.hincrby('show:%s' % showId, 'refcount', 1)
 
     def deleteShowFromUser(self, user, showId):
         self.db.hdel('user:%s:lastseen' % user, showId)
-        count = self.db.srem('user:%s:shows' % user, showId)
+        count = self.db.zrem('user:%s:shows' % user, showId)
         if count == 1:
             refcount = self.db.hincrby('show:%s' % showId, 'refcount', -1)
             if refcount <= 0:
@@ -84,10 +84,10 @@ class SeriesDatabase:
             self.db.hdel('user:%s:lastseen' % user, showId)
 
     def getUserShowList(self, user):
-        return self.db.smembers('user:%s:shows' % user)
+        return self.db.zrangebyscore('user:%s:shows' % user, '-inf', '+inf')
 
     def userHasShow(self, user, showId):
-        return self.db.sismember('user:%s:shows' % user, showId)
+        return self.db.zscore('user:%s:shows' % user, showId) != None
 
     def getShowInfo(self, user, showId, withEpisodes=False, episodeLimit=None, onlyUnseen=False):
         showInfo = {'show_id': showId, 'name': self.db.hget('show:%s' % showId, 'name')}
