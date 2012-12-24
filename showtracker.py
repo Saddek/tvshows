@@ -169,14 +169,23 @@ def get_show(showid):
 def add_show(showid):
     series.addShowToUser(request.authorization.username, showid)
     
-    if 'last_seen' in request.form:
-        lastSeen = request.form['last_seen']
-        if lastSeen.lower() in ('null', 'none', '-1'):
-            lastSeen = None
-
-        series.setLastSeen(request.authorization.username, showid, lastSeen)
-
     return jsonify(result='Success')
+
+@app.route('/user/shows/<showid>/last_seen', methods=['PUT'])
+@requires_auth
+def change_show(showid):
+    if not series.userHasShow(request.authorization.username, showid):
+        abort(404)
+
+    lastSeen = request.data
+    if lastSeen.lower() in ('null', 'none', '-1'):
+        lastSeen = None
+    elif not lastSeen.isdigit():
+        abort(400)
+
+    series.setLastSeen(request.authorization.username, showid, lastSeen)
+
+    return jsonify(result='Successa')
 
 @app.route('/user/shows/<showid>', methods=['DELETE'])
 @requires_auth
