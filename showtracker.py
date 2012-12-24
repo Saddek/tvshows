@@ -38,7 +38,7 @@ class SeriesDatabase:
             self.db.hset('show:%s' % showId, 'name', tree.xpath('/Show/name')[0].text)
 
             pipe = self.db.pipeline()
-            pipe.delete('episodes:%s' % showId)
+            pipe.delete('show:%s:episodes' % showId)
 
             for season in tree.xpath('/Show/Episodelist/Season'):
                 seasonNum = int(season.get('no'))
@@ -55,7 +55,7 @@ class SeriesDatabase:
                         'airdate': episode.xpath('airdate')[0].text
                     }
 
-                    pipe.zadd('episodes:%s' % showId, episodeId, json.dumps(episodeInfo))
+                    pipe.zadd('show:%s:episodes' % showId, episodeId, json.dumps(episodeInfo))
 
             pipe.execute()
 
@@ -69,7 +69,7 @@ class SeriesDatabase:
         if count == 1:
             refcount = self.db.hincrby('show:%s' % showId, 'refcount', -1)
             if refcount <= 0:
-                self.db.delete('show:%s' % showId, 'episodes:%s' % showId)
+                self.db.delete('show:%s' % showId, 'show:%s:episodes' % showId)
 
     def getLastSeen(self, user, showId):
         return self.db.hget('user:%s:lastseen' % user, showId)
@@ -78,7 +78,7 @@ class SeriesDatabase:
         if episodeId:
             lastEpisode = str(episodeId).zfill(8)
 
-            if self.db.zcount('episodes:%s' % showId, lastEpisode, lastEpisode) != 0:
+            if self.db.zcount('show:%s:episodes' % showId, lastEpisode, lastEpisode) != 0:
                 self.db.hset('user:%s:lastseen' % user, showId, lastEpisode)
         else:
             self.db.hdel('user:%s:lastseen' % user, showId)
@@ -109,7 +109,7 @@ class SeriesDatabase:
 
         episodes = []
 
-        for ep in self.db.zrangebyscore('episodes:%s' % showId, begin, end, start=start, num=limit):
+        for ep in self.db.zrangebyscore('show:%s:episodes' % showId, begin, end, start=start, num=limit):
             episodes.append(json.loads(ep))
 
         return episodes
