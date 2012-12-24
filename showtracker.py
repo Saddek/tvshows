@@ -59,11 +59,17 @@ class SeriesDatabase:
 
             pipe.execute()
 
-        self.db.sadd('user:%s:shows' % user, showId)
+        count = self.db.sadd('user:%s:shows' % user, showId)
+        if count == 1:
+            self.db.hincrby('show:%s' % showId, 'refcount', 1)
 
     def deleteShowFromUser(self, user, showId):
-        # TODO: delete if last show
-        self.db.srem('user:%s:shows' % user, showId)
+        self.db.hdel('user:%s:lastseen' % user, showId)
+        count = self.db.srem('user:%s:shows' % user, showId)
+        if count == 1:
+            refcount = self.db.hincrby('show:%s' % showId, 'refcount', -1)
+            if refcount <= 0:
+                self.db.delete('show:%s' % showId, 'episodes:%s' % showId)
 
     def getLastSeen(self, user, showId):
         return self.db.hget('user:%s:lastseen' % user, showId)
