@@ -8,9 +8,6 @@ import requests
 from functools import wraps
 from StringIO import StringIO
 
-# TODO: user -> users in redis ?
-#       lastepisode -> lastseen
-
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
 
@@ -51,7 +48,7 @@ class SeriesDatabase:
                     episodeId = '%04d%04d' % (seasonNum, episodeNum)
 
                     episodeInfo = {
-                        'episodeid': episodeId,
+                        'episode_id': episodeId,
                         'title': episode.xpath('title')[0].text,
                         'season': seasonNum,
                         'episode': episodeNum,
@@ -69,13 +66,13 @@ class SeriesDatabase:
         self.db.srem('user:%s:shows' % user, showId)
 
     def getLastSeen(self, user, showId):
-        return self.db.hget('user:%s:lastepisodes' % user, showId)
+        return self.db.hget('user:%s:lastseen' % user, showId)
 
     def setLastSeen(self, user, showId, episodeId):
         lastEpisode = str(episodeId).zfill(8)
 
         if self.db.zcount('episodes:%s' % showId, lastEpisode, lastEpisode) != 0:
-            self.db.hset('user:%s:lastepisodes' % user, showId, lastEpisode)
+            self.db.hset('user:%s:lastseen' % user, showId, lastEpisode)
 
     def getUserShowList(self, user):
         return self.db.smembers('user:%s:shows' % user)
@@ -84,13 +81,13 @@ class SeriesDatabase:
         return self.db.sismember('user:%s:shows' % user, showId)
 
     def getShowInfo(self, user, showId, withEpisodes=False, episodeLimit=None, onlyUnseen=False):
-        showInfo = {'showId': showId, 'name': self.db.hget('show:%s' % showId, 'name')}
+        showInfo = {'show_id': showId, 'name': self.db.hget('show:%s' % showId, 'name')}
 
-        showInfo['lastepisode'] = self.getLastSeen(user, showId)
+        showInfo['last_seen'] = self.getLastSeen(user, showId)
 
         if withEpisodes:
             if onlyUnseen:
-                lastEpisode = self.db.hget('user:%s:lastepisodes' % user, showId) or '-inf'
+                lastEpisode = self.db.hget('user:%s:lastseen' % user, showId) or '-inf'
                 showInfo['episodes'] = self.__getEpisodes(showId, begin='(' + lastEpisode, limit=episodeLimit)
             else:
                 showInfo['episodes'] = self.__getEpisodes(showId, limit=episodeLimit)
@@ -127,9 +124,9 @@ def requires_auth(f):
         return f(*args, **kwargs)
     return decorated
 
-@app.route('/search/<showName>', methods=['GET'])
-def search_show(showName):
-    return jsonify(series.searchShow(showName))
+@app.route('/search/<show_name>', methods=['GET'])
+def search_show(show_name):
+    return jsonify(series.searchShow(show_name))
 
 @app.route('/user/shows', methods=['GET'])
 @requires_auth
@@ -139,39 +136,39 @@ def get_user_shows():
     onlyUnseen = str2bool(request.args.get('unseen', 'false'))
 
     shows = []
-    for showId in series.getUserShowList(request.authorization.username):
-        shows.append(series.getShowInfo(request.authorization.username, showId, withEpisodes=withEpisodes, episodeLimit=episodeLimit, onlyUnseen=onlyUnseen))
+    for showid in series.getUserShowList(request.authorization.username):
+        shows.append(series.getShowInfo(request.authorization.username, showid, withEpisodes=withEpisodes, episodeLimit=episodeLimit, onlyUnseen=onlyUnseen))
 
     return jsonify(shows=shows)
 
-@app.route('/user/shows/<showId>', methods=['GET'])
+@app.route('/user/shows/<showid>', methods=['GET'])
 @requires_auth
-def get_show(showId):
-    if not series.userHasShow(request.authorization.username, showId):
+def get_show(showid):
+    if not series.userHasShow(request.authorization.username, showid):
         abort(404)
 
     withEpisodes = str2bool(request.args.get('episodes', 'true'))
     episodeLimit = int(request.args.get('limit', '0'))
     onlyUnseen = str2bool(request.args.get('unseen', 'false'))
 
-    showInfo = series.getShowInfo(request.authorization.username, showId, withEpisodes=withEpisodes, episodeLimit=episodeLimit, onlyUnseen=onlyUnseen)
+    showInfo = series.getShowInfo(request.authorization.username, showid, withEpisodes=withEpisodes, episodeLimit=episodeLimit, onlyUnseen=onlyUnseen)
 
     return jsonify(showInfo)
 
-@app.route('/user/shows/<showId>', methods=['PUT'])
+@app.route('/user/shows/<showid>', methods=['PUT'])
 @requires_auth
-def add_show(showId):
-    series.addShowToUser(request.authorization.username, showId)
+def add_show(showid):
+    series.addShowToUser(request.authorization.username, showid)
     
-    if 'lastEpisode' in request.form:
-        series.setLastSeen(request.authorization.username, showId, request.form['lastEpisode'])
+    if 'last_seen' in request.form:
+        series.setLastSeen(request.authorization.username, showid, request.form['last_seen'])
 
     return jsonify(result='Success')
 
-@app.route('/user/shows/<showId>', methods=['DELETE'])
+@app.route('/user/shows/<showid>', methods=['DELETE'])
 @requires_auth
-def delete_show(showId):
-    series.deleteShowFromUser(request.authorization.username, showId)
+def delete_show(showid):
+    series.deleteShowFromUser(request.authorization.username, showid)
 
     return jsonify(result='Success')
 
