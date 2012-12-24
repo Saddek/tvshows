@@ -80,8 +80,12 @@ class SeriesDatabase:
 
             if self.db.zcount('show:%s:episodes' % showId, lastEpisode, lastEpisode) != 0:
                 self.db.hset('user:%s:lastseen' % user, showId, lastEpisode)
+            else:
+                return False
         else:
             self.db.hdel('user:%s:lastseen' % user, showId)
+
+        return True
 
     def getUserShowList(self, user):
         return self.db.zrangebyscore('user:%s:shows' % user, '-inf', '+inf')
@@ -197,7 +201,10 @@ def change_show(showid):
     elif not lastSeen.isdigit():
         abort(400)
 
-    series.setLastSeen(request.authorization.username, showid, lastSeen)
+    if not series.setLastSeen(request.authorization.username, showid, lastSeen):
+        response = jsonify(message='Invalid episode_id %s' % lastSeen)
+        response.status_code = 400
+        return response
 
     return Response(status=204)
 
