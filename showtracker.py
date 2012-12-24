@@ -118,11 +118,11 @@ series = SeriesDatabase('192.168.1.2', 6379, 1)
 app = Flask(__name__)
 
 def authenticate():
-    """Sends a 401 response that enables basic auth"""
-    return Response(
-    'Could not verify your access level for that URL.\n'
-    'You have to login with proper credentials', 401,
-    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+    response = jsonify(message='You have to login with proper credentials')
+    response.status_code = 401
+    response.headers.add('WWW-Authenticate', 'Basic realm="Login required"')
+
+    return response
 
 def requires_auth(f):
     @wraps(f)
