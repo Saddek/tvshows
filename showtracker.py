@@ -29,7 +29,7 @@ class SeriesDatabase:
     def checkAuth(self, user, password):
         return self.db.hget('user:%s' % user, 'password') == hashlib.sha256(password).hexdigest()
 
-    def addShowToUser(self, user, showId):
+    def addShowToUser(self, user, showId, order=0):
         if not self.db.exists('show:%s' % showId):
             req = requests.get('http://services.tvrage.com/feeds/full_show_info.php?sid=%s' % showId)
 
@@ -59,7 +59,7 @@ class SeriesDatabase:
 
             pipe.execute()
 
-        count = self.db.zadd('user:%s:shows' % user, 0, showId)
+        count = self.db.zadd('user:%s:shows' % user, order, showId)
         if count == 1:
             self.db.hincrby('show:%s' % showId, 'refcount', 1)
 
@@ -88,6 +88,13 @@ class SeriesDatabase:
 
     def userHasShow(self, user, showId):
         return self.db.zscore('user:%s:shows' % user, showId) != None
+
+    def userHasShows(self, user, showIds):
+        pipe = self.db.pipeline()
+        for showId in showIds:
+            pipe.zscore('user:%s:shows' % user, showId)
+
+        return not None in pipe.execute()
 
     def getShowInfo(self, user, showId, withEpisodes=False, episodeLimit=None, onlyUnseen=False):
         showInfo = {'show_id': showId, 'name': self.db.hget('show:%s' % showId, 'name')}
@@ -201,6 +208,24 @@ def delete_show(showid):
         abort(404)
     
     series.deleteShowFromUser(request.authorization.username, showid)
+
+    return Response(status=204)
+
+@app.route('/user/shows_order', methods=['POST'])
+@requires_auth
+def reorder_shows():
+    if not series.userHasShows(request.authorization.username, request.form.keys()):
+        response = jsonify(message='One or more show_id is invalid')
+        response.status_code = 400
+        return response
+
+    for showId, order in request.form.iteritems():
+        if not order.isdigit():
+            response = jsonify(message='Invalid order value %s' % order)
+            response.status_code = 400
+            return response
+
+        series.addShowToUser(request.authorization.username, showId, order)
 
     return Response(status=204)
 
