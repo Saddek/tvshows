@@ -57,7 +57,7 @@ def search_show(showName):
     
     return jsonify(results)
 
-@app.route('/shows', methods=['GET'])
+@app.route('/user/shows', methods=['GET'])
 @requires_auth
 def get_user_shows():
     shows = []
@@ -67,7 +67,7 @@ def get_user_shows():
 
     return jsonify(shows=shows)
 
-@app.route('/shows/<showId>', methods=['GET'])
+@app.route('/user/shows/<showId>', methods=['GET'])
 @requires_auth
 def get_show(showId):
     if not db.sismember('user:%s:shows' % request.authorization.username, showId):
@@ -80,7 +80,7 @@ def get_show(showId):
 
     return jsonify(showInfo)
 
-@app.route('/shows/<showId>', methods=['PUT'])
+@app.route('/user/shows/<showId>', methods=['PUT'])
 @requires_auth
 def add_show(showId):
     if not db.exists('show:%s' % showId):
@@ -122,7 +122,7 @@ def add_show(showId):
 
     return jsonify(result='Success')
 
-@app.route('/shows/<showId>', methods=['DELETE'])
+@app.route('/user/shows/<showId>', methods=['DELETE'])
 @requires_auth
 def delete_show(showId):
     # TODO: delete if last show
@@ -136,14 +136,14 @@ def getUnseenEpisodes(user, showid, limit=None):
 
     return getEpisodes(showid, '(' + lastEpisode, '+inf', limit)
 
-@app.route('/unseen/<showid>', methods=['GET'])
+@app.route('/user/unseen/<showid>', methods=['GET'])
 @requires_auth
 def get_unseen(showid):
     limit = request.args.get('limit')
 
     return jsonify(showid=showid, unseen=getUnseenEpisodes(request.authorization.username, showid, limit))
 
-@app.route('/unseen', methods=['GET'])
+@app.route('/user/unseen', methods=['GET'])
 @requires_auth
 def get_all_unseen():
     limit = request.args.get('limit')
