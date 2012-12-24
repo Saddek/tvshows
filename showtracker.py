@@ -75,10 +75,13 @@ class SeriesDatabase:
         return self.db.hget('user:%s:lastseen' % user, showId)
 
     def setLastSeen(self, user, showId, episodeId):
-        lastEpisode = str(episodeId).zfill(8)
+        if episodeId:
+            lastEpisode = str(episodeId).zfill(8)
 
-        if self.db.zcount('episodes:%s' % showId, lastEpisode, lastEpisode) != 0:
-            self.db.hset('user:%s:lastseen' % user, showId, lastEpisode)
+            if self.db.zcount('episodes:%s' % showId, lastEpisode, lastEpisode) != 0:
+                self.db.hset('user:%s:lastseen' % user, showId, lastEpisode)
+        else:
+            self.db.hdel('user:%s:lastseen' % user, showId)
 
     def getUserShowList(self, user):
         return self.db.smembers('user:%s:shows' % user)
@@ -167,7 +170,11 @@ def add_show(showid):
     series.addShowToUser(request.authorization.username, showid)
     
     if 'last_seen' in request.form:
-        series.setLastSeen(request.authorization.username, showid, request.form['last_seen'])
+        lastSeen = request.form['last_seen']
+        if lastSeen.lower() in ('null', 'none', '-1'):
+            lastSeen = None
+
+        series.setLastSeen(request.authorization.username, showid, lastSeen)
 
     return jsonify(result='Success')
 
