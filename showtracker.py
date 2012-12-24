@@ -1,4 +1,4 @@
-from bottle import route, request, response, abort, get, post, put, delete, run
+from flask import Flask, request, Response, abort, jsonify
 from lxml import etree
 import base64
 import hashlib
@@ -12,27 +12,26 @@ from StringIO import StringIO
 #       lastepisode -> lastseen
 
 db = redis.StrictRedis(host='192.168.1.2', port=6379, db=1)
-loggedUser = None
+app = Flask(__name__)
+
+def check_auth(username, password):
+    return db.hget('user:%s' % username, 'password') == hashlib.sha256(password).hexdigest()
+
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response(
+    'Could not verify your access level for that URL.\n'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 def requires_auth(f):
     @wraps(f)
-    def wrapper(*args, **kwds):
-        if request.headers.get('Authorization'):
-            authHeader = request.headers.get('Authorization').split(' ')
-            scheme = authHeader[0]
-
-            if scheme == 'Basic':
-                decoded = base64.b64decode(authHeader[1])
-                user, password = decoded.split(':')
-                
-                if db.hget('user:%s' % user, 'password') == hashlib.sha256(password).hexdigest():
-                    loggedUser = user
-                    return f(*args, **kwds)
-
-        response.set_header('WWW-Authenticate', 'Basic realm="Authentication required"')
-        response.status = 401
-
-    return wrapper
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
 
 def getShowInfo(showId):
     return {'showid': showId, 'name': db.hget('show:%s' % showId, 'name')}
@@ -45,7 +44,7 @@ def getEpisodes(showId, begin='-inf', end='+inf', limit=None):
 
     return episodes
 
-@get('/search/<showName>')
+@app.route('/search/<showName>', methods=['GET'])
 def search_show(showName):
     req = requests.get('http://services.tvrage.com/feeds/search.php?show=%s' % showName)
 
@@ -56,32 +55,32 @@ def search_show(showName):
         showId = e.xpath('showid')[0].text
         results[showId] = {'name': e.xpath('name')[0].text}
     
-    return results
+    return jsonify(results)
 
-@get('/shows')
+@app.route('/shows', methods=['GET'])
 @requires_auth
 def get_user_shows():
     shows = []
 
-    for showId in db.smembers('user:%s:shows' % loggedUser):
+    for showId in db.smembers('user:%s:shows' % request.authorization.username):
         shows.append(getShowInfo(showId))
 
-    return {'shows': shows}
+    return jsonify(shows=shows)
 
-@get('/shows/<showId>')
+@app.route('/shows/<showId>', methods=['GET'])
 @requires_auth
 def get_show(showId):
-    if not db.sismember('user:%s:shows' % loggedUser, showId):
+    if not db.sismember('user:%s:shows' % request.authorization.username, showId):
         abort(404)
 
     showInfo = getShowInfo(showId)
 
     showInfo['episodes'] = getEpisodes(showId)
-    showInfo['lastepisode'] = db.hget('user:%s:lastepisodes' % loggedUser, showId) or -1
+    showInfo['lastepisode'] = db.hget('user:%s:lastepisodes' % request.authorization.username, showId) or -1
 
-    return showInfo
+    return jsonify(showInfo)
 
-@put('/shows/<showId>')
+@app.route('/shows/<showId>', methods=['PUT'])
 @requires_auth
 def add_show(showId):
     if not db.exists('show:%s' % showId):
@@ -113,48 +112,50 @@ def add_show(showId):
 
         pipe.execute()
 
-    db.sadd('user:%s:shows' % loggedUser, showId)
+    db.sadd('user:%s:shows' % request.authorization.username, showId)
+    
+    if 'lastEpisode' in request.form:
+        lastEpisode = str(request.form['lastEpisode']).zfill(8)
 
-    if request.body.len > 0:
-        body = json.load(request.body)
+        if db.zcount('episodes:%s' % showId, lastEpisode, lastEpisode) != 0:
+            db.hset('user:%s:lastepisodes' % request.authorization.username, showId, lastEpisode)
 
-        if body['lastEpisode']:
-            lastEpisode = str(body['lastEpisode']).zfill(8)
+    return jsonify(result='Success')
 
-            if db.zcount('episodes:%s' % showId, lastEpisode, lastEpisode) != 0:
-                db.hset('user:%s:lastepisodes' % loggedUser, showId, lastEpisode)
-
-@delete('/shows/<showId>')
+@app.route('/shows/<showId>', methods=['DELETE'])
 @requires_auth
 def delete_show(showId):
     # TODO: delete if last show
 
-    db.srem('user:%s:shows' % loggedUser, showId)
+    db.srem('user:%s:shows' % request.authorization.username, showId)
+
+    return jsonify(result='Success')
 
 def getUnseenEpisodes(user, showid, limit=None):
     lastEpisode = db.hget('user:%s:lastepisodes' % user, showid) or '-inf'
 
     return getEpisodes(showid, '(' + lastEpisode, '+inf', limit)
 
-@get('/unseen/<showid>')
+@app.route('/unseen/<showid>', methods=['GET'])
 @requires_auth
 def get_unseen(showid):
-    limit = int(request.query.limit) if request.query.limit else None
+    limit = request.args.get('limit')
 
-    return {'showid': showid, 'unseen': getUnseenEpisodes(loggedUser, showid, limit)}
+    return jsonify(showid=showid, unseen=getUnseenEpisodes(request.authorization.username, showid, limit))
 
-@get('/unseen')
+@app.route('/unseen', methods=['GET'])
 @requires_auth
 def get_all_unseen():
-    limit = int(request.query.limit) if request.query.limit else None
+    limit = request.args.get('limit')
     
     unseen = []
 
-    for showid in db.smembers('user:%s:shows' % loggedUser):
-        unseen.append({'showid': showid, 'unseen': getUnseenEpisodes(loggedUser, showid, limit)})
+    for showid in db.smembers('user:%s:shows' % request.authorization.username):
+        unseen.append({'showid': showid, 'unseen': getUnseenEpisodes(request.authorization.username, showid, limit)})
 
-    return {'unseen': unseen}
+    return jsonify(unseen=unseen)
 
 #########
 
-run(host='localhost', port=8080)
+if __name__ == "__main__":
+    app.run(debug=True)
