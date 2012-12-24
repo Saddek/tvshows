@@ -11,11 +11,105 @@ from StringIO import StringIO
 # TODO: user -> users in redis ?
 #       lastepisode -> lastseen
 
-db = redis.StrictRedis(host='192.168.1.2', port=6379, db=1)
-app = Flask(__name__)
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
 
-def check_auth(username, password):
-    return db.hget('user:%s' % username, 'password') == hashlib.sha256(password).hexdigest()
+class SeriesDatabase:
+    def __init__(self, host, port, database):
+        self.db = redis.StrictRedis(host=host, port=port, db=database)
+
+    def searchShow(self, showName):
+        req = requests.get('http://services.tvrage.com/feeds/search.php?show=%s' % showName)
+        tree = etree.fromstring(req.text.encode(req.encoding))
+
+        results = {}
+        for e in tree.xpath('/Results/show'):
+            showId = e.xpath('showid')[0].text
+            results[showId] = {'name': e.xpath('name')[0].text}
+
+        return results;
+
+    def checkAuth(self, user, password):
+        return self.db.hget('user:%s' % user, 'password') == hashlib.sha256(password).hexdigest()
+
+    def addShowToUser(self, user, showId):
+        if not self.db.exists('show:%s' % showId):
+            req = requests.get('http://services.tvrage.com/feeds/full_show_info.php?sid=%s' % showId)
+
+            tree = etree.fromstring(req.text.encode(req.encoding))
+
+            self.db.hset('show:%s' % showId, 'name', tree.xpath('/Show/name')[0].text)
+
+            pipe = self.db.pipeline()
+            pipe.delete('episodes:%s' % showId)
+
+            for season in tree.xpath('/Show/Episodelist/Season'):
+                seasonNum = int(season.get('no'))
+
+                for episode in season.xpath('episode'):
+                    episodeNum = int(episode.xpath('seasonnum')[0].text)
+                    episodeId = '%04d%04d' % (seasonNum, episodeNum)
+
+                    episodeInfo = {
+                        'episodeid': episodeId,
+                        'title': episode.xpath('title')[0].text,
+                        'season': seasonNum,
+                        'episode': episodeNum,
+                        'airdate': episode.xpath('airdate')[0].text
+                    }
+
+                    pipe.zadd('episodes:%s' % showId, episodeId, json.dumps(episodeInfo))
+
+            pipe.execute()
+
+        self.db.sadd('user:%s:shows' % user, showId)
+
+    def deleteShowFromUser(self, user, showId):
+        # TODO: delete if last show
+        self.db.srem('user:%s:shows' % user, showId)
+
+    def getLastSeen(self, user, showId):
+        return self.db.hget('user:%s:lastepisodes' % user, showId)
+
+    def setLastSeen(self, user, showId, episodeId):
+        lastEpisode = str(episodeId).zfill(8)
+
+        if self.db.zcount('episodes:%s' % showId, lastEpisode, lastEpisode) != 0:
+            self.db.hset('user:%s:lastepisodes' % user, showId, lastEpisode)
+
+    def getUserShowList(self, user):
+        return self.db.smembers('user:%s:shows' % user)
+
+    def userHasShow(self, user, showId):
+        return self.db.sismember('user:%s:shows' % user, showId)
+
+    def getShowInfo(self, user, showId, withEpisodes=False, episodeLimit=None, onlyUnseen=False):
+        showInfo = {'showId': showId, 'name': self.db.hget('show:%s' % showId, 'name')}
+
+        showInfo['lastepisode'] = self.getLastSeen(user, showId)
+
+        if withEpisodes:
+            if onlyUnseen:
+                lastEpisode = self.db.hget('user:%s:lastepisodes' % user, showId) or '-inf'
+                showInfo['episodes'] = self.__getEpisodes(showId, begin='(' + lastEpisode, limit=episodeLimit)
+            else:
+                showInfo['episodes'] = self.__getEpisodes(showId, limit=episodeLimit)
+
+        return showInfo
+
+    def __getEpisodes(self, showId, begin='-inf', end='+inf', limit=None):
+        limit = limit or None
+        start = 0 if limit else None
+
+        episodes = []
+
+        for ep in self.db.zrangebyscore('episodes:%s' % showId, begin, end, start=start, num=limit):
+            episodes.append(json.loads(ep))
+
+        return episodes
+
+series = SeriesDatabase('192.168.1.2', 6379, 1)
+app = Flask(__name__)
 
 def authenticate():
     """Sends a 401 response that enables basic auth"""
@@ -28,134 +122,58 @@ def requires_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         auth = request.authorization
-        if not auth or not check_auth(auth.username, auth.password):
+        if not auth or not series.checkAuth(auth.username, auth.password):
             return authenticate()
         return f(*args, **kwargs)
     return decorated
 
-def getShowInfo(showId):
-    return {'showid': showId, 'name': db.hget('show:%s' % showId, 'name')}
-
-def getEpisodes(showId, begin='-inf', end='+inf', limit=None):
-    episodes = []
-
-    for ep in db.zrangebyscore('episodes:%s' % showId, begin, end, start=(None if limit == None else 0), num=limit):
-        episodes.append(json.loads(ep))
-
-    return episodes
-
 @app.route('/search/<showName>', methods=['GET'])
 def search_show(showName):
-    req = requests.get('http://services.tvrage.com/feeds/search.php?show=%s' % showName)
-
-    results = {}
-
-    tree = etree.fromstring(req.text.encode(req.encoding))
-    for e in tree.xpath('/Results/show'):
-        showId = e.xpath('showid')[0].text
-        results[showId] = {'name': e.xpath('name')[0].text}
-    
-    return jsonify(results)
+    return jsonify(series.searchShow(showName))
 
 @app.route('/user/shows', methods=['GET'])
 @requires_auth
 def get_user_shows():
-    shows = []
+    withEpisodes = str2bool(request.args.get('episodes', 'false'))
+    episodeLimit = int(request.args.get('limit', '0'))
+    onlyUnseen = str2bool(request.args.get('unseen', 'false'))
 
-    for showId in db.smembers('user:%s:shows' % request.authorization.username):
-        shows.append(getShowInfo(showId))
+    shows = []
+    for showId in series.getUserShowList(request.authorization.username):
+        shows.append(series.getShowInfo(request.authorization.username, showId, withEpisodes=withEpisodes, episodeLimit=episodeLimit, onlyUnseen=onlyUnseen))
 
     return jsonify(shows=shows)
 
 @app.route('/user/shows/<showId>', methods=['GET'])
 @requires_auth
 def get_show(showId):
-    if not db.sismember('user:%s:shows' % request.authorization.username, showId):
+    if not series.userHasShow(request.authorization.username, showId):
         abort(404)
 
-    showInfo = getShowInfo(showId)
+    withEpisodes = str2bool(request.args.get('episodes', 'true'))
+    episodeLimit = int(request.args.get('limit', '0'))
+    onlyUnseen = str2bool(request.args.get('unseen', 'false'))
 
-    showInfo['episodes'] = getEpisodes(showId)
-    showInfo['lastepisode'] = db.hget('user:%s:lastepisodes' % request.authorization.username, showId) or -1
+    showInfo = series.getShowInfo(request.authorization.username, showId, withEpisodes=withEpisodes, episodeLimit=episodeLimit, onlyUnseen=onlyUnseen)
 
     return jsonify(showInfo)
 
 @app.route('/user/shows/<showId>', methods=['PUT'])
 @requires_auth
 def add_show(showId):
-    if not db.exists('show:%s' % showId):
-        req = requests.get('http://services.tvrage.com/feeds/full_show_info.php?sid=%s' % showId)
-
-        tree = etree.fromstring(req.text.encode(req.encoding))
-
-        db.hset('show:%s' % showId, 'name', tree.xpath('/Show/name')[0].text)
-
-        pipe = db.pipeline()
-        pipe.delete('episodes:%s' % showId)
-
-        for season in tree.xpath('/Show/Episodelist/Season'):
-            seasonNum = int(season.get('no'))
-
-            for episode in season.xpath('episode'):
-                episodeNum = int(episode.xpath('seasonnum')[0].text)
-                episodeId = '%04d%04d' % (seasonNum, episodeNum)
-
-                episodeInfo = {
-                    'episodeid': episodeId,
-                    'title': episode.xpath('title')[0].text,
-                    'season': seasonNum,
-                    'episode': episodeNum,
-                    'airdate': episode.xpath('airdate')[0].text
-                }
-
-                pipe.zadd('episodes:%s' % showId, episodeId, json.dumps(episodeInfo))
-
-        pipe.execute()
-
-    db.sadd('user:%s:shows' % request.authorization.username, showId)
+    series.addShowToUser(request.authorization.username, showId)
     
     if 'lastEpisode' in request.form:
-        lastEpisode = str(request.form['lastEpisode']).zfill(8)
-
-        if db.zcount('episodes:%s' % showId, lastEpisode, lastEpisode) != 0:
-            db.hset('user:%s:lastepisodes' % request.authorization.username, showId, lastEpisode)
+        series.setLastSeen(request.authorization.username, showId, request.form['lastEpisode'])
 
     return jsonify(result='Success')
 
 @app.route('/user/shows/<showId>', methods=['DELETE'])
 @requires_auth
 def delete_show(showId):
-    # TODO: delete if last show
-
-    db.srem('user:%s:shows' % request.authorization.username, showId)
+    series.deleteShowFromUser(request.authorization.username, showId)
 
     return jsonify(result='Success')
-
-def getUnseenEpisodes(user, showid, limit=None):
-    lastEpisode = db.hget('user:%s:lastepisodes' % user, showid) or '-inf'
-
-    return getEpisodes(showid, '(' + lastEpisode, '+inf', limit)
-
-@app.route('/user/unseen/<showid>', methods=['GET'])
-@requires_auth
-def get_unseen(showid):
-    limit = request.args.get('limit')
-
-    return jsonify(showid=showid, unseen=getUnseenEpisodes(request.authorization.username, showid, limit))
-
-@app.route('/user/unseen', methods=['GET'])
-@requires_auth
-def get_all_unseen():
-    limit = request.args.get('limit')
-    
-    unseen = []
-
-    for showid in db.smembers('user:%s:shows' % request.authorization.username):
-        unseen.append({'showid': showid, 'unseen': getUnseenEpisodes(request.authorization.username, showid, limit)})
-
-    return jsonify(unseen=unseen)
-
-#########
 
 if __name__ == "__main__":
     app.run(debug=True)
