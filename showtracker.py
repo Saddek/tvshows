@@ -36,6 +36,7 @@ class SeriesDatabase:
             tree = etree.fromstring(req.text.encode(req.encoding))
 
             self.db.hset('show:%s' % showId, 'name', tree.xpath('/Show/name')[0].text)
+            self.db.hset('show:%s' % showId, 'seasons', int(tree.xpath('count(/Show/Episodelist/Season)')))
 
             pipe = self.db.pipeline()
             pipe.delete('show:%s:episodes' % showId)
@@ -101,7 +102,7 @@ class SeriesDatabase:
         return not None in pipe.execute()
 
     def getShowInfo(self, user, showId, withEpisodes=False, episodeLimit=None, onlyUnseen=False):
-        showInfo = {'show_id': showId, 'name': self.db.hget('show:%s' % showId, 'name')}
+        showInfo = {'show_id': showId, 'name': self.db.hget('show:%s' % showId, 'name'), 'seasons': self.db.hget('show:%s' % showId, 'seasons')}
 
         showInfo['last_seen'] = self.getLastSeen(user, showId)
 
@@ -237,4 +238,4 @@ def reorder_shows():
     return Response(status=204)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
