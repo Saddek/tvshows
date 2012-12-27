@@ -62,15 +62,16 @@ class SeriesDatabase:
 
         count = self.db.zadd('user:%s:shows' % user, order, showId)
         if count == 1:
-            self.db.hincrby('show:%s' % showId, 'refcount', 1)
+            self.db.hincrby('shows', showId, 1)
 
     def deleteShowFromUser(self, user, showId):
         self.db.hdel('user:%s:lastseen' % user, showId)
         count = self.db.zrem('user:%s:shows' % user, showId)
         if count == 1:
-            refcount = self.db.hincrby('show:%s' % showId, 'refcount', -1)
+            refcount = self.db.hincrby('shows', showId, -1)
             if refcount <= 0:
                 self.db.delete('show:%s' % showId, 'show:%s:episodes' % showId)
+                self.db.hdel('shows', showId)
 
     def getLastSeen(self, user, showId):
         return self.db.hget('user:%s:lastseen' % user, showId)
