@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+      <div class="row">
+        <div class="span6">
+          <h2>À voir</h2>
+
+          <table class="table table-bordered">
+            <tbody>
+              {% for show in unseen %}
+              <tr>
+                <td>{{show.name}}</td>
+                <td>{{show.episodes[0] | episodeNumber}}: {{show.episodes[0].title}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="span6">
+          <h2>Prochainement</h2>
+
+          <table class="table table-bordered">
+            <tbody>
+              {% for show in upcoming | reverse %}
+              <tr>
+                <td>{{show.episodes[0].airdate}}</td>
+                <td>{{show.name}}</td>
+                <td>{{show.episodes[0] | episodeNumber}}: {{show.episodes[0].title}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+{% endblock %}
