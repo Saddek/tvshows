@@ -5,16 +5,61 @@ import hashlib
 import json
 import redis
 import requests
+import time
 from functools import wraps
 from StringIO import StringIO
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
 
+def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
+    """Retry calling the decorated function using an exponential backoff.
+
+    http://www.saltycrane.com/blog/2009/11/trying-out-retry-decorator-python/
+    original from: http://wiki.python.org/moin/PythonDecoratorLibrary#Retry
+
+    :param ExceptionToCheck: the exception to check. may be a tuple of
+        excpetions to check
+    :type ExceptionToCheck: Exception or tuple
+    :param tries: number of times to try (not retry) before giving up
+    :type tries: int
+    :param delay: initial delay between retries in seconds
+    :type delay: int
+    :param backoff: backoff multiplier e.g. value of 2 will double the delay
+        each retry
+    :type backoff: int
+    :param logger: logger to use. If None, print
+    :type logger: logging.Logger instance
+    """
+    def deco_retry(f):
+        def f_retry(*args, **kwargs):
+            mtries, mdelay = tries, delay
+            try_one_last_time = True
+            while mtries > 1:
+                try:
+                    return f(*args, **kwargs)
+                    try_one_last_time = False
+                    break
+                except ExceptionToCheck, e:
+                    msg = "%s, Retrying in %d seconds..." % (str(e), mdelay)
+                    if logger:
+                        logger.warning(msg)
+                    else:
+                        print msg
+                    time.sleep(mdelay)
+                    mtries -= 1
+                    mdelay *= backoff
+            if try_one_last_time:
+                return f(*args, **kwargs)
+            return
+        return f_retry  # true decorator
+    return deco_retry
+
 class SeriesDatabase:
     def __init__(self, host, port, database):
         self.db = redis.StrictRedis(host=host, port=port, db=database)
 
+    @retry(requests.ConnectionError, tries=4, delay=1)
     def searchShow(self, showName):
         req = requests.get('http://services.tvrage.com/feeds/search.php?show=%s' % showName)
         tree = etree.fromstring(req.text.encode(req.encoding))
@@ -29,36 +74,56 @@ class SeriesDatabase:
     def checkAuth(self, user, password):
         return self.db.hget('user:%s' % user, 'password') == hashlib.sha256(password).hexdigest()
 
+    @retry(requests.ConnectionError, tries=4, delay=1)
+    def downloadShow(self, showId):
+        req = requests.get('http://services.tvrage.com/feeds/full_show_info.php?sid=%s' % showId)
+
+        tree = etree.fromstring(req.text.encode(req.encoding))
+
+        pipe = self.db.pipeline()
+
+        pipe.hset('show:%s' % showId, 'name', tree.xpath('/Show/name')[0].text)
+        pipe.hset('show:%s' % showId, 'seasons', int(tree.xpath('count(/Show/Episodelist/Season)')))
+
+        pipe.delete('show:%s:episodes' % showId)
+        for season in tree.xpath('/Show/Episodelist/Season'):
+            seasonNum = int(season.get('no'))
+
+            for episode in season.xpath('episode'):
+                episodeNum = int(episode.xpath('seasonnum')[0].text)
+                episodeId = '%04d%04d' % (seasonNum, episodeNum)
+
+                episodeInfo = {
+                    'episode_id': episodeId,
+                    'title': episode.xpath('title')[0].text,
+                    'season': seasonNum,
+                    'episode': episodeNum,
+                    'airdate': episode.xpath('airdate')[0].text
+                }
+
+                pipe.zadd('show:%s:episodes' % showId, episodeId, json.dumps(episodeInfo))
+
+        pipe.execute()
+
+    @retry(requests.ConnectionError, tries=4, delay=1)
+    def update(self):
+        print "Starting daily update..."
+        allShows = set(self.db.hkeys('shows'))
+
+        req = requests.get('http://services.tvrage.com/feeds/last_updates.php?hours=36')
+        tree = etree.fromstring(req.text.encode(req.encoding))
+
+        updatedShows = tree.xpath('/updates/show/id/text()')
+
+        for show in allShows.intersection(updatedShows):
+            self.downloadShow(show)
+            print " - Updated", show
+
+        print "Update done."
+
     def addShowToUser(self, user, showId, order=0):
         if not self.db.exists('show:%s' % showId):
-            req = requests.get('http://services.tvrage.com/feeds/full_show_info.php?sid=%s' % showId)
-
-            tree = etree.fromstring(req.text.encode(req.encoding))
-
-            self.db.hset('show:%s' % showId, 'name', tree.xpath('/Show/name')[0].text)
-            self.db.hset('show:%s' % showId, 'seasons', int(tree.xpath('count(/Show/Episodelist/Season)')))
-
-            pipe = self.db.pipeline()
-            pipe.delete('show:%s:episodes' % showId)
-
-            for season in tree.xpath('/Show/Episodelist/Season'):
-                seasonNum = int(season.get('no'))
-
-                for episode in season.xpath('episode'):
-                    episodeNum = int(episode.xpath('seasonnum')[0].text)
-                    episodeId = '%04d%04d' % (seasonNum, episodeNum)
-
-                    episodeInfo = {
-                        'episode_id': episodeId,
-                        'title': episode.xpath('title')[0].text,
-                        'season': seasonNum,
-                        'episode': episodeNum,
-                        'airdate': episode.xpath('airdate')[0].text
-                    }
-
-                    pipe.zadd('show:%s:episodes' % showId, episodeId, json.dumps(episodeInfo))
-
-            pipe.execute()
+            self.downloadShow(showId)
 
         count = self.db.zadd('user:%s:shows' % user, order, showId)
         if count == 1:
@@ -145,6 +210,15 @@ def requires_auth(f):
             return authenticate()
         return f(*args, **kwargs)
     return decorated
+
+@app.route('/update', methods=['POST'])
+def update_shows():
+    if not request.authorization or request.authorization.username != 'alex':
+        return Response(status=401)
+
+    series.update()
+
+    return Response(status=204)
 
 @app.route('/search/<show_name>', methods=['GET'])
 def search_show(show_name):
