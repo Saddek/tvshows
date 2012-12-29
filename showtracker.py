@@ -3,11 +3,20 @@ from lxml import etree
 import base64
 import hashlib
 import json
+import os
+import re
 import redis
 import requests
 import time
 from functools import wraps
 from StringIO import StringIO
+
+TVDB_API_KEY = '3BD7DD177DA50564'
+
+tvdbBannerURLFormat = 'http://thetvdb.com/banners/%s'
+
+postersDir = os.path.join(os.path.dirname(__file__), 'static', 'posters')
+if not os.path.exists(postersDir): os.makedirs(postersDir)
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
@@ -74,15 +83,94 @@ class SeriesDatabase:
     def checkAuth(self, user, password):
         return self.db.hget('user:%s' % user, 'password') == hashlib.sha256(password).hexdigest()
 
+    def getTVDBID(self, showInfo):
+        print 'Searching TVDB for "%s"...' % showInfo['name']
+        req = requests.get('http://www.thetvdb.com/api/GetSeries.php?seriesname=%s' % showInfo['name'])
+        tree = etree.fromstring(req.text.encode(req.encoding))
+
+        if len(tree) == 0:
+            # remove parenthesis (TVRage sometimes include the country or year in the show name and not TVDB)
+            strippedName = re.compile('\(.+?\)').sub('', showInfo['name']).strip()
+
+            print ' No results, trying "%s"...' % strippedName
+            req = requests.get('http://www.thetvdb.com/api/GetSeries.php?seriesname=%s' % strippedName)
+            tree = etree.fromstring(req.text.encode(req.encoding))
+
+            if len(tree) == 0:
+                print ' Still nothing, giving up.'
+                return None
+
+        print 'We got results! Getting the results with the same air date'
+        matches = tree.xpath('/Data/Series[FirstAired="%s"]/seriesid' % showInfo['first_aired'])
+
+        if len(matches) == 0:
+            print 'Nothing. Getting first result instead'
+            matches = tree.xpath('/Data/Series/seriesid')
+        
+            if len(matches) == 0:
+                print 'What the fuck?'
+                return None
+
+        print 'TVDB ID for %s: %s' % (showInfo['name'], matches[0].text)
+        return matches[0].text
+
+
+    def getTVDBPosters(self, showInfo):
+        tvdbId = self.getTVDBID(showInfo)
+
+        req = requests.get('http://www.thetvdb.com/api/%s/series/%s/banners.xml' % (TVDB_API_KEY, tvdbId))
+        tree = etree.fromstring(req.text.encode(req.encoding))
+
+        posters = []
+        for poster in tree.xpath('/Banners/Banner[BannerType="poster"]'):
+            rating = poster.xpath('Rating')[0].text or 0
+            voters = poster.xpath('RatingCount')[0].text or 0
+
+            posters.append({
+                'path': poster.xpath('BannerPath')[0].text,
+                'rating': float(rating),
+                'voters': int(voters)
+            })
+
+        maxVoters = 0
+        for poster in posters:
+            if poster['voters'] > maxVoters:
+                maxVoters = poster['voters']
+
+        for poster in posters:
+            if poster['voters'] == 0:
+                poster['weightedRating'] = 0
+            else:
+                poster['weightedRating'] = poster['rating'] * (poster['voters'] / float(maxVoters))
+
+        posters.sort(key=lambda e: e['weightedRating'], reverse=True)
+        
+        return [poster['path'] for poster in posters]
+
+    def downloadPoster(self, showInfo, index=0):
+        posters = self.getTVDBPosters(showInfo)
+
+        if len(posters) == 0:
+            return
+
+        req = requests.get(tvdbBannerURLFormat % posters[0])
+        with open(self.posterFilename(showInfo['show_id']), 'wb') as code:
+            code.write(req.content)
+
+    def posterFilename(self, showId):
+        return os.path.join(postersDir, '%s.jpg' % showId)
+
     @retry(requests.ConnectionError, tries=4, delay=1)
     def downloadShow(self, showId):
         req = requests.get('http://services.tvrage.com/feeds/full_show_info.php?sid=%s' % showId)
 
         tree = etree.fromstring(req.text.encode(req.encoding))
 
+        showName = tree.xpath('/Show/name')[0].text
+
         pipe = self.db.pipeline()
 
-        pipe.hset('show:%s' % showId, 'name', tree.xpath('/Show/name')[0].text)
+        pipe.hset('show:%s' % showId, 'name', showName)
         pipe.hset('show:%s' % showId, 'seasons', int(tree.xpath('count(/Show/Episodelist/Season)')))
 
         pipe.delete('show:%s:episodes' % showId)
@@ -104,6 +192,14 @@ class SeriesDatabase:
                 pipe.zadd('show:%s:episodes' % showId, episodeId, json.dumps(episodeInfo))
 
         pipe.execute()
+
+        episodes = self.__getEpisodes(showId, limit=1)
+        firstAired = episodes[0]['airdate'] if len(episodes) > 0 else None
+
+        self.db.hset('show:%s' % showId, 'firstaired', firstAired)
+
+        if not os.path.exists(self.posterFilename(showId)):
+            self.downloadPoster({'show_id': showId, 'name': showName, 'first_aired': firstAired})
 
     @retry(requests.ConnectionError, tries=4, delay=1)
     def update(self):
@@ -138,6 +234,10 @@ class SeriesDatabase:
                 self.db.delete('show:%s' % showId, 'show:%s:episodes' % showId)
                 self.db.hdel('shows', showId)
 
+                posterFile = self.posterFilename(showId)
+                if os.path.exists(posterFile):
+                    os.remove(posterFile)
+
     def getLastSeen(self, user, showId):
         return self.db.hget('user:%s:lastseen' % user, showId)
 
@@ -168,9 +268,18 @@ class SeriesDatabase:
         return not None in pipe.execute()
 
     def getShowInfo(self, user, showId, withEpisodes=False, episodeLimit=None, onlyUnseen=False):
-        showInfo = {'show_id': showId, 'name': self.db.hget('show:%s' % showId, 'name'), 'seasons': self.db.hget('show:%s' % showId, 'seasons')}
+        showInfo = {
+            'show_id': showId,
+            'name': self.db.hget('show:%s' % showId, 'name'),
+            'seasons': self.db.hget('show:%s' % showId, 'seasons'),
+            'first_aired': self.db.hget('show:%s' % showId, 'firstaired')
+        }
 
         showInfo['last_seen'] = self.getLastSeen(user, showId)
+
+        posterFile = self.posterFilename(showId)
+        if os.path.exists(posterFile):
+            showInfo['poster'] = posterFile
 
         if withEpisodes:
             if onlyUnseen:
@@ -210,6 +319,18 @@ def requires_auth(f):
             return authenticate()
         return f(*args, **kwargs)
     return decorated
+
+@app.route('/posters/<showid>', methods=['GET'])
+@requires_auth
+def get_poster(showid):
+    if not series.userHasShow(request.authorization.username, showid):
+        abort(404)
+
+    showInfo = series.getShowInfo(request.authorization.username, showid)
+
+    posters = series.getTVDBPosters(showInfo)
+
+    return jsonify(posters=posters)
 
 @app.route('/update', methods=['POST'])
 def update_shows():
