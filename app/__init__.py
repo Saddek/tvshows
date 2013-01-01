@@ -146,11 +146,12 @@ def login():
 	if request.method == 'POST':
 		user = User(request.form['username'])
 		password = request.form['password']
+		remember = bool(request.form.get('remember', False))
 
 		r = requests.get('%s/user/shows' % SERIES_API_URL, auth=(user.id, password))
 
 		if r.status_code == 200:
-			login_user(user)
+			login_user(user, remember=remember)
 			session['password'] = password
 			return redirect(request.args.get('next') or url_for('home'))
 		else:

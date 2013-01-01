@@ -11,8 +11,11 @@ body {
       <h3>Login</h3>
       {{ parts.displayFlashes() }}
       <fieldset>
-        <input class="input-block-level" type="text" name="username" placeholder="Nom d'utilisateur"><br>
-        <input class="input-block-level" type="password" name="password" placeholder="Mot de passe"><br>
+        <input class="input-block-level" type="text" name="username" placeholder="Nom d'utilisateur">
+        <input class="input-block-level" type="password" name="password" placeholder="Mot de passe">
+        <label class="checkbox">
+          <input type="checkbox" name="remember"> Se souvenir de moi
+        </label>
         <button class="btn btn-primary pull-right" type="submit">Connexion</button>
       </fieldset>
     </form>
