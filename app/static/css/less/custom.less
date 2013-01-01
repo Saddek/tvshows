@@ -25,6 +25,7 @@ ul.unseen > li {
     position: absolute;
     top: 1px;
     right: 0;
+    display: none;
 
     background: @bodyBackground;
     
@@ -40,6 +41,10 @@ ul.unseen > li {
          -o-border-image:      -o-linear-gradient(left, rgba(255,255,255,0) 0%, @bodyBackground 90%) 1 100%;
             border-image:         linear-gradient(to right, rgba(255,255,255,0) 0%, @bodyBackground 90%) 1 100%;
   }
+}
+
+ul.unseen > li:hover .detail-hover {
+  display: block;
 }
 
 h4 > a {
