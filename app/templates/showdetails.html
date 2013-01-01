@@ -3,6 +3,7 @@
 {% set active_page = 'shows' -%}
 
 {% block content %}
+    <div class="container">
       <h2>{{ show.name }}</h2>
       {% if show.poster_path %}
         <img src="{{ show.poster_path }}" width="187" height="275" alt="{{ show.name }}">
@@ -30,4 +31,5 @@
               <td>{{ ep.airdate | prettyDate(forceYear=True) }}</td>
             </tr>
       {% endfor %}
+    </div>
 {% endblock %}

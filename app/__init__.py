@@ -1,16 +1,38 @@
-from flask import Flask, render_template, request, Response, jsonify
+# -*- coding: utf-8 -*-
+
+from flask import Flask, render_template, request, Response, jsonify, url_for, redirect, session, flash
+from flask.ext.login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 from datetime import date, datetime
 import calendar
 import locale
 import os
 import requests
 
+class User(UserMixin):
+	def __init__(self, userId):
+		super(User, self).__init__()
+		self.id = userId
+
 app = Flask(__name__)
+login_manager = LoginManager()
+
 app.config.from_object('config')
+app.config['SECRET_KEY'] = os.urandom(24)
+
+login_manager.setup_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message = u'Merci de vous identifier pour accéder à cette page'
 
 SERIES_API_URL = 'http://seriesv2.madjawa.net/api'
 
-credentials = ('alex', '42')
+def credentials():
+	return (current_user.id, current_user.password)
+
+@login_manager.user_loader
+def load_user(userId):
+	user = User(userId)
+	user.password = session['password'] if 'password' in session else None
+	return user
 
 locale.setlocale(locale.LC_ALL, 'fr_FR')
 
@@ -49,6 +71,7 @@ def prettyDate(dateStr, forceYear=False, addPrefix=False):
 
 app.jinja_env.filters['episodeNumber'] = episodeNumber
 app.jinja_env.filters['prettyDate'] = prettyDate
+app.jinja_env.add_extension('jinja2.ext.do')
 
 # sorts episodes by date
 def unseenEpisodesKey(show):
@@ -69,7 +92,7 @@ def airdateKey(airdate):
 	return airdate
 
 def getShowsOverview():
-	res = requests.get('%s/user/shows?episodes=true&unseen=true' % SERIES_API_URL, auth=credentials)
+	res = requests.get('%s/user/shows?episodes=true&unseen=true' % SERIES_API_URL, auth=credentials())
 
 	shows = [show for show in res.json()['shows'] if len(show['episodes']) > 0]
 
@@ -87,14 +110,16 @@ def getShowsOverview():
 	return unseen, upcoming
 
 @app.route('/')
+@login_required
 def home():
 	unseen, upcoming = getShowsOverview()
 
 	return render_template('home.html', unseen=unseen, upcoming=upcoming)
 
 @app.route('/shows/')
+@login_required
 def shows():
-	res = requests.get('%s/user/shows' % SERIES_API_URL, auth=credentials)
+	res = requests.get('%s/user/shows' % SERIES_API_URL, auth=credentials())
 
 	shows = res.json()['shows']
 	
@@ -105,8 +130,9 @@ def shows():
 	return render_template('shows.html', shows=shows)
 
 @app.route('/show/<showId>/')
+@login_required
 def show_details(showId):
-	res = requests.get('%s/user/shows/%s' % (SERIES_API_URL, showId), auth=credentials)
+	res = requests.get('%s/user/shows/%s' % (SERIES_API_URL, showId), auth=credentials())
 
 	show = res.json()
 	
@@ -115,9 +141,34 @@ def show_details(showId):
 
 	return render_template('showdetails.html', show=show)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+	if request.method == 'POST':
+		user = User(request.form['username'])
+		password = request.form['password']
+
+		r = requests.get('%s/user/shows' % SERIES_API_URL, auth=(user.id, password))
+
+		if r.status_code == 200:
+			login_user(user)
+			session['password'] = password
+			return redirect(request.args.get('next') or url_for('home'))
+		else:
+			flash(u'Identifiants invalides', 'error')
+
+	return render_template('login.html')
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash(u'Déconnecté avec succès', 'success')
+    return redirect(url_for('login'))
+
 @app.route('/ajax/unseen/<showId>/<episodeId>')
+@login_required
 def ajax_home_unseen(showId, episodeId):
-	r = requests.put('%s/user/shows/%s/last_seen' % (SERIES_API_URL, showId), data=episodeId, auth=credentials)
+	r = requests.put('%s/user/shows/%s/last_seen' % (SERIES_API_URL, showId), data=episodeId, auth=credentials())
 
 	if (r.status_code != 204):
 		return Response(status=500)
@@ -133,6 +184,7 @@ def ajax_home_unseen(showId, episodeId):
 				   upcoming=render_template('ajax/home_upcoming.html', upcoming=upcoming))
 
 @app.route('/ajax/showsorder', methods=['POST'])
+@login_required
 def ajax_set_show_order():
 	ordering = {}
 
@@ -142,7 +194,7 @@ def ajax_set_show_order():
 
 		ordering[showId] = order
 
-	res = requests.post('%s/user/shows_order' % SERIES_API_URL, data=ordering, auth=credentials)
+	res = requests.post('%s/user/shows_order' % SERIES_API_URL, data=ordering, auth=credentials())
 
 	if res.status_code != 204:
 		return Response(status=500)
