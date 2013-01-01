@@ -6,7 +6,9 @@ from datetime import date, datetime
 import calendar
 import locale
 import os
+import re
 import requests
+import urllib
 
 class User(UserMixin):
 	def __init__(self, userId):
@@ -38,6 +40,14 @@ locale.setlocale(locale.LC_ALL, 'fr_FR')
 
 def episodeNumber(episode):
 	return 'S%02dE%02d' % (episode['season'], episode['episode'])
+
+def pirateBayLink(show, episodeNumber):
+	# remove content in parenthesis from the name if they are present (like the year)
+	# because they are not included in release names most of the time
+	strippedName = re.compile('\(.+?\)').sub('', show['name']).strip()
+	searchString = '%s %s' % (strippedName, episodeNumber)
+
+	return 'http://thepiratebay.se/search/%s/0/99/208' % urllib.quote_plus(searchString)
 
 def prettyDate(dateStr, forceYear=False, addPrefix=False):
 	year, month, day = [int(component) for component in dateStr.split('-')]
@@ -71,6 +81,7 @@ def prettyDate(dateStr, forceYear=False, addPrefix=False):
 
 app.jinja_env.filters['episodeNumber'] = episodeNumber
 app.jinja_env.filters['prettyDate'] = prettyDate
+app.jinja_env.filters['pirateBayLink'] = pirateBayLink
 app.jinja_env.add_extension('jinja2.ext.do')
 
 # sorts episodes by date
