@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% set active_page = 'shows' -%}
+
+{% block content %}
+      <h2>Mes séries</h2>
+
+      <ul class="thumbnails sortable" style="margin: 0 auto">
+      {% for show in shows %}
+        <li data-show-id="{{ show.show_id }}">
+          <a href="/show/{{ show.show_id }}/" class="thumbnail">
+          {% if show.poster_path %}
+            <img src="{{ show.poster_path }}" width="187" height="275" alt="{{ show.name }}">
+          {% else %}
+            <img data-src="holder.js/187x275/text:{{ show.name }}" alt="{{ show.name }}">
+          {% endif %}
+          </a>
+        </li>
+      {% endfor %}
+      </ul>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="/static/js/holder.js"></script>
+    <script src="/static/js/jquery.sortable.min.js"></script>
+
+    <script>
+      $('.sortable').sortable().bind('sortupdate', function() {
+        ordering = {}
+        
+        $(this).find('> li').each(function (index, element) {
+          ordering[$(element).data('showId')] = index;
+        });
+
+        $.post('/ajax/showsorder', ordering);
+      });
+    </script>
+{% endblock %}

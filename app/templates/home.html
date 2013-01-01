@@ -1,36 +1,64 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
-      <div class="row">
+      <div class="row-fluid">
         <div class="span6">
           <h2>À voir</h2>
 
-          <table class="table table-bordered">
-            <tbody>
-              {% for show in unseen %}
-              <tr>
-                <td>{{show.name}}</td>
-                <td>{{show.episodes[0] | episodeNumber}}: {{show.episodes[0].title}}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+          {% for show in unseen %}
+            <div data-show-id="{{ show.show_id }}">
+              {{ parts.unseenEpisodes(show) }}
+            </div>
+          {% endfor %}
         </div>
 
         <div class="span6">
           <h2>Prochainement</h2>
 
-          <table class="table table-bordered">
-            <tbody>
-              {% for show in upcoming | reverse %}
-              <tr>
-                <td>{{show.episodes[0].airdate}}</td>
-                <td>{{show.name}}</td>
-                <td>{{show.episodes[0] | episodeNumber}}: {{show.episodes[0].title}}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
+          <table id="upcoming" class="table table-bordered">
+            {{ parts.upcomingRows(upcoming) }}
           </table>
         </div>
       </div>
 {% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+      function setupHoverButtons(context) {
+        $('ul.unseen > li', context).hover(
+          function () {
+            $(this).find('.detail-hover').removeClass('hide')
+          }, 
+          function () {
+            $(this).find('.detail-hover').addClass('hide')
+          }
+        );
+
+        $('.btn[data-action="seen"]', context).click(function(e) {
+          div = $(this).closest('div[data-show-id]');
+          showId = div.data('showId');
+          episodeId = $(this).data('episodeId')
+
+          if (!showId || !episodeId) {
+            console.error('No show and/or episode ID found');
+            return false;
+          }
+
+          $.getJSON('/ajax/unseen/' + showId + '/' + episodeId, function(data, status, xhr) {
+            if (xhr.status == 200) {
+              div.html(data.unseen);
+              $('table#upcoming').html(data.upcoming);
+
+              setupHoverButtons(div);
+            }
+          });
+
+          return false;
+        });
+      }
+
+      setupHoverButtons();
+    </script>
+{% endblock %}
+

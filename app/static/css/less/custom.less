@@ -1,0 +1,47 @@
+@unseenPadding: 3px;
+
+ul.unseen > li {
+  position: relative;
+  line-height: 24px;
+  padding-top: @unseenPadding;
+  padding-bottom: @unseenPadding;
+
+  small {
+    line-height: 20px;
+    color: @grayLight;
+  }
+
+  .detail-hover {
+    position: absolute;
+    top: 1px;
+    right: 0;
+
+    background: @bodyBackground;
+    
+    -webkit-background-clip: padding;
+       -moz-background-clip: padding;
+            background-clip: padding-box; 
+
+    border-width: 0 0 0 20px;
+    
+    -webkit-border-image: -webkit-gradient(linear, left top, right top, color-stop(0%, rgba(255,255,255,0)), color-stop(90%, @bodyBackground)) 1 100%;
+    -webkit-border-image: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%, @bodyBackground 90%) 1 100%;
+       -moz-border-image:    -moz-linear-gradient(left, rgba(255,255,255,0) 0%, @bodyBackground 90%) 1 100%;
+         -o-border-image:      -o-linear-gradient(left, rgba(255,255,255,0) 0%, @bodyBackground 90%) 1 100%;
+            border-image:         linear-gradient(to right, rgba(255,255,255,0) 0%, @bodyBackground 90%) 1 100%;
+  }
+}
+
+h4 > a {
+  color: @headingsColor;
+}
+
+.sortable-placeholder {
+    width: 187px;
+    height: 275px;
+    padding: 4px;
+    line-height: @baseLineHeight;
+    border: 1px dashed #ddd;
+    .border-radius(@baseBorderRadius);
+    .box-shadow(0 1px 3px rgba(0,0,0,.055));
+}

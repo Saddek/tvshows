@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% set active_page = 'shows' -%}
+
+{% block content %}
+      <h2>{{ show.name }}</h2>
+      {% if show.poster_path %}
+        <img src="{{ show.poster_path }}" width="187" height="275" alt="{{ show.name }}">
+      {% else %}
+        <img data-src="holder.js/187x275/text:{{ show.name }}" alt="{{ show.name }}">
+      {% endif %}
+
+      <h3>Saison 1</h3>
+      
+      {% for ep in show.episodes %}
+        {% if (ep.episode == 1 and not loop.first) or loop.last %}
+          </tbody>
+        </table>
+        <hr>
+        {% endif %}
+
+        {% if ep.episode == 1 %}
+        <table class="table table-striped" style="width: 70%; margin: 0 auto;">
+          <tbody>
+        {% endif %}
+
+            <tr>
+              <td>{{ ep | episodeNumber }}</td>
+              <td>{{ ep.title }}</td>
+              <td>{{ ep.airdate | prettyDate(forceYear=True) }}</td>
+            </tr>
+      {% endfor %}
+{% endblock %}
