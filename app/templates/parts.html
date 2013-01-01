@@ -10,7 +10,7 @@
       <div class="detail-hover">
         <a class="btn btn-mini" href="{{ show | pirateBayLink(episode) }}" target="_blank"><i class="icon-magnet"></i> Torrent</a>
         <a class="btn btn-mini" href="{{ show | addic7edLink(episode) }}" target="_blank"><i class="icon-align-left"></i> Sous-titres</a>
-        <a class="btn btn-mini" data-action="seen" data-episode-id="{{ episode.episode_id }}" href="#"><i class="icon-eye-open"></i> Vu</a>
+        <a class="btn btn-mini" data-action="seen" data-episode-id="{{ episode.episode_id }}" href="javascript:void(0)"><i class="icon-eye-open"></i> Vu</a>
       </div>
     </li>
   {% endfor %}
