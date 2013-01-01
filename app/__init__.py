@@ -41,13 +41,19 @@ locale.setlocale(locale.LC_ALL, 'fr_FR')
 def episodeNumber(episode):
 	return 'S%02dE%02d' % (episode['season'], episode['episode'])
 
-def pirateBayLink(show, episodeNumber):
+def pirateBayLink(show, episode):
 	# remove content in parenthesis from the name if they are present (like the year)
 	# because they are not included in release names most of the time
-	strippedName = re.compile('\(.+?\)').sub('', show['name']).strip()
-	searchString = '%s %s' % (strippedName, episodeNumber)
+	strippedName = re.sub(r'\(.+?\)', '', show['name']).strip()
+	searchString = '%s %s' % (strippedName, episodeNumber(episode))
 
 	return 'http://thepiratebay.se/search/%s/0/99/208' % urllib.quote_plus(searchString)
+
+def addic7edLink(show, episode):
+	# remove content in parenthesis AND keep only alphanum, spaces and colon for Addic7ed
+	strippedName = re.sub(r'[^\s\w:]', '', re.sub(r'\(.+?\)', '', show['name'])).strip().replace(' ', '_')
+	
+	return 'http://www.addic7ed.com/serie/%s/%s/%s/episode' % (urllib.quote_plus(strippedName), episode['season'], episode['episode'])
 
 def prettyDate(dateStr, forceYear=False, addPrefix=False):
 	year, month, day = [int(component) for component in dateStr.split('-')]
@@ -82,6 +88,7 @@ def prettyDate(dateStr, forceYear=False, addPrefix=False):
 app.jinja_env.filters['episodeNumber'] = episodeNumber
 app.jinja_env.filters['prettyDate'] = prettyDate
 app.jinja_env.filters['pirateBayLink'] = pirateBayLink
+app.jinja_env.filters['addic7edLink'] = addic7edLink
 app.jinja_env.add_extension('jinja2.ext.do')
 
 # sorts episodes by date
