@@ -36,7 +36,7 @@ def load_user(userId):
 	user.password = session['password'] if 'password' in session else None
 	return user
 
-locale.setlocale(locale.LC_ALL, 'fr_FR')
+locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
 
 def episodeNumber(episode):
 	return 'S%02dE%02d' % (episode['season'], episode['episode'])
