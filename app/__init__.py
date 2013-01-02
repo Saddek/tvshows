@@ -74,7 +74,7 @@ def prettyDate(dateStr, forceYear=False, addPrefix=False):
 		prefix = 'le ' if addPrefix else None
 		format = '%d %B %Y' if forceYear or year != date.today().year else '%d %B'
 
-	if abs((date.today() - parsedDate).days) <= 7:
+	if abs((date.today() - parsedDate).days) < 7:
 		prefix = ''
 		format = '%A'
 
