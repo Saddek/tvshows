@@ -18,7 +18,11 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
+    {% if config.DEBUG %}
     <link rel="stylesheet/less" href="/static/css/less/bootstrap.less">
+    {% else %}
+    <link rel="stylesheet" href="/static/css/stylesheets/bootstrap.min.css">
+    {% endif %}
     <style>
       body > .navbar .brand {
         padding-right: 20px;
@@ -28,9 +32,13 @@
         font-size: 24px;
       }
     </style>
+    {% if config.DEBUG %}
     <link rel="stylesheet/less" href="/static/css/less/responsive.less">
 
     <script src="/static/js/less.min.js"></script>
+    {% else %}
+    <link rel="stylesheet" href="/static/css/stylesheets/bootstrap-responsive.min.css">
+    {% endif %}
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -61,7 +69,6 @@
       </div>
     </div>
 
-    
     {% block content %}{% endblock %}
 
     {% block scripts %}
