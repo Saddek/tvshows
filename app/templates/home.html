@@ -29,14 +29,21 @@
     <script>
       function setupButtons(context) {
         $('.btn[data-action="seen"]', context).click(function(e) {
-          div = $(this).closest('div[data-show-id]');
+          button = $(this);
+
+          if (button.hasClass('disabled')) return;
+
+          div = button.closest('div[data-show-id]');
           showId = div.data('showId');
-          episodeId = $(this).data('episodeId')
+          episodeId = button.data('episodeId')
 
           if (!showId || !episodeId) {
             console.error('No show and/or episode ID found');
-            return false;
+            return;
           }
+
+          button.find('> i').removeClass('icon-eye-open').addClass('icon-loader');
+          button.addClass('disabled');
 
           $.getJSON('/ajax/unseen/' + showId + '/' + episodeId, function(data, status, xhr) {
             if (xhr.status == 200) {
@@ -44,9 +51,11 @@
               setupButtons(div);
               $('table#upcoming').html(data.upcoming);
             }
+          }).error(function (xhr, textStatus, errorThrown) {
+            console.error(errorThrown);
+            button.find('> i').removeClass('icon-loader').addClass('icon-eye-open');
+            button.removeClass('disabled');
           });
-
-          return false;
         });
       }
 
