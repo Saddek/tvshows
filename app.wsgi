@@ -13,5 +13,3 @@ monitor.start(interval=1.0)
 monitor.track(os.path.join(os.path.dirname(__file__)))
 
 from app import app as application
-
-application.config['DEBUG'] = True
