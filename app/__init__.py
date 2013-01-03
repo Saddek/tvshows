@@ -78,9 +78,9 @@ def prettyDate(dateStr, forceYear=False, addPrefix=False):
 	if daysDiff == 0:
 		return 'ce soir'
 	elif daysDiff == 1:
-		return 'demain soir'
-	elif daysDiff == -1:
 		return 'hier soir'
+	elif daysDiff == -1:
+		return 'demain soir'
 	elif abs(daysDiff) < 7:
 		prefix = ''
 		format = '%A'
