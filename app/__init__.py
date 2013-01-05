@@ -83,7 +83,7 @@ def prettyDate(dateStr, forceYear=False, addPrefix=False):
 		return 'demain soir'
 	elif abs(daysDiff) < 7:
 		prefix = ''
-		format = '%A'
+		format = '%A prochain'
 
 	formattedDate = parsedDate.strftime(format).lstrip('0').lower()
 
