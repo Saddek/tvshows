@@ -1,6 +1,7 @@
 from flask import Flask, request, Response, abort, jsonify
 from lxml import etree
 import base64
+import errno
 import hashlib
 import json
 import os
@@ -83,6 +84,7 @@ class SeriesDatabase:
     def checkAuth(self, user, password):
         return self.db.hget('user:%s' % user, 'password') == hashlib.sha256(password).hexdigest()
 
+    @retry(requests.ConnectionError, tries=4, delay=1)
     def getTVDBID(self, showInfo):
         print 'Searching TVDB for "%s"...' % showInfo['name']
         req = requests.get('http://www.thetvdb.com/api/GetSeries.php?seriesname=%s' % showInfo['name'])
@@ -114,7 +116,7 @@ class SeriesDatabase:
         print 'TVDB ID for %s: %s' % (showInfo['name'], matches[0].text)
         return matches[0].text
 
-
+    @retry(requests.ConnectionError, tries=4, delay=1)
     def getTVDBPosters(self, showInfo):
         tvdbId = self.getTVDBID(showInfo)
 
@@ -147,18 +149,44 @@ class SeriesDatabase:
         
         return [poster['path'] for poster in posters]
 
-    def downloadPoster(self, showInfo, index=0):
+    @retry(requests.ConnectionError, tries=4, delay=1)
+    def downloadPoster(self, showInfo):
         posters = self.getTVDBPosters(showInfo)
 
         if len(posters) == 0:
             return
 
         req = requests.get(tvdbBannerURLFormat % posters[0])
-        with open(self.posterFilename(showInfo['show_id']), 'wb') as code:
-            code.write(req.content)
+        if req.status_code == 200:
+            with open(self.posterFilename(showInfo['show_id']), 'wb') as code:
+                code.write(req.content)
 
-    def posterFilename(self, showId):
-        return os.path.join(postersDir, '%s.jpg' % showId)
+
+    def deleteCustomPoster(self, user, showId):
+        posterFile = series.posterFilename(showId, user=user);
+        posterDir = os.path.dirname(posterFile)
+
+        if not os.path.exists(posterFile): return False
+
+        os.remove(posterFile)
+
+        try:
+            os.rmdir(posterDir)
+        except OSError as e:
+            if e.errno == errno.ENOTEMPTY:
+                pass
+            else:
+                raise
+
+        return True
+
+    def posterFilename(self, showId, user=None):
+        filename = '%s.jpg' % showId
+        
+        if user:
+            return os.path.join(postersDir, user, filename)
+        
+        return os.path.join(postersDir, filename)
 
     @retry(requests.ConnectionError, tries=4, delay=1)
     def downloadShow(self, showId):
@@ -227,6 +255,7 @@ class SeriesDatabase:
 
     def deleteShowFromUser(self, user, showId):
         self.db.hdel('user:%s:lastseen' % user, showId)
+        self.deleteCustomPoster(user, showId)
         count = self.db.zrem('user:%s:shows' % user, showId)
         if count == 1:
             refcount = self.db.hincrby('shows', showId, -1)
@@ -277,9 +306,10 @@ class SeriesDatabase:
 
         showInfo['last_seen'] = self.getLastSeen(user, showId)
 
-        posterFile = self.posterFilename(showId)
-        if os.path.exists(posterFile):
-            showInfo['poster'] = posterFile
+        if os.path.exists(self.posterFilename(showId, user=user)):
+            showInfo['poster'] = 'static/posters/%s/%s.jpg' % (user, showId)
+        elif os.path.exists(self.posterFilename(showId)):
+            showInfo['poster'] = 'static/posters/%s.jpg' % showId
 
         if withEpisodes:
             if onlyUnseen:
@@ -331,6 +361,45 @@ def get_poster(showid):
     posters = series.getTVDBPosters(showInfo)
 
     return jsonify(posters=posters)
+
+@app.route('/posters/<showid>', methods=['POST'])
+@requires_auth
+def set_custom_poster(showid):
+    if not series.userHasShow(request.authorization.username, showid):
+        abort(404)
+
+    req = requests.get(tvdbBannerURLFormat % request.form['posterURL'])
+
+    posterFile = series.posterFilename(showid, user=request.authorization.username);
+    posterDir = os.path.dirname(posterFile)
+
+    if not os.path.exists(posterDir):
+        os.makedirs(os.path.dirname(posterFile))
+
+    if req.status_code == 200:
+        with open(posterFile, 'wb') as code:
+            code.write(req.content)
+
+        return Response(status=204)
+    elif req.status_code == 404:
+        response = jsonify(message='Invalid posterURL')
+        response.status_code = 400
+        return response
+    else:
+        abort(500)
+
+@app.route('/posters/<showid>', methods=['DELETE'])
+@requires_auth
+def delete_custom_poster(showid):
+    if not series.userHasShow(request.authorization.username, showid):
+        abort(404)
+
+    if not series.deleteCustomPoster(request.authorization.username, showid):
+        response = jsonify(message='There is no custom poster for showID %s' % showid)
+        response.status_code = 400
+        return response
+
+    return Response(status=204)
 
 @app.route('/update', methods=['POST'])
 def update_shows():
