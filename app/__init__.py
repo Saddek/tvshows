@@ -18,14 +18,16 @@ class User(UserMixin):
 app = Flask(__name__)
 login_manager = LoginManager()
 
-app.config.from_object('config')
 app.config['SECRET_KEY'] = os.urandom(24)
+
+# TODO: check that all needed config variables are set
+app.config.from_pyfile('config.cfg')
+
+apiURL = app.config['SERIES_API_URL']
 
 login_manager.setup_app(app)
 login_manager.login_view = 'login'
 login_manager.login_message = u'Merci de vous identifier pour accéder à cette page'
-
-SERIES_API_URL = 'http://seriesv2.madjawa.net/api'
 
 def credentials():
 	return (current_user.id, current_user.password)
@@ -117,7 +119,7 @@ def airdateKey(airdate):
 	return airdate
 
 def getShowsOverview():
-	res = requests.get('%s/user/shows?episodes=true&unseen=true' % SERIES_API_URL, auth=credentials())
+	res = requests.get('%s/user/shows?episodes=true&unseen=true' % apiURL, auth=credentials())
 
 	shows = [show for show in res.json()['shows'] if len(show['episodes']) > 0]
 
@@ -144,25 +146,25 @@ def home():
 @app.route('/shows/')
 @login_required
 def shows():
-	res = requests.get('%s/user/shows' % SERIES_API_URL, auth=credentials())
+	res = requests.get('%s/user/shows' % apiURL, auth=credentials())
 
 	shows = res.json()['shows']
 	
 	for show in shows:
 		if 'poster' in show:
-			show['poster_path'] = '%s/%s' % (SERIES_API_URL, show['poster'])
+			show['poster_path'] = '%s/%s' % (apiURL, show['poster'])
 
 	return render_template('shows.html', shows=shows)
 
 @app.route('/show/<showId>/')
 @login_required
 def show_details(showId):
-	res = requests.get('%s/user/shows/%s' % (SERIES_API_URL, showId), auth=credentials())
+	res = requests.get('%s/user/shows/%s' % (apiURL, showId), auth=credentials())
 
 	show = res.json()
 	
 	if 'poster' in show:
-		show['poster_path'] = '%s/%s' % (SERIES_API_URL, show['poster'])
+		show['poster_path'] = '%s/%s' % (apiURL, show['poster'])
 
 	return render_template('showdetails.html', show=show)
 
@@ -173,7 +175,7 @@ def login():
 		password = request.form['password']
 		remember = bool(request.form.get('remember', False))
 
-		r = requests.get('%s/user/shows' % SERIES_API_URL, auth=(user.id, password))
+		r = requests.get('%s/user/shows' % apiURL, auth=(user.id, password))
 
 		if r.status_code == 200:
 			login_user(user, remember=remember)
@@ -194,7 +196,7 @@ def logout():
 @app.route('/ajax/unseen/<showId>/<episodeId>')
 @login_required
 def ajax_home_unseen(showId, episodeId):
-	r = requests.put('%s/user/shows/%s/last_seen' % (SERIES_API_URL, showId), data=episodeId, auth=credentials())
+	r = requests.put('%s/user/shows/%s/last_seen' % (apiURL, showId), data=episodeId, auth=credentials())
 
 	if (r.status_code != 204):
 		return Response(status=500)
@@ -220,7 +222,7 @@ def ajax_set_show_order():
 
 		ordering[showId] = order
 
-	res = requests.post('%s/user/shows_order' % SERIES_API_URL, data=ordering, auth=credentials())
+	res = requests.post('%s/user/shows_order' % apiURL, data=ordering, auth=credentials())
 
 	if res.status_code != 204:
 		return Response(status=500)
