@@ -12,8 +12,12 @@ import time
 from functools import wraps
 from StringIO import StringIO
 
-TVDB_API_KEY = '3BD7DD177DA50564'
+app = Flask(__name__)
 
+# TODO: check that all needed config variables are set
+app.config.from_pyfile('config.cfg')
+
+tvdbAPIKey = app.config['TVDB_API_KEY']
 tvdbBannerURLFormat = 'http://thetvdb.com/banners/%s'
 
 postersDir = os.path.join(os.path.dirname(__file__), 'static', 'posters')
@@ -66,8 +70,8 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     return deco_retry
 
 class SeriesDatabase:
-    def __init__(self, host, port, database):
-        self.db = redis.StrictRedis(host=host, port=port, db=database)
+    def __init__(self):
+        self.db = redis.StrictRedis(host=app.config['REDIS_HOST'], port=app.config['REDIS_PORT'], db=app.config['REDIS_DB'])
 
     @retry(requests.ConnectionError, tries=4, delay=1)
     def searchShow(self, showName):
@@ -120,7 +124,7 @@ class SeriesDatabase:
     def getTVDBPosters(self, showInfo):
         tvdbId = self.getTVDBID(showInfo)
 
-        req = requests.get('http://www.thetvdb.com/api/%s/series/%s/banners.xml' % (TVDB_API_KEY, tvdbId))
+        req = requests.get('http://www.thetvdb.com/api/%s/series/%s/banners.xml' % (tvdbAPIKey, tvdbId))
         tree = etree.fromstring(req.text.encode(req.encoding))
 
         posters = []
@@ -331,8 +335,7 @@ class SeriesDatabase:
 
         return episodes
 
-series = SeriesDatabase('192.168.1.2', 6379, 1)
-app = Flask(__name__)
+series = SeriesDatabase()
 
 def authenticate():
     response = jsonify(message='You have to login with proper credentials')
@@ -503,4 +506,4 @@ def reorder_shows():
     return Response(status=204)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=5001)
