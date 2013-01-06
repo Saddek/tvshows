@@ -34,4 +34,14 @@
   }
 
   setupButtons();
+
+  $('.sortable').sortable().bind('sortupdate', function() {
+    var ordering = {}
+    
+    $(this).find('> li').each(function (index, element) {
+      ordering[$(element).data('showId')] = index;
+    });
+
+    $.post('/ajax/showsorder', ordering);
+  });
 }(window.jQuery);

@@ -60,13 +60,14 @@
 
     {% block content %}{% endblock %}
 
-    {% block scripts %}
     <script>
       SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
+    
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    {% block scripts -%}
+    {%- endblock %}
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-    {% endblock %}
   </body>
 </html>

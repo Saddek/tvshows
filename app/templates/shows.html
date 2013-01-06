@@ -25,19 +25,6 @@
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}
     <script src="/static/js/holder.js"></script>
     <script src="/static/js/jquery.sortable.min.js"></script>
-
-    <script>
-      $('.sortable').sortable().bind('sortupdate', function() {
-        ordering = {}
-        
-        $(this).find('> li').each(function (index, element) {
-          ordering[$(element).data('showId')] = index;
-        });
-
-        $.post('/ajax/showsorder', ordering);
-      });
-    </script>
 {% endblock %}
