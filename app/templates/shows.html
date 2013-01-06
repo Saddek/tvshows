@@ -2,11 +2,11 @@
 
 {% set active_page = 'shows' -%}
 
-{% set page_name = 'Mes séries' -%}
+{% set page_name = _('myshows.pagetitle') -%}
 
 {% block content %}
     <div class="container">
-      <h2>Mes séries</h2>
+      <h2>{{ _('myshows.pagetitle') }}</h2>
 
       <ul class="thumbnails sortable" style="margin: 0 auto">
       {% for show in shows %}

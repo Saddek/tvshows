@@ -1,22 +1,22 @@
 {% set maxUnseen = 4 %}
 
 {% macro unseenEpisodes(show) %}
-  <h4><a href="/show/{{show.show_id}}/">{{show.name}}</a> <small>{{ show.unseenEpisodes|count }} épisode{% if show.unseenEpisodes|count > 1 %}s{% endif %}</small></h4>
+  <h4><a href="/show/{{show.show_id}}/">{{show.name}}</a> <small>{{ ngettext('unseen.%(num)d_episode', 'unseen.%(num)d_episodes', show.unseenEpisodes|count) }}</small></h4>
   <ul class="unseen">
   {% for episode in show.unseenEpisodes[:maxUnseen] %}
     <li>
       <strong>{{episode | episodeNumber}}:</strong> {{episode.title}}
-      <small>(diffusé {{ episode.airdate | prettyDate(addPrefix=True) }})</small>
+      <small>({{ _('aired') }} {{ episode.airdate | prettyDate(addPrefix=True) }})</small>
       <div class="detail-hover">
-        <a class="btn btn-mini" href="{{ show | pirateBayLink(episode) }}" target="_blank"><i class="icon-magnet"></i> Torrent</a>
-        <a class="btn btn-mini" href="{{ show | addic7edLink(episode) }}" target="_blank"><i class="icon-align-left"></i> Sous-titres</a>
-        <a class="btn btn-mini" data-action="seen" data-episode-id="{{ episode.episode_id }}" href="javascript:void(0)"><i class="icon-eye-open"></i> Vu</a>
+        <a class="btn btn-mini" href="{{ show | pirateBayLink(episode) }}" target="_blank"><i class="icon-magnet"></i> {{ _('torrent') }}</a>
+        <a class="btn btn-mini" href="{{ show | addic7edLink(episode) }}" target="_blank"><i class="icon-align-left"></i> {{ _('subtitles') }}</a>
+        <a class="btn btn-mini" data-action="seen" data-episode-id="{{ episode.episode_id }}" href="javascript:void(0)"><i class="icon-eye-open"></i> {{ _('seen') }}</a>
       </div>
     </li>
   {% endfor %}
   {% set leftEpisodes = show.unseenEpisodes|count - maxUnseen %}
   {% if leftEpisodes > 0 %}
-    <li><i>{{ leftEpisodes }} autre{% if leftEpisodes > 1 %}s{% endif %}&hellip;</i></li>
+    <li><i>{{ ngettext('unseen.%(num)d_other', 'unseen.%(num)d_others', leftEpisodes) }}</i></li>
   {% endif %}
   </ul>
   <hr>

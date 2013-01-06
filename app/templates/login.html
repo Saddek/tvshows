@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% set page_name = 'Connexion' -%}
+{% set page_name = _('login.pagetitle') -%}
 
 {% block content %}
 <style>
@@ -10,15 +10,15 @@ body {
 </style>
 <div id="login" class="container">
     <form method="POST">
-      <h3>Login</h3>
+      <h3>{{ _('login.heading') }}</h3>
       {{ parts.displayFlashes() }}
       <fieldset>
-        <input class="input-block-level" type="text" name="username" placeholder="Nom d'utilisateur">
-        <input class="input-block-level" type="password" name="password" placeholder="Mot de passe">
+        <input class="input-block-level" type="text" name="username" placeholder="{{ _('login.placeholder.username') }}">
+        <input class="input-block-level" type="password" name="password" placeholder="{{ _('login.placeholder.password') }}">
         <label class="checkbox">
-          <input type="checkbox" name="remember"> Se souvenir de moi
+          <input type="checkbox" name="remember"> {{ _('login.rememberme') }}
         </label>
-        <button class="btn btn-primary pull-right" type="submit">Connexion</button>
+        <button class="btn btn-primary pull-right" type="submit">{{ _('login.submitbutton') }}</button>
       </fieldset>
     </form>
 </div>

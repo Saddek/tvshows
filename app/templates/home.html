@@ -4,7 +4,7 @@
     <div class="container">
       <div class="row-fluid">
         <div class="span6">
-          <h2>À voir</h2>
+          <h2>{{ _('home.unseen') }}</h2>
 
           {% for show in unseen %}
             <div data-show-id="{{ show.show_id }}">
@@ -14,7 +14,7 @@
         </div>
 
         <div class="span6">
-          <h2>Prochainement</h2>
+          <h2>{{ _('home.upcoming') }}</h2>
 
           <table id="upcoming" class="table table-bordered">
             {{ parts.upcomingRows(upcoming) }}

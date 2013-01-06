@@ -2,6 +2,7 @@
 
 from flask import Flask, render_template, request, Response, jsonify, url_for, redirect, session, flash
 from flask.ext.login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
+from flask.ext.babel import Babel, gettext, ngettext, lazy_gettext, format_date
 from datetime import date, datetime
 import calendar
 import locale
@@ -23,11 +24,13 @@ app.config['SECRET_KEY'] = os.urandom(24)
 # TODO: check that all needed config variables are set
 app.config.from_pyfile('config.cfg')
 
+babel = Babel(app)
+
 apiURL = app.config['SERIES_API_URL']
 
 login_manager.setup_app(app)
 login_manager.login_view = 'login'
-login_manager.login_message = u'Merci de vous identifier pour accéder à cette page'
+login_manager.login_message = lazy_gettext(u'login.authentication_required')
 
 def credentials():
 	return (current_user.id, current_user.password)
@@ -38,7 +41,9 @@ def load_user(userId):
 	user.password = session['password'] if 'password' in session else None
 	return user
 
-locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
+@babel.localeselector
+def get_locale():
+    return request.accept_languages.best_match(['fr', 'en'])
 
 def episodeNumber(episode):
 	return 'S%02dE%02d' % (episode['season'], episode['episode'])
@@ -61,38 +66,40 @@ def prettyDate(dateStr, forceYear=False, addPrefix=False):
 	year, month, day = [int(component) for component in dateStr.split('-')]
 
 	if year == 0:
-		return 'Inconnu'
+		return gettext('date.unknown')
 
 	if month == 0:
 		parsedDate = date(year, 1, 1)
-		prefix = 'en ' if addPrefix else None
-		format = '%Y'
+		format = gettext('date.format.year_only')
+
+		if addPrefix:
+			format = gettext('date.in_year_%(year)s', year=format)
 	elif day == 0:
 		parsedDate = date(year, month, 1)
-		prefix = 'en ' if addPrefix else None
-		format = '%B %Y'
+		format = gettext('date.format.year_month')
+
+		if addPrefix:
+			format = gettext('date.in_month_%(month)s', month=format)
 	else:
 		parsedDate = date(year, month, day)
-		prefix = 'le ' if addPrefix else None
-		format = '%d %B %Y' if forceYear or year != date.today().year else '%d %B'
+		format = gettext('date.format.date_with_year') if forceYear or year != date.today().year else gettext('date.format.date_without_year')
+
+		if addPrefix:
+			format = gettext('date.on_day_%(day)s', day=format)
 
 	daysDiff = (date.today() - parsedDate).days
 	if daysDiff == 0:
-		return 'ce soir'
+		return gettext('date.tonight')
 	elif daysDiff == 1:
-		return 'hier soir'
+		return gettext('date.yesterday_night')
 	elif daysDiff == -1:
-		return 'demain soir'
+		return gettext('date.tomorrow_night')
 	elif abs(daysDiff) < 7:
-		prefix = ''
-		format = '%A prochain'
+		format = gettext('date.format.next_day')
 
-	formattedDate = parsedDate.strftime(format).lstrip('0').lower()
+	formattedDate = format_date(parsedDate, format)
 
-	if prefix:
-		formattedDate = prefix + formattedDate
-
-	return formattedDate.decode('utf-8')
+	return formattedDate
 
 app.jinja_env.filters['episodeNumber'] = episodeNumber
 app.jinja_env.filters['prettyDate'] = prettyDate
@@ -182,7 +189,7 @@ def login():
 			session['password'] = password
 			return redirect(request.args.get('next') or url_for('home'))
 		else:
-			flash(u'Identifiants invalides', 'error')
+			flash(gettext(u'login.authentication_failed'), 'error')
 
 	return render_template('login.html')
 
@@ -190,7 +197,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash(u'Déconnecté avec succès', 'success')
+    flash(gettext(u'login.successful_logout'), 'success')
     return redirect(url_for('login'))
 
 @app.route('/ajax/unseen/<showId>/<episodeId>')
