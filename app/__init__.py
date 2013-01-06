@@ -4,9 +4,9 @@ from flask import Flask, render_template, request, Response, jsonify, url_for, r
 from flask.ext.login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 from flask.ext.babel import Babel, gettext, ngettext, lazy_gettext, format_date
 from datetime import date, datetime
+from PIL import Image, ImageFile
 from StringIO import StringIO
 import calendar
-import Image
 import locale
 import os
 import re
@@ -158,10 +158,6 @@ def shows():
 	res = requests.get('%s/user/shows' % apiURL, auth=credentials())
 
 	shows = res.json()['shows']
-	
-	for show in shows:
-		if 'poster' in show:
-			show['poster_path'] = '%s/%s' % (apiURL, show['poster'])
 
 	return render_template('shows.html', shows=shows)
 
@@ -238,23 +234,31 @@ def ajax_set_show_order():
 
 	return Response(status=204)
 
-@app.route('/thumbs/', methods=['GET'])
-#@login_required
-def get_thumbnail():
-	url = request.args.get('url')
+@app.route('/thumbs/<size>/<path:posterPath>', methods=['GET'])
+def get_thumbnail(size, posterPath):
+	# width and height are separated by an 'x' (e.g. 187x275)
+	splittedSize = size.split('x')
 
-	if not url: abort(400)
+	if len(splittedSize) != 2 or not splittedSize[0].isdigit() or not splittedSize[1].isdigit():
+		abort(400)
 
-	r = requests.get(url, stream=True)
+	width, height = [int(component) for component in splittedSize]
+
+	r = requests.get('%s/%s' % (apiURL, posterPath), stream=True)
 
 	img = Image.open(StringIO(r.content))
 
-	#img = img.rotate(45)
-	img.thumbnail((187, 275), Image.ANTIALIAS)
+	img.thumbnail((width, height), Image.ANTIALIAS)
 
 	thumbnail = StringIO()
-	print img.format
-	img.save(thumbnail, 'JPEG', quality=95, optimize=True, progressive=True)
+
+	try:
+		img.save(thumbnail, 'JPEG', quality=95, optimize=True, progressive=True)
+	except IOError:
+		# http://stackoverflow.com/questions/6788398/how-to-save-progressive-jpeg-using-python-pil-1-1-7
+		ImageFile.MAXBLOCK = img.size[0] * img.size[1]
+		img.save(thumbnail, 'JPEG', quality=95, optimize=True, progressive=True)
+	
 	thumbnail.seek(0)
 
 	return send_file(thumbnail, mimetype='image/jpeg')
