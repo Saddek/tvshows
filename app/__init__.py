@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, render_template, request, Response, jsonify, url_for, redirect, session, flash
+from flask import Flask, render_template, request, Response, jsonify, url_for, redirect, session, flash, abort, send_file
 from flask.ext.login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 from flask.ext.babel import Babel, gettext, ngettext, lazy_gettext, format_date
 from datetime import date, datetime
+from StringIO import StringIO
 import calendar
+import Image
 import locale
 import os
 import re
@@ -43,7 +45,7 @@ def load_user(userId):
 
 @babel.localeselector
 def get_locale():
-    return request.accept_languages.best_match(['fr', 'en'])
+	return request.accept_languages.best_match(['fr', 'en'])
 
 def episodeNumber(episode):
 	return 'S%02dE%02d' % (episode['season'], episode['episode'])
@@ -196,9 +198,9 @@ def login():
 @app.route("/logout")
 @login_required
 def logout():
-    logout_user()
-    flash(gettext(u'login.successful_logout'), 'success')
-    return redirect(url_for('login'))
+	logout_user()
+	flash(gettext(u'login.successful_logout'), 'success')
+	return redirect(url_for('login'))
 
 @app.route('/ajax/unseen/<showId>/<episodeId>')
 @login_required
@@ -235,3 +237,24 @@ def ajax_set_show_order():
 		return Response(status=500)
 
 	return Response(status=204)
+
+@app.route('/thumbs/', methods=['GET'])
+#@login_required
+def get_thumbnail():
+	url = request.args.get('url')
+
+	if not url: abort(400)
+
+	r = requests.get(url, stream=True)
+
+	img = Image.open(StringIO(r.content))
+
+	#img = img.rotate(45)
+	img.thumbnail((187, 275), Image.ANTIALIAS)
+
+	thumbnail = StringIO()
+	print img.format
+	img.save(thumbnail, 'JPEG', quality=95, optimize=True, progressive=True)
+	thumbnail.seek(0)
+
+	return send_file(thumbnail, mimetype='image/jpeg')

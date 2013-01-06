@@ -13,7 +13,7 @@
         <li data-show-id="{{ show.show_id }}">
           <a href="/show/{{ show.show_id }}/" class="thumbnail">
           {% if show.poster_path %}
-            <img src="{{ show.poster_path }}" width="187" height="275" alt="{{ show.name }}">
+            <img src="{{ url_for('get_thumbnail', url=show.poster_path) }}" width="187" height="275" alt="{{ show.name }}">
           {% else %}
             <img data-src="holder.js/187x275/text:{{ show.name }}" alt="{{ show.name }}">
           {% endif %}
