@@ -4,9 +4,6 @@
 
 {% set page_name = _('myshows.pagetitle') -%}
 
-{% set poster_width = 187 -%}
-{% set poster_height = 275 -%}
-
 {% block content %}
     <div class="container">
       <h2>{{ _('myshows.pagetitle') }}</h2>
@@ -16,7 +13,7 @@
         <li data-show-id="{{ show.show_id }}">
           <a href="/show/{{ show.show_id }}/" class="thumbnail">
           {% if show.poster %}
-            <img src="{{ url_for('get_thumbnail', posterPath=show.poster, size='%dx%d' % (poster_width, poster_height)) }}" width="poster_width" height="poster_height" alt="{{ show.name }}">
+            <img src="{{ url_for('get_thumbnail', posterPath=show.poster, size='187x275') }}" alt="{{ show.name }}">
           {% else %}
             <img data-src="holder.js/187x275/text:{{ show.name }}" alt="{{ show.name }}">
           {% endif %}
