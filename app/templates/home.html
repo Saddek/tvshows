@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 
-{% block content %}
+{% block content -%}
     <div class="container">
       <div class="row-fluid">
         <div class="span6">
           <h2>{{ _('home.unseen') }}</h2>
 
-          {% for show in unseen %}
+          {%- for show in unseen %}
             <div data-show-id="{{ show.show_id }}">
               {{ parts.unseenEpisodes(show) }}
             </div>
-          {% endfor %}
+          {%- endfor %}
         </div>
 
         <div class="span6">
@@ -22,5 +22,5 @@
         </div>
       </div>
     </div>
-{% endblock %}
+{%- endblock %}
 
