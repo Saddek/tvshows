@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-06 01:01+0100\n"
+"POT-Creation-Date: 2013-01-07 22:02+0100\n"
 "PO-Revision-Date: 2013-01-06 00:06+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -21,56 +21,60 @@ msgstr ""
 msgid "login.authentication_required"
 msgstr "Please login to access this page"
 
-#: app/__init__.py:69
+#: app/__init__.py:71
 msgid "date.unknown"
 msgstr "unknown"
 
-#: app/__init__.py:73
+#: app/__init__.py:75
 msgid "date.format.year_only"
 msgstr "yyyy"
 
-#: app/__init__.py:76
+#: app/__init__.py:78
 #, python-format
 msgid "date.in_year_%(year)s"
 msgstr "in %(year)s"
 
-#: app/__init__.py:79
+#: app/__init__.py:81
 msgid "date.format.year_month"
 msgstr "MMMM yyyy"
 
-#: app/__init__.py:82
+#: app/__init__.py:84
 #, python-format
 msgid "date.in_month_%(month)s"
 msgstr "in %(month)s"
 
-#: app/__init__.py:85
+#: app/__init__.py:87
 msgid "date.format.date_with_year"
 msgstr "MMMM d, yyyy"
 
-#: app/__init__.py:85
+#: app/__init__.py:87
 msgid "date.format.date_without_year"
 msgstr "MMMM d"
 
-#: app/__init__.py:88
+#: app/__init__.py:90
 #, python-format
 msgid "date.on_day_%(day)s"
 msgstr "on %(day)s"
 
-#: app/__init__.py:92
+#: app/__init__.py:94
 msgid "date.tonight"
 msgstr "Tonight"
 
-#: app/__init__.py:94
-msgid "date.yesterday_night"
-msgstr "Yesterday night"
-
 #: app/__init__.py:96
+msgid "date.yesterday_night"
+msgstr "yesterday night"
+
+#: app/__init__.py:98
 msgid "date.tomorrow_night"
 msgstr "Tomorrow night"
 
-#: app/__init__.py:98
+#: app/__init__.py:100
 msgid "date.format.next_day"
 msgstr "'Next' EEEE"
+
+#: app/__init__.py:102
+msgid "date.format.previous_day"
+msgstr "'last' EEEE"
 
 #: app/__init__.py:192
 msgid "login.authentication_failed"
@@ -97,7 +101,7 @@ msgstr "Search"
 msgid "logout"
 msgstr "Log out"
 
-#: app/templates/base.html:16 app/templates/base.html:61
+#: app/templates/base.html:16 app/templates/base.html:48
 msgid "tvshows"
 msgstr "TV Shows"
 
@@ -113,23 +117,23 @@ msgstr "Upcoming"
 msgid "login.pagetitle"
 msgstr "Login"
 
-#: app/templates/login.html:13
+#: app/templates/login.html:8
 msgid "login.heading"
 msgstr "Login"
 
-#: app/templates/login.html:16
+#: app/templates/login.html:11
 msgid "login.placeholder.username"
 msgstr "Username"
 
-#: app/templates/login.html:17
+#: app/templates/login.html:12
 msgid "login.placeholder.password"
 msgstr "Password"
 
-#: app/templates/login.html:19
+#: app/templates/login.html:14
 msgid "login.rememberme"
 msgstr "Remember me"
 
-#: app/templates/login.html:21
+#: app/templates/login.html:16
 msgid "login.submitbutton"
 msgstr "Login"
 
@@ -162,3 +166,4 @@ msgid "unseen.%(num)d_other"
 msgid_plural "unseen.%(num)d_others"
 msgstr[0] "1 other…"
 msgstr[1] "%(num)d others…"
+

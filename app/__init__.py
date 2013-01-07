@@ -89,15 +89,17 @@ def prettyDate(dateStr, forceYear=False, addPrefix=False):
 		if addPrefix:
 			format = gettext('date.on_day_%(day)s', day=format)
 
-	daysDiff = (date.today() - parsedDate).days
+	daysDiff = (parsedDate - date.today()).days
 	if daysDiff == 0:
 		return gettext('date.tonight')
-	elif daysDiff == 1:
-		return gettext('date.yesterday_night')
 	elif daysDiff == -1:
+		return gettext('date.yesterday_night')
+	elif daysDiff == 1:
 		return gettext('date.tomorrow_night')
-	elif abs(daysDiff) < 7:
+	elif daysDiff > 0 and daysDiff < 7:
 		format = gettext('date.format.next_day')
+	elif daysDiff < 0 and daysDiff > -7:
+		format = gettext('date.format.previous_day')
 
 	formattedDate = format_date(parsedDate, format)
 
