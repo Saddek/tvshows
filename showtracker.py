@@ -78,11 +78,11 @@ class SeriesDatabase:
         req = requests.get('http://services.tvrage.com/feeds/search.php?show=%s' % showName)
         tree = etree.fromstring(req.text.encode(req.encoding))
 
-        results = {}
+        results = []
         for e in tree.xpath('/Results/show'):
             showId = e.xpath('showid')[0].text
-            results[showId] = {'name': e.xpath('name')[0].text}
-
+            results.append({'id': showId, 'name': e.xpath('name')[0].text})
+        print results
         return results;
 
     def checkAuth(self, user, password):
@@ -415,7 +415,7 @@ def update_shows():
 
 @app.route('/search/<show_name>', methods=['GET'])
 def search_show(show_name):
-    return jsonify(series.searchShow(show_name))
+    return jsonify(results=series.searchShow(show_name))
 
 @app.route('/user/shows', methods=['GET'])
 @requires_auth
