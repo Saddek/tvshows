@@ -1,5 +1,5 @@
 app/config.cfg
-*.pot
+app/translations/messages.pot
 
 ####
 

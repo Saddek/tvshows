@@ -1,0 +1,21 @@
+{% if results %}
+<ul>
+  {% for result in results %}
+  <li>
+    <div>
+      {% if result.id not in userShows %}
+      <a href="/add/{{ result.id }}" class="btn btn-success">{{ _('shows.search.addbutton') }}</a>
+      {% else %}
+      <button class="btn disabled" type="button">{{ _('shows.search.alreadyadded') }}</a>
+      {% endif %}
+    </div>
+    <p>
+      <strong>{{ result.name }}</strong><br>
+      {{ result.started | yearRange(result.ended) }}{% if result.genres %} – {{ result.genres | join(', ') }}{% endif %}
+    </p>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="lead">{{ _('shows.search.noresults') }}</p>
+{% endif %}

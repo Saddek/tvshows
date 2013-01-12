@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-07 22:02+0100\n"
+"POT-Creation-Date: 2013-01-12 01:30+0100\n"
 "PO-Revision-Date: 2013-01-06 00:06+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -76,11 +76,11 @@ msgstr "'Next' EEEE"
 msgid "date.format.previous_day"
 msgstr "'last' EEEE"
 
-#: app/__init__.py:192
+#: app/__init__.py:209
 msgid "login.authentication_failed"
 msgstr "Invalid credentials"
 
-#: app/__init__.py:200
+#: app/__init__.py:217
 msgid "login.successful_logout"
 msgstr "Successfully logged out"
 
@@ -89,19 +89,15 @@ msgid "home.pagetitle"
 msgstr "Home"
 
 #: app/templates/base.html:3 app/templates/shows.html:5
-#: app/templates/shows.html:9
+#: app/templates/shows.html:10
 msgid "myshows.pagetitle"
 msgstr "My shows"
 
-#: app/templates/base.html:4
-msgid "search.pagetitle"
-msgstr "Search"
-
-#: app/templates/base.html:7
+#: app/templates/base.html:6
 msgid "logout"
 msgstr "Log out"
 
-#: app/templates/base.html:16 app/templates/base.html:48
+#: app/templates/base.html:15 app/templates/base.html:47
 msgid "tvshows"
 msgstr "TV Shows"
 
@@ -166,4 +162,40 @@ msgid "unseen.%(num)d_other"
 msgid_plural "unseen.%(num)d_others"
 msgstr[0] "1 other…"
 msgstr[1] "%(num)d others…"
+
+#: app/templates/shows.html:11
+msgid "shows.addbutton"
+msgstr "Add"
+
+#: app/templates/shows.html:32
+msgid "shows.search.title"
+msgstr "Add show"
+
+#: app/templates/shows.html:38
+msgid "shows.search.searchbutton"
+msgstr "Search"
+
+#: app/templates/shows.html:41
+msgid "shows.search.placeholder"
+msgstr "Enter a show name"
+
+#: app/templates/shows.html:41
+msgid "shows.search.error"
+msgstr "An error occurred, please try again"
+
+#: app/templates/shows.html:44
+msgid "cancel"
+msgstr "Cancel"
+
+#: app/templates/ajax/search_results.html:7
+msgid "shows.search.addbutton"
+msgstr "Add"
+
+#: app/templates/ajax/search_results.html:9
+msgid "shows.search.alreadyadded"
+msgstr "Already added"
+
+#: app/templates/ajax/search_results.html:20
+msgid "shows.search.noresults"
+msgstr "No results found"
 

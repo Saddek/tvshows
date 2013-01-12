@@ -6,7 +6,10 @@
 
 {% block content -%}
     <div class="container">
-      <h2>{{ _('myshows.pagetitle') }}</h2>
+      <h2>
+        {{ _('myshows.pagetitle') }}
+        <button class="btn btn-small" type="button" data-toggle="modal" data-target="#searchModal"><i class=" icon-plus"></i> {{ _('shows.addbutton') }}</button>
+      </h2>
 
       <ul class="thumbnails sortable" style="margin: 0 auto">
       {%- for show in shows %}
@@ -21,6 +24,25 @@
         </li>
       {%- endfor %}
       </ul>
+    </div>
+
+    <div id="searchModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="searchModalLabel">{{ _('shows.search.title') }}</h3>
+      </div>
+      <div class="modal-body">
+        <form class="form-search" id="search-form">
+          <div class="input-append" style="width: 100%; text-align: center">
+            <input type="text" id="search-query" class="span4 search-query">
+            <button type="submit" class="btn">{{ _('shows.search.searchbutton') }}</button>
+          </div>
+        </form>
+        <div id="search-results" data-placeholder-text="{{ _('shows.search.placeholder') }}" data-error-text="{{ _('shows.search.error') }}"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('cancel') }}</button>
+      </div>
     </div>
 {%- endblock %}
 

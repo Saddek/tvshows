@@ -105,10 +105,17 @@ def prettyDate(dateStr, forceYear=False, addPrefix=False):
 
 	return formattedDate
 
+def yearRange(started, ended):
+	if ended == 0:
+		return started
+
+	return '%d - %d' % (started, ended)
+
 app.jinja_env.filters['episodeNumber'] = episodeNumber
 app.jinja_env.filters['prettyDate'] = prettyDate
 app.jinja_env.filters['pirateBayLink'] = pirateBayLink
 app.jinja_env.filters['addic7edLink'] = addic7edLink
+app.jinja_env.filters['yearRange'] = yearRange
 app.jinja_env.add_extension('jinja2.ext.do')
 
 # sorts episodes by date
@@ -175,6 +182,16 @@ def show_details(showId):
 
 	return render_template('showdetails.html', show=show)
 
+@app.route('/add/<showId>')
+@login_required
+def show_add(showId):
+	r = requests.put('%s/user/shows/%s' % (apiURL, showId), auth=credentials())
+
+	if r.status_code != 200 and r.status_code != 201:
+		return Response(status=500)
+
+	return redirect(url_for('shows'))
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	if request.method == 'POST':
@@ -235,6 +252,22 @@ def ajax_set_show_order():
 		return Response(status=500)
 
 	return Response(status=204)
+
+@app.route('/ajax/search/<showName>')
+@login_required
+def ajax_search_show(showName):
+	r = requests.get('%s/search/%s' % (apiURL, urllib.quote_plus(showName)))
+
+	if r.status_code != 200:
+		abort(500)
+
+	results = r.json()['results']
+
+	r = requests.get('%s/user/shows' % apiURL, auth=credentials())
+
+	userShows = [show['show_id'] for show in r.json()['shows']]
+
+	return render_template('ajax/search_results.html', results=results, userShows=userShows)
 
 @app.route('/thumbs/<size>/<path:posterPath>', methods=['GET'])
 def get_thumbnail(size, posterPath):

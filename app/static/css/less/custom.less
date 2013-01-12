@@ -31,6 +31,16 @@ body.page_login {
   background-position: -1px 0;
 }
 
+.modal-backdrop,
+.modal-backdrop.fade.in {
+  .opacity(40);
+}
+
+.modal.fade {
+  .transition(e('opacity .2s linear, top .2s ease-out'));
+  top: 10%;
+}
+
 @unseenPadding: 3px;
 
 ul.unseen > li {
@@ -72,6 +82,27 @@ ul.unseen > li:hover .detail-hover {
 
 h4 > a {
   color: @headingsColor;
+}
+
+#search-results > .lead {
+  text-align: center;
+  margin-bottom: 0;
+}
+
+#search-results > .progress {
+  text-align: center;
+  margin: 0 auto 10px;
+  width: 75%;
+}
+
+#search-results > ul {
+  list-style-type: none;
+  padding-right: 25px;
+
+  > li > div {
+    display:inline-block;
+    float:right;
+  }
 }
 
 .sortable .thumbnail > img {
