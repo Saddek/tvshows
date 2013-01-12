@@ -81,8 +81,15 @@ class SeriesDatabase:
         results = []
         for e in tree.xpath('/Results/show'):
             showId = e.xpath('showid')[0].text
-            results.append({'id': showId, 'name': e.xpath('name')[0].text})
-        print results
+            results.append({
+                'id': showId,
+                'name': e.xpath('name')[0].text,
+                'seasons': int(e.xpath('seasons')[0].text),
+                'started': int(e.xpath('started')[0].text),
+                'ended': int(e.xpath('ended')[0].text),
+                'genres': [genre.text for genre in e.xpath('genres/genre')]
+            })
+        
         return results;
 
     def checkAuth(self, user, password):
