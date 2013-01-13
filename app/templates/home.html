@@ -10,15 +10,21 @@
             <div data-show-id="{{ show.show_id }}">
               {{ parts.unseenEpisodes(show) }}
             </div>
+          {% else %}
+          <h3 class="muted">{{ _('home.nounseen') }}</h3>
           {%- endfor %}
         </div>
 
         <div class="span6">
           <h2>{{ _('home.upcoming') }}</h2>
 
+          {% if upcoming %}
           <table id="upcoming" class="table table-bordered">
             {{ parts.upcomingRows(upcoming) }}
           </table>
+          {% else %}
+          <h3 class="muted">{{ _('home.noupcoming') }}</h3>
+          {% endif %}
         </div>
       </div>
     </div>

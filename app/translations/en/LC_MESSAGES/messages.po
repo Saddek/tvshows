@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-13 15:12+0100\n"
+"POT-Creation-Date: 2013-01-13 15:39+0100\n"
 "PO-Revision-Date: 2013-01-06 00:06+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -104,9 +104,17 @@ msgstr "TV Shows"
 msgid "home.unseen"
 msgstr "Unseen"
 
-#: templates/home.html:17
+#: templates/home.html:14
+msgid "home.nounseen"
+msgstr "Nothing to watch :("
+
+#: templates/home.html:19
 msgid "home.upcoming"
 msgstr "Upcoming"
+
+#: templates/home.html:26
+msgid "home.noupcoming"
+msgstr "Nothing to come :("
 
 #: templates/login.html:3
 msgid "login.pagetitle"
