@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-12 01:30+0100\n"
+"POT-Creation-Date: 2013-01-13 15:12+0100\n"
 "PO-Revision-Date: 2013-01-06 00:06+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -17,185 +17,197 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: app/__init__.py:35
+#: __init__.py:35
 msgid "login.authentication_required"
 msgstr "Vous devez être connecté pour accéder à cette page"
 
-#: app/__init__.py:71
+#: __init__.py:71
 msgid "date.unknown"
 msgstr "inconnu"
 
-#: app/__init__.py:75
+#: __init__.py:75
 msgid "date.format.year_only"
 msgstr "yyyy"
 
-#: app/__init__.py:78
+#: __init__.py:78
 #, python-format
 msgid "date.in_year_%(year)s"
 msgstr "en %(year)s"
 
-#: app/__init__.py:81
+#: __init__.py:81
 msgid "date.format.year_month"
 msgstr "MMMM yyyy"
 
-#: app/__init__.py:84
+#: __init__.py:84
 #, python-format
 msgid "date.in_month_%(month)s"
 msgstr "en %(month)s"
 
-#: app/__init__.py:87
+#: __init__.py:87
 msgid "date.format.date_with_year"
 msgstr "d MMMM yyyy"
 
-#: app/__init__.py:87
+#: __init__.py:87
 msgid "date.format.date_without_year"
 msgstr "d MMMM"
 
-#: app/__init__.py:90
+#: __init__.py:90
 #, python-format
 msgid "date.on_day_%(day)s"
 msgstr "'le' %(day)s"
 
-#: app/__init__.py:94
+#: __init__.py:94
 msgid "date.tonight"
 msgstr "ce soir"
 
-#: app/__init__.py:96
+#: __init__.py:96
 msgid "date.yesterday_night"
 msgstr "hier soir"
 
-#: app/__init__.py:98
+#: __init__.py:98
 msgid "date.tomorrow_night"
 msgstr "demain soir"
 
-#: app/__init__.py:100
+#: __init__.py:100
 msgid "date.format.next_day"
 msgstr "EEEE 'prochain'"
 
-#: app/__init__.py:102
+#: __init__.py:102
 msgid "date.format.previous_day"
 msgstr "EEEE 'dernier'"
 
-#: app/__init__.py:209
+#: __init__.py:222
 msgid "login.authentication_failed"
 msgstr "Identifiants invalides"
 
-#: app/__init__.py:217
+#: __init__.py:230
 msgid "login.successful_logout"
 msgstr "Déconnecté avec succès"
 
-#: app/templates/base.html:2
+#: templates/base.html:2
 msgid "home.pagetitle"
 msgstr "Accueil"
 
-#: app/templates/base.html:3 app/templates/shows.html:5
-#: app/templates/shows.html:10
+#: templates/base.html:3 templates/shows.html:5 templates/shows.html:10
 msgid "myshows.pagetitle"
 msgstr "Mes séries"
 
-#: app/templates/base.html:6
+#: templates/base.html:6
 msgid "logout"
 msgstr "Déconnexion"
 
-#: app/templates/base.html:15 app/templates/base.html:47
+#: templates/base.html:15 templates/base.html:47
 msgid "tvshows"
 msgstr "Séries TV"
 
-#: app/templates/home.html:7
+#: templates/home.html:7
 msgid "home.unseen"
 msgstr "À voir"
 
-#: app/templates/home.html:17
+#: templates/home.html:17
 msgid "home.upcoming"
 msgstr "Prochainement"
 
-#: app/templates/login.html:3
+#: templates/login.html:3
 msgid "login.pagetitle"
 msgstr "Connexion"
 
-#: app/templates/login.html:8
+#: templates/login.html:8
 msgid "login.heading"
 msgstr "Login"
 
-#: app/templates/login.html:11
+#: templates/login.html:11
 msgid "login.placeholder.username"
 msgstr "Nom d'utilisateur"
 
-#: app/templates/login.html:12
+#: templates/login.html:12
 msgid "login.placeholder.password"
 msgstr "Mot de passe"
 
-#: app/templates/login.html:14
+#: templates/login.html:14
 msgid "login.rememberme"
 msgstr "Se souvenir de moi"
 
-#: app/templates/login.html:16
+#: templates/login.html:16
 msgid "login.submitbutton"
 msgstr "Connexion"
 
-#: app/templates/parts.html:4
+#: templates/parts.html:4
 #, python-format
 msgid "unseen.%(num)d_episode"
 msgid_plural "unseen.%(num)d_episodes"
 msgstr[0] "1 épisode"
 msgstr[1] "%(num)d épisodes"
 
-#: app/templates/parts.html:9
+#: templates/parts.html:9
 msgid "aired"
 msgstr "diffusé"
 
-#: app/templates/parts.html:11
+#: templates/parts.html:11
 msgid "torrent"
 msgstr "Torrent"
 
-#: app/templates/parts.html:12
+#: templates/parts.html:12
 msgid "subtitles"
 msgstr "Sous-titres"
 
-#: app/templates/parts.html:13
+#: templates/parts.html:13
 msgid "seen"
 msgstr "Vu"
 
-#: app/templates/parts.html:19
+#: templates/parts.html:19
 #, python-format
 msgid "unseen.%(num)d_other"
 msgid_plural "unseen.%(num)d_others"
 msgstr[0] "1 autre…"
 msgstr[1] "%(num)d autres…"
 
-#: app/templates/shows.html:11
-msgid "shows.addbutton"
-msgstr "Ajouter"
+#: templates/showdetails.html:11 templates/showdetails.html:51
+msgid "delete"
+msgstr "Supprimer"
 
-#: app/templates/shows.html:32
-msgid "shows.search.title"
-msgstr "Ajouter une série"
+#: templates/showdetails.html:44
+msgid "showdetail.deletedialog.title"
+msgstr "Supprimer la série"
 
-#: app/templates/shows.html:38
-msgid "shows.search.searchbutton"
-msgstr "Rechercher"
+#: templates/showdetails.html:47
+#, python-format
+msgid "showdetail.deletedialog.text_%(show)s"
+msgstr "Êtes-vous sûr de vouloir supprimer %(show)s ? Cette action est irréversible."
 
-#: app/templates/shows.html:41
-msgid "shows.search.placeholder"
-msgstr "Entrez le nom d'une série"
-
-#: app/templates/shows.html:41
-msgid "shows.search.error"
-msgstr "Une erreur s'est produite, merci de réessayer"
-
-#: app/templates/shows.html:44
+#: templates/showdetails.html:50 templates/shows.html:44
 msgid "cancel"
 msgstr "Annuler"
 
-#: app/templates/ajax/search_results.html:7
+#: templates/shows.html:11
+msgid "shows.addbutton"
+msgstr "Ajouter"
+
+#: templates/shows.html:32
+msgid "shows.search.title"
+msgstr "Ajouter une série"
+
+#: templates/shows.html:38
+msgid "shows.search.searchbutton"
+msgstr "Rechercher"
+
+#: templates/shows.html:41
+msgid "shows.search.placeholder"
+msgstr "Entrez le nom d'une série"
+
+#: templates/shows.html:41
+msgid "shows.search.error"
+msgstr "Une erreur s'est produite, merci de réessayer"
+
+#: templates/ajax/search_results.html:7
 msgid "shows.search.addbutton"
 msgstr "Ajouter"
 
-#: app/templates/ajax/search_results.html:9
+#: templates/ajax/search_results.html:9
 msgid "shows.search.alreadyadded"
 msgstr "Déjà ajouté"
 
-#: app/templates/ajax/search_results.html:20
+#: templates/ajax/search_results.html:20
 msgid "shows.search.noresults"
 msgstr "Pas de résultats"
 

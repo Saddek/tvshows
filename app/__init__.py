@@ -192,6 +192,19 @@ def show_add(showId):
 
 	return redirect(url_for('shows'))
 
+@app.route('/delete/<showId>')
+@login_required
+def show_delete(showId):
+	r = requests.delete('%s/user/shows/%s' % (apiURL, showId), auth=credentials())
+
+	if r.status_code == 404:
+		return Response(status=404)
+
+	if r.status_code != 204:
+		return Response(status=500)
+
+	return redirect(url_for('shows'))
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	if request.method == 'POST':
