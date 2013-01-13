@@ -11,6 +11,7 @@
         <button class="btn btn-small" type="button" data-toggle="modal" data-target="#searchModal"><i class="icon-plus"></i> {{ _('shows.addbutton') }}</button>
       </h2>
 
+      {% if shows %}
       <ul class="thumbnails sortable" style="margin: 0 auto">
       {%- for show in shows %}
         <li data-show-id="{{ show.show_id }}">
@@ -24,6 +25,9 @@
         </li>
       {%- endfor %}
       </ul>
+      {% else %}
+      <h3 class="muted">{{ _('myshows.noshow') }}</h3>
+      {% endif %}
     </div>
 
     <div id="searchModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-13 15:39+0100\n"
+"POT-Creation-Date: 2013-01-13 15:49+0100\n"
 "PO-Revision-Date: 2013-01-06 00:06+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -183,7 +183,7 @@ msgstr "Delete show"
 msgid "showdetail.deletedialog.text_%(show)s"
 msgstr "Are you sure you want to delete %(show)s? This action cannot be undone."
 
-#: templates/showdetails.html:50 templates/shows.html:44
+#: templates/showdetails.html:50 templates/shows.html:48
 msgid "cancel"
 msgstr "Cancel"
 
@@ -191,19 +191,23 @@ msgstr "Cancel"
 msgid "shows.addbutton"
 msgstr "Add"
 
-#: templates/shows.html:32
+#: templates/shows.html:29
+msgid "myshows.noshow"
+msgstr "None (add one!)"
+
+#: templates/shows.html:36
 msgid "shows.search.title"
 msgstr "Add show"
 
-#: templates/shows.html:38
+#: templates/shows.html:42
 msgid "shows.search.searchbutton"
 msgstr "Search"
 
-#: templates/shows.html:41
+#: templates/shows.html:45
 msgid "shows.search.placeholder"
 msgstr "Enter a show name"
 
-#: templates/shows.html:41
+#: templates/shows.html:45
 msgid "shows.search.error"
 msgstr "An error occurred, please try again"
 
