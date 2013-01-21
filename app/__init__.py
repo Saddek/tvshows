@@ -7,6 +7,7 @@ from datetime import date, datetime
 from PIL import Image, ImageFile
 from StringIO import StringIO
 import calendar
+import ConfigParser
 import locale
 import os
 import re
@@ -25,6 +26,9 @@ app.config['SECRET_KEY'] = os.urandom(24)
 
 # TODO: check that all needed config variables are set
 app.config.from_pyfile('config.cfg')
+
+overrides = ConfigParser.ConfigParser()
+overrides.read(os.path.join(os.path.dirname(__file__), 'overrides.cfg'))
 
 babel = Babel(app)
 
@@ -59,8 +63,12 @@ def pirateBayLink(show, episode):
 	return 'http://thepiratebay.se/search/%s/0/99/208' % urllib.quote_plus(searchString)
 
 def addic7edLink(show, episode):
-	# remove content in parenthesis AND keep only alphanum, spaces and colon for Addic7ed
-	strippedName = re.sub(r'[^\s\w:]', '', re.sub(r'\(.+?\)', '', show['name'])).strip().replace(' ', '_')
+	if overrides.has_option(show['show_id'], 'addic7ed_str'):
+		# get the addic7ed string from the overrides file if it's defined
+		strippedName = overrides.get(show['show_id'], 'addic7ed_str')
+	else:
+		# else, remove content in parenthesis AND keep only alphanum, spaces and colon
+		strippedName = re.sub(r'[^\s\w:]', '', re.sub(r'\(.+?\)', '', show['name'])).strip().replace(' ', '_')
 	
 	return 'http://www.addic7ed.com/serie/%s/%s/%s/episode' % (urllib.quote_plus(strippedName), episode['season'], episode['episode'])
 
