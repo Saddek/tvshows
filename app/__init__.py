@@ -8,6 +8,7 @@ from PIL import Image, ImageFile
 from StringIO import StringIO
 import calendar
 import ConfigParser
+import errno
 import locale
 import os
 import re
@@ -26,6 +27,21 @@ app.config['SECRET_KEY'] = os.urandom(24)
 
 # TODO: check that all needed config variables are set
 app.config.from_pyfile('config.cfg')
+
+if not app.debug:
+	import logging
+	from logging.handlers import TimedRotatingFileHandler
+
+	logsDir = os.path.join(os.path.dirname(__file__), 'logs')
+	try:
+		os.makedirs(logsDir)
+	except OSError as exception:
+		if exception.errno != errno.EEXIST:
+			raise
+
+	file_handler = TimedRotatingFileHandler(os.path.join(logsDir, 'error.log'), when='midnight', backupCount=5)
+	file_handler.setLevel(logging.WARNING)
+	app.logger.addHandler(file_handler)
 
 overrides = ConfigParser.ConfigParser()
 overrides.read(os.path.join(os.path.dirname(__file__), 'overrides.cfg'))
