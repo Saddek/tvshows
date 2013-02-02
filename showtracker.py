@@ -1,6 +1,5 @@
 from flask import Flask, request, Response, abort, jsonify
 from lxml import etree
-import base64
 import errno
 import hashlib
 import json
@@ -10,7 +9,6 @@ import redis
 import requests
 import time
 from functools import wraps
-from StringIO import StringIO
 
 app = Flask(__name__)
 
@@ -21,10 +19,13 @@ tvdbAPIKey = app.config['TVDB_API_KEY']
 tvdbBannerURLFormat = 'http://thetvdb.com/banners/%s'
 
 postersDir = os.path.join(os.path.dirname(__file__), 'static', 'posters')
-if not os.path.exists(postersDir): os.makedirs(postersDir)
+if not os.path.exists(postersDir):
+    os.makedirs(postersDir)
+
 
 def str2bool(v):
-  return v.lower() in ("yes", "true", "t", "1")
+    return v.lower() in ("yes", "true", "t", "1")
+
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     """Retry calling the decorated function using an exponential backoff.
@@ -69,6 +70,7 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
         return f_retry  # true decorator
     return deco_retry
 
+
 class SeriesDatabase:
     def __init__(self):
         self.db = redis.StrictRedis(host=app.config['REDIS_HOST'], port=app.config['REDIS_PORT'], db=app.config['REDIS_DB'])
@@ -89,8 +91,8 @@ class SeriesDatabase:
                 'ended': int(e.xpath('ended')[0].text),
                 'genres': [genre.text for genre in e.xpath('genres/genre')]
             })
-        
-        return results;
+
+        return results
 
     def checkAuth(self, user, password):
         return self.db.hget('user:%s' % user, 'password') == hashlib.sha256(password).hexdigest()
@@ -119,7 +121,7 @@ class SeriesDatabase:
         if len(matches) == 0:
             print 'Nothing. Getting first result instead'
             matches = tree.xpath('/Data/Series/seriesid')
-        
+
             if len(matches) == 0:
                 print 'What the fuck?'
                 return None
@@ -157,7 +159,7 @@ class SeriesDatabase:
                 poster['weightedRating'] = poster['rating'] * (poster['voters'] / float(maxVoters))
 
         posters.sort(key=lambda e: e['weightedRating'], reverse=True)
-        
+
         return [poster['path'] for poster in posters]
 
     @retry(requests.ConnectionError, tries=4, delay=1)
@@ -172,12 +174,12 @@ class SeriesDatabase:
             with open(self.posterFilename(showInfo['show_id']), 'wb') as code:
                 code.write(req.content)
 
-
     def deleteCustomPoster(self, user, showId):
-        posterFile = series.posterFilename(showId, user=user);
+        posterFile = series.posterFilename(showId, user=user)
         posterDir = os.path.dirname(posterFile)
 
-        if not os.path.exists(posterFile): return False
+        if not os.path.exists(posterFile):
+            return False
 
         os.remove(posterFile)
 
@@ -193,10 +195,10 @@ class SeriesDatabase:
 
     def posterFilename(self, showId, user=None):
         filename = '%s.jpg' % showId
-        
+
         if user:
             return os.path.join(postersDir, user, filename)
-        
+
         return os.path.join(postersDir, filename)
 
     @retry(requests.ConnectionError, tries=4, delay=1)
@@ -344,12 +346,14 @@ class SeriesDatabase:
 
 series = SeriesDatabase()
 
+
 def authenticate():
     response = jsonify(message='You have to login with proper credentials')
     response.status_code = 401
     response.headers.add('WWW-Authenticate', 'Basic realm="Login required"')
 
     return response
+
 
 def requires_auth(f):
     @wraps(f)
@@ -359,6 +363,7 @@ def requires_auth(f):
             return authenticate()
         return f(*args, **kwargs)
     return decorated
+
 
 @app.route('/posters/<showid>', methods=['GET'])
 @requires_auth
@@ -372,6 +377,7 @@ def get_poster(showid):
 
     return jsonify(posters=posters)
 
+
 @app.route('/posters/<showid>', methods=['POST'])
 @requires_auth
 def set_custom_poster(showid):
@@ -380,7 +386,7 @@ def set_custom_poster(showid):
 
     req = requests.get(tvdbBannerURLFormat % request.form['posterURL'])
 
-    posterFile = series.posterFilename(showid, user=request.authorization.username);
+    posterFile = series.posterFilename(showid, user=request.authorization.username)
     posterDir = os.path.dirname(posterFile)
 
     if not os.path.exists(posterDir):
@@ -398,6 +404,7 @@ def set_custom_poster(showid):
     else:
         abort(500)
 
+
 @app.route('/posters/<showid>', methods=['DELETE'])
 @requires_auth
 def delete_custom_poster(showid):
@@ -411,6 +418,7 @@ def delete_custom_poster(showid):
 
     return Response(status=204)
 
+
 @app.route('/update', methods=['POST'])
 def update_shows():
     if not request.authorization or request.authorization.username != 'alex':
@@ -420,9 +428,11 @@ def update_shows():
 
     return Response(status=204)
 
+
 @app.route('/search/<show_name>', methods=['GET'])
 def search_show(show_name):
     return jsonify(results=series.searchShow(show_name))
+
 
 @app.route('/user/shows', methods=['GET'])
 @requires_auth
@@ -436,6 +446,7 @@ def get_user_shows():
         shows.append(series.getShowInfo(request.authorization.username, showid, withEpisodes=withEpisodes, episodeLimit=episodeLimit, onlyUnseen=onlyUnseen))
 
     return jsonify(shows=shows)
+
 
 @app.route('/user/shows/<showid>', methods=['GET'])
 @requires_auth
@@ -451,6 +462,7 @@ def get_show(showid):
 
     return jsonify(showInfo)
 
+
 @app.route('/user/shows/<showid>', methods=['PUT'])
 @requires_auth
 def add_show(showid):
@@ -464,6 +476,7 @@ def add_show(showid):
     response.status_code = 201 if shouldAdd else 200
 
     return response
+
 
 @app.route('/user/shows/<showid>/last_seen', methods=['PUT'])
 @requires_auth
@@ -484,15 +497,17 @@ def change_show(showid):
 
     return Response(status=204)
 
+
 @app.route('/user/shows/<showid>', methods=['DELETE'])
 @requires_auth
 def delete_show(showid):
     if not series.userHasShow(request.authorization.username, showid):
         abort(404)
-    
+
     series.deleteShowFromUser(request.authorization.username, showid)
 
     return Response(status=204)
+
 
 @app.route('/user/shows_order', methods=['POST'])
 @requires_auth
