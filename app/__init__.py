@@ -188,7 +188,7 @@ def airdateKey(airdate):
 
 
 def getShowsOverview():
-    res = requests.get('%s/user/shows?episodes=true&unseen=true' % apiURL, auth=credentials())
+    res = requests.get('%s/user/shows?episodes=true&unseen=true' % apiURL, auth=credentials(), verify=False)
 
     shows = [show for show in res.json()['shows'] if len(show['episodes']) > 0]
 
@@ -217,7 +217,7 @@ def home():
 @app.route('/shows/')
 @login_required
 def shows():
-    res = requests.get('%s/user/shows' % apiURL, auth=credentials())
+    res = requests.get('%s/user/shows' % apiURL, auth=credentials(), verify=False)
 
     shows = res.json()['shows']
 
@@ -227,7 +227,7 @@ def shows():
 @app.route('/show/<showId>/')
 @login_required
 def show_details(showId):
-    res = requests.get('%s/user/shows/%s' % (apiURL, showId), auth=credentials())
+    res = requests.get('%s/user/shows/%s' % (apiURL, showId), auth=credentials(), verify=False)
 
     show = res.json()
 
@@ -240,7 +240,7 @@ def show_details(showId):
 @app.route('/add/<showId>')
 @login_required
 def show_add(showId):
-    r = requests.put('%s/user/shows/%s' % (apiURL, showId), auth=credentials())
+    r = requests.put('%s/user/shows/%s' % (apiURL, showId), auth=credentials(), verify=False)
 
     if r.status_code != 200 and r.status_code != 201:
         return Response(status=500)
@@ -251,7 +251,7 @@ def show_add(showId):
 @app.route('/delete/<showId>')
 @login_required
 def show_delete(showId):
-    r = requests.delete('%s/user/shows/%s' % (apiURL, showId), auth=credentials())
+    r = requests.delete('%s/user/shows/%s' % (apiURL, showId), auth=credentials(), verify=False)
 
     if r.status_code == 404:
         return Response(status=404)
@@ -269,7 +269,7 @@ def login():
         password = request.form['password']
         remember = bool(request.form.get('remember', False))
 
-        r = requests.get('%s/user/shows' % apiURL, auth=(user.id, password))
+        r = requests.get('%s/user/shows' % apiURL, auth=(user.id, password), verify=False)
 
         if r.status_code == 200:
             login_user(user, remember=remember)
@@ -292,7 +292,7 @@ def logout():
 @app.route('/ajax/unseen/<showId>/<episodeId>')
 @login_required
 def ajax_home_unseen(showId, episodeId):
-    r = requests.put('%s/user/shows/%s/last_seen' % (apiURL, showId), data=episodeId, auth=credentials())
+    r = requests.put('%s/user/shows/%s/last_seen' % (apiURL, showId), data=episodeId, auth=credentials(), verify=False)
 
     if (r.status_code != 204):
         return Response(status=500)
@@ -319,7 +319,7 @@ def ajax_set_show_order():
 
         ordering[showId] = order
 
-    res = requests.post('%s/user/shows_order' % apiURL, data=ordering, auth=credentials())
+    res = requests.post('%s/user/shows_order' % apiURL, data=ordering, auth=credentials(), verify=False)
 
     if res.status_code != 204:
         return Response(status=500)
@@ -330,14 +330,14 @@ def ajax_set_show_order():
 @app.route('/ajax/search/<showName>')
 @login_required
 def ajax_search_show(showName):
-    r = requests.get('%s/search/%s' % (apiURL, urllib.quote_plus(showName)))
+    r = requests.get('%s/search/%s' % (apiURL, urllib.quote_plus(showName)), verify=False)
 
     if r.status_code != 200:
         abort(500)
 
     results = r.json()['results']
 
-    r = requests.get('%s/user/shows' % apiURL, auth=credentials())
+    r = requests.get('%s/user/shows' % apiURL, auth=credentials(), verify=False)
 
     userShows = [show['show_id'] for show in r.json()['shows']]
 
@@ -354,7 +354,7 @@ def get_thumbnail(size, posterPath):
 
     width, height = [int(component) for component in splittedSize]
 
-    r = requests.get('%s/%s' % (apiURL, posterPath), stream=True)
+    r = requests.get('%s/%s' % (apiURL, posterPath), stream=True, verify=False)
 
     img = Image.open(StringIO(r.content))
 
