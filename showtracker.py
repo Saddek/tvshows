@@ -112,6 +112,9 @@ class SeriesDatabase:
     def checkAuth(self, user, password):
         return self.db.hget('user:%s' % user, 'password') == hashlib.sha256(password).hexdigest()
 
+    def addUser(self, user, password):
+        self.db.hset('user:%s' % user, 'password', hashlib.sha256(password).hexdigest())
+
     @retry(requests.ConnectionError, tries=4, delay=1)
     def getTVDBID(self, showInfo):
         print 'Searching TVDB for "%s"...' % showInfo['name']
@@ -324,6 +327,9 @@ class SeriesDatabase:
             self.db.hdel('user:%s:lastseen' % user, showId)
 
         return True
+
+    def userExists(self, user):
+        return self.db.exists('user:%s' % user)
 
     def getUserShowList(self, user):
         return self.db.zrangebyscore('user:%s:shows' % user, '-inf', '+inf')
@@ -559,6 +565,27 @@ def reorder_shows():
             return response
 
         series.addShowToUser(request.authorization.username, showId, order)
+
+    return Response(status=204)
+
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    username = request.form['username'].lower()
+    if re.match('^[\w-]+$', username) is None:
+        response = jsonify(message='Invalid username')
+        response.status_code = 400
+        return response
+
+    if series.userExists(username):
+        return Response(status=409)
+
+    password = request.form['password']
+
+    if len(password) == 0:
+        return Response(status=400)
+
+    series.addUser(username, password)
 
     return Response(status=204)
 
