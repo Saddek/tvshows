@@ -76,9 +76,10 @@ def episodeNumber(episode):
 
 
 def pirateBayLink(show, episode):
-    # remove content in parenthesis from the name if they are present (like the year)
+    # Remove content in parenthesis from the name if they are present (like the year)
     # because they are not included in release names most of the time
-    strippedName = re.sub(r'\(.+?\)', '', show['name']).strip()
+    # Also remove everything that is not alphanumeric or whitespace (such has apostrophes)
+    strippedName = re.sub(r'\(.+?\)|([^\s\w])+', '', show['name']).strip()
     searchString = '%s %s' % (strippedName, episodeNumber(episode))
 
     return 'http://thepiratebay.se/search/%s/0/99/208' % urllib.quote_plus(searchString)
