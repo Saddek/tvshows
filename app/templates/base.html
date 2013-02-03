@@ -1,9 +1,17 @@
+{% if current_user.is_authenticated() %}
 {% set navigation_bar = [
     (url_for('home'), 'home', _('home.pagetitle')),
-    (url_for('shows'), 'shows', _('myshows.pagetitle'))
+    (url_for('shows'), 'shows', _('myshows.pagetitle')),
+    (url_for('logout'), 'logout', _('logout'))
 ] -%}
+{% else %}
+{% set navigation_bar = [
+    (url_for('login'), 'login', _('login.pagetitle')),
+    (url_for('signup'), 'signup', _('signup.pagetitle'))
+] -%}
+{% endif -%}
+
 {% set active_page = active_page|default('home') -%}
-{% if current_user.is_authenticated() %}{% do navigation_bar.append((url_for('logout'), 'logout', _('logout'))) %}{% endif -%}
 
 {% import 'parts.html' as parts -%}
 

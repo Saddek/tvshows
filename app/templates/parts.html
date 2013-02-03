@@ -37,8 +37,19 @@
 {% macro displayFlashes() %}
 {% for category, message in get_flashed_messages(with_categories=True) %}
 <div class="alert alert-{{ category }}">
-  <button type="button" class="close" data-dismiss="alert">&times;</button>
   {{ message }}
 </div>
 {% endfor %}
 {%- endmacro %}
+
+{% macro displayFormErrors(form) %}
+{% if form.errors %}
+  <div class="alert alert-error">
+  {% for field in form.errors %}
+    {% if form.errors[field] %}
+        <strong>{{ form[field].label.text }}:</strong> {{ form.errors[field][0] }}{% if not loop.last %}<br>{% endif %}
+    {% endif %}
+  {% endfor %}
+  </div>
+{% endif %}
+{% endmacro %}

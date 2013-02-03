@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-02-03 15:29+0100\n"
+"POT-Creation-Date: 2013-02-03 22:33+0100\n"
 "PO-Revision-Date: 2013-01-06 00:06+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,103 +17,147 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: app/__init__.py:55
+#: app/__init__.py:57
 msgid "login.authentication_required"
 msgstr "Please login to access this page"
 
-#: app/__init__.py:102
+#: app/__init__.py:105
 msgid "date.unknown"
 msgstr "unknown"
 
-#: app/__init__.py:106
+#: app/__init__.py:109
 msgid "date.format.year_only"
 msgstr "yyyy"
 
-#: app/__init__.py:109
+#: app/__init__.py:112
 #, python-format
 msgid "date.in_year_%(year)s"
 msgstr "in %(year)s"
 
-#: app/__init__.py:112
+#: app/__init__.py:115
 msgid "date.format.year_month"
 msgstr "MMMM yyyy"
 
-#: app/__init__.py:115
+#: app/__init__.py:118
 #, python-format
 msgid "date.in_month_%(month)s"
 msgstr "in %(month)s"
 
-#: app/__init__.py:118
+#: app/__init__.py:121
 msgid "date.format.date_with_year"
 msgstr "MMMM d, yyyy"
 
-#: app/__init__.py:118
+#: app/__init__.py:121
 msgid "date.format.date_without_year"
 msgstr "MMMM d"
 
-#: app/__init__.py:121
+#: app/__init__.py:124
 #, python-format
 msgid "date.on_day_%(day)s"
 msgstr "on %(day)s"
 
-#: app/__init__.py:125
+#: app/__init__.py:128
 msgid "date.tonight"
 msgstr "Tonight"
 
-#: app/__init__.py:127
+#: app/__init__.py:130
 msgid "date.yesterday_night"
 msgstr "yesterday night"
 
-#: app/__init__.py:129
+#: app/__init__.py:132
 msgid "date.tomorrow_night"
 msgstr "Tomorrow night"
 
-#: app/__init__.py:131
+#: app/__init__.py:134
 msgid "date.format.next_day"
 msgstr "'Next' EEEE"
 
-#: app/__init__.py:133
+#: app/__init__.py:136
 msgid "date.format.previous_day"
 msgstr "'last' EEEE"
 
-#: app/__init__.py:149
+#: app/__init__.py:152
 msgid "showdetails.status.returning"
 msgstr "Returning series"
 
-#: app/__init__.py:151
+#: app/__init__.py:154
 msgid "showdetails.status.ended"
 msgstr "Ended"
 
-#: app/__init__.py:153
+#: app/__init__.py:156
 msgid "showdetails.status.firstseason"
 msgstr "New series"
 
-#: app/__init__.py:155
+#: app/__init__.py:158
 msgid "showdetails.status.finalseason"
 msgstr "Final season"
 
-#: app/__init__.py:278
+#: app/__init__.py:270
+msgid "login.placeholder.username"
+msgstr "Username"
+
+#: app/__init__.py:272
+msgid "signup.error.alphanum"
+msgstr "Must contain only alphanumeric characters"
+
+#: app/__init__.py:274 app/__init__.py:282
+msgid "login.placeholder.password"
+msgstr "Password"
+
+#: app/__init__.py:278 app/templates/login.html:25
+msgid "login.rememberme"
+msgstr "Remember me"
+
+#: app/__init__.py:284
+msgid "signup.error.passwordsmatch"
+msgstr "Passwords must match"
+
+#: app/__init__.py:286
+msgid "signup.placeholder.confirmpassword"
+msgstr "Confirm password"
+
+#: app/__init__.py:305
 msgid "login.authentication_failed"
 msgstr "Invalid credentials"
 
-#: app/__init__.py:287
+#: app/__init__.py:323
+msgid "login.successful_signup"
+msgstr "Sign up successful. You can now login"
+
+#: app/__init__.py:326
+msgid "signup.usernametaken"
+msgstr "Username already taken"
+
+#: app/__init__.py:328
+msgid "internalerror"
+msgstr "Internal server error, please try again later"
+
+#: app/__init__.py:337
 msgid "login.successful_logout"
 msgstr "Successfully logged out"
 
-#: app/templates/base.html:2
+#: app/templates/base.html:3
 msgid "home.pagetitle"
 msgstr "Home"
 
-#: app/templates/base.html:3 app/templates/shows.html:5
+#: app/templates/base.html:4 app/templates/shows.html:5
 #: app/templates/shows.html:10
 msgid "myshows.pagetitle"
 msgstr "My shows"
 
-#: app/templates/base.html:6
+#: app/templates/base.html:5
 msgid "logout"
 msgstr "Log out"
 
-#: app/templates/base.html:15 app/templates/base.html:47
+#: app/templates/base.html:9 app/templates/login.html:4
+msgid "login.pagetitle"
+msgstr "Login"
+
+#: app/templates/base.html:10 app/templates/signup.html:4
+msgid "signup.pagetitle"
+msgstr "Sign up"
+
+#: app/templates/base.html:23 app/templates/base.html:55
 msgid "tvshows"
 msgstr "TV Shows"
 
@@ -133,29 +177,21 @@ msgstr "Upcoming"
 msgid "home.noupcoming"
 msgstr "Nothing to come :("
 
-#: app/templates/login.html:3
-msgid "login.pagetitle"
-msgstr "Login"
-
-#: app/templates/login.html:8
+#: app/templates/login.html:9
 msgid "login.heading"
 msgstr "Login"
 
-#: app/templates/login.html:11
-msgid "login.placeholder.username"
-msgstr "Username"
-
-#: app/templates/login.html:12
-msgid "login.placeholder.password"
-msgstr "Password"
-
-#: app/templates/login.html:14
-msgid "login.rememberme"
-msgstr "Remember me"
-
-#: app/templates/login.html:16
+#: app/templates/login.html:28
 msgid "login.submitbutton"
 msgstr "Login"
+
+#: app/templates/login.html:29
+msgid "login.noaccount"
+msgstr "No account?"
+
+#: app/templates/login.html:29
+msgid "login.signup"
+msgstr "Sign up"
 
 #: app/templates/parts.html:4
 #, python-format
@@ -256,6 +292,18 @@ msgstr "Enter a show name"
 #: app/templates/shows.html:45
 msgid "shows.search.error"
 msgstr "An error occurred, please try again"
+
+#: app/templates/signup.html:9
+msgid "signup.heading"
+msgstr "Sign up"
+
+#: app/templates/signup.html:14
+msgid "signup.allfieldsrequired"
+msgstr "All fields are required."
+
+#: app/templates/signup.html:30
+msgid "signup.submitbutton"
+msgstr "Sign up"
 
 #: app/templates/ajax/search_results.html:7
 msgid "shows.search.addbutton"

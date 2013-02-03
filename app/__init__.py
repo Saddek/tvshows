@@ -3,6 +3,7 @@
 from flask import Flask, render_template, request, Response, jsonify, url_for, redirect, session, flash, abort, send_file
 from flask.ext.login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 from flask.ext.babel import Babel, gettext, lazy_gettext, format_date
+from flask.ext.wtf import Form, TextField, PasswordField, BooleanField, validators
 from datetime import date
 from PIL import Image, ImageFile
 from StringIO import StringIO
@@ -13,6 +14,7 @@ import os
 import re
 import requests
 import urllib
+import wtforms.ext.i18n.form
 
 
 class User(UserMixin):
@@ -262,12 +264,27 @@ def show_delete(showId):
     return redirect(url_for('shows'))
 
 
+class UserForm(Form, wtforms.ext.i18n.form.Form):
+    username = TextField(lazy_gettext('login.placeholder.username'), [
+        validators.Length(min=2, max=25),
+        validators.Regexp('^\w+$', message=lazy_gettext('signup.error.alphanum'))
+    ])
+    password = PasswordField(lazy_gettext('login.placeholder.password'), [validators.Required()])
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        user = User(request.form['username'].lower())
-        password = request.form['password']
-        remember = bool(request.form.get('remember', False))
+    class LoginForm(UserForm):
+        LANGUAGES = [get_locale()]
+
+        remember = BooleanField(lazy_gettext('login.rememberme'))
+
+    form = LoginForm()
+
+    if form.validate_on_submit():
+        user = User(form.username.data.lower())
+        password = form.password.data
+        remember = bool(form.remember.data)
 
         r = requests.get('%s/user/shows' % apiURL, auth=(user.id, password), verify=False)
 
@@ -278,7 +295,39 @@ def login():
         else:
             flash(gettext(u'login.authentication_failed'), 'error')
 
-    return render_template('login.html')
+    return render_template('login.html', form=form)
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    class RegistrationForm(UserForm):
+        LANGUAGES = [get_locale()]
+
+        password = PasswordField(lazy_gettext('login.placeholder.password'), [
+            validators.Required(),
+            validators.EqualTo('confirm', message=lazy_gettext('signup.error.passwordsmatch'))
+        ])
+        confirm = PasswordField(lazy_gettext('signup.placeholder.confirmpassword'))
+
+    form = RegistrationForm()
+
+    if form.validate_on_submit():
+        data = {
+            'username': form.username.data,
+            'password': form.password.data
+        }
+
+        r = requests.post('%s/signup' % apiURL, data=data, verify=False)
+
+        if r.status_code == 204:
+            flash(gettext('login.successful_signup'), 'success')
+            return redirect(url_for('login'))
+        elif r.status_code == 409:
+            flash(gettext('signup.usernametaken'), 'error')
+        else:
+            flash(gettext('internalerror'), 'error')
+
+    return render_template('signup.html', form=form)
 
 
 @app.route("/logout")

@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 
-{% set active_page = 'login' -%}
-{% set page_name = _('login.pagetitle') -%}
+{% set active_page = 'signup' -%}
+{% set page_name = _('signup.pagetitle') -%}
 
 {% block content %}
-<div id="login" class="container">
+<div id="signup" class="container">
     <form method="POST">
-      <h3>{{ _('login.heading') }}</h3>
+      <h3>{{ _('signup.heading') }}</h3>
       {{ parts.displayFlashes() }}
       {{ parts.displayFormErrors(form) }}
       
       <fieldset>
+        <span class="help-block">{{ _('signup.allfieldsrequired') }}</span>
+
         {{ form.csrf_token }}
 
         <div class="control-group{% if form.username.errors %} error{% endif %}">
@@ -21,12 +23,11 @@
           {{ form.password(class_='input-block-level', placeholder=form.password.label.text) }}
         </div>
 
-        <label class="checkbox">
-          <input type="checkbox" name="remember"> {{ _('login.rememberme') }}
-        </label>
+        <div class="control-group{% if form.confirm.errors or form.password.errors %} error{% endif %}">
+          {{ form.confirm(class_='input-block-level', placeholder=form.confirm.label.text) }}
+        </div>
 
-        <button class="btn btn-primary pull-right" type="submit">{{ _('login.submitbutton') }}</button>
-        <span class="pull-right">{{ _('login.noaccount')}} <a href="{{ url_for('signup') }}">{{ _('login.signup') }}</a></span>
+        <button class="btn btn-success pull-right" type="submit">{{ _('signup.submitbutton') }}</button>
       </fieldset>
     </form>
 </div>

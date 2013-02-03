@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-02-03 15:29+0100\n"
+"POT-Creation-Date: 2013-02-03 22:33+0100\n"
 "PO-Revision-Date: 2013-01-06 00:06+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -17,103 +17,147 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: app/__init__.py:55
+#: app/__init__.py:57
 msgid "login.authentication_required"
 msgstr "Vous devez être connecté pour accéder à cette page"
 
-#: app/__init__.py:102
+#: app/__init__.py:105
 msgid "date.unknown"
 msgstr "inconnu"
 
-#: app/__init__.py:106
+#: app/__init__.py:109
 msgid "date.format.year_only"
 msgstr "yyyy"
 
-#: app/__init__.py:109
+#: app/__init__.py:112
 #, python-format
 msgid "date.in_year_%(year)s"
 msgstr "en %(year)s"
 
-#: app/__init__.py:112
+#: app/__init__.py:115
 msgid "date.format.year_month"
 msgstr "MMMM yyyy"
 
-#: app/__init__.py:115
+#: app/__init__.py:118
 #, python-format
 msgid "date.in_month_%(month)s"
 msgstr "en %(month)s"
 
-#: app/__init__.py:118
+#: app/__init__.py:121
 msgid "date.format.date_with_year"
 msgstr "d MMMM yyyy"
 
-#: app/__init__.py:118
+#: app/__init__.py:121
 msgid "date.format.date_without_year"
 msgstr "d MMMM"
 
-#: app/__init__.py:121
+#: app/__init__.py:124
 #, python-format
 msgid "date.on_day_%(day)s"
 msgstr "'le' %(day)s"
 
-#: app/__init__.py:125
+#: app/__init__.py:128
 msgid "date.tonight"
 msgstr "ce soir"
 
-#: app/__init__.py:127
+#: app/__init__.py:130
 msgid "date.yesterday_night"
 msgstr "hier soir"
 
-#: app/__init__.py:129
+#: app/__init__.py:132
 msgid "date.tomorrow_night"
 msgstr "demain soir"
 
-#: app/__init__.py:131
+#: app/__init__.py:134
 msgid "date.format.next_day"
 msgstr "EEEE 'prochain'"
 
-#: app/__init__.py:133
+#: app/__init__.py:136
 msgid "date.format.previous_day"
 msgstr "EEEE 'dernier'"
 
-#: app/__init__.py:149
+#: app/__init__.py:152
 msgid "showdetails.status.returning"
 msgstr "En production"
 
-#: app/__init__.py:151
+#: app/__init__.py:154
 msgid "showdetails.status.ended"
 msgstr "Terminée"
 
-#: app/__init__.py:153
+#: app/__init__.py:156
 msgid "showdetails.status.firstseason"
 msgstr "Nouvelle série"
 
-#: app/__init__.py:155
+#: app/__init__.py:158
 msgid "showdetails.status.finalseason"
 msgstr "Saison finale"
 
-#: app/__init__.py:278
+#: app/__init__.py:270
+msgid "login.placeholder.username"
+msgstr "Nom d'utilisateur"
+
+#: app/__init__.py:272
+msgid "signup.error.alphanum"
+msgstr "Ne doit contenir que des caractères alphanumériques"
+
+#: app/__init__.py:274 app/__init__.py:282
+msgid "login.placeholder.password"
+msgstr "Mot de passe"
+
+#: app/__init__.py:278 app/templates/login.html:25
+msgid "login.rememberme"
+msgstr "Se souvenir de moi"
+
+#: app/__init__.py:284
+msgid "signup.error.passwordsmatch"
+msgstr "Les mots de passe doivent correspondre"
+
+#: app/__init__.py:286
+msgid "signup.placeholder.confirmpassword"
+msgstr "Confirmez le mot de passe"
+
+#: app/__init__.py:305
 msgid "login.authentication_failed"
 msgstr "Identifiants invalides"
 
-#: app/__init__.py:287
+#: app/__init__.py:323
+msgid "login.successful_signup"
+msgstr "Inscription réussie. Vous pouvez maintenant vous connecter"
+
+#: app/__init__.py:326
+msgid "signup.usernametaken"
+msgstr "Nom d'utilisateur déjà pris"
+
+#: app/__init__.py:328
+msgid "internalerror"
+msgstr "Erreur interne, merci de réessayer plus tard"
+
+#: app/__init__.py:337
 msgid "login.successful_logout"
 msgstr "Déconnecté avec succès"
 
-#: app/templates/base.html:2
+#: app/templates/base.html:3
 msgid "home.pagetitle"
 msgstr "Accueil"
 
-#: app/templates/base.html:3 app/templates/shows.html:5
+#: app/templates/base.html:4 app/templates/shows.html:5
 #: app/templates/shows.html:10
 msgid "myshows.pagetitle"
 msgstr "Mes séries"
 
-#: app/templates/base.html:6
+#: app/templates/base.html:5
 msgid "logout"
 msgstr "Déconnexion"
 
-#: app/templates/base.html:15 app/templates/base.html:47
+#: app/templates/base.html:9 app/templates/login.html:4
+msgid "login.pagetitle"
+msgstr "Connexion"
+
+#: app/templates/base.html:10 app/templates/signup.html:4
+msgid "signup.pagetitle"
+msgstr "Inscription"
+
+#: app/templates/base.html:23 app/templates/base.html:55
 msgid "tvshows"
 msgstr "Séries TV"
 
@@ -133,29 +177,21 @@ msgstr "Prochainement"
 msgid "home.noupcoming"
 msgstr "Rien à venir :("
 
-#: app/templates/login.html:3
-msgid "login.pagetitle"
-msgstr "Connexion"
-
-#: app/templates/login.html:8
+#: app/templates/login.html:9
 msgid "login.heading"
 msgstr "Login"
 
-#: app/templates/login.html:11
-msgid "login.placeholder.username"
-msgstr "Nom d'utilisateur"
-
-#: app/templates/login.html:12
-msgid "login.placeholder.password"
-msgstr "Mot de passe"
-
-#: app/templates/login.html:14
-msgid "login.rememberme"
-msgstr "Se souvenir de moi"
-
-#: app/templates/login.html:16
+#: app/templates/login.html:28
 msgid "login.submitbutton"
 msgstr "Connexion"
+
+#: app/templates/login.html:29
+msgid "login.noaccount"
+msgstr "Pas de compte ?"
+
+#: app/templates/login.html:29
+msgid "login.signup"
+msgstr "S'inscrire"
 
 #: app/templates/parts.html:4
 #, python-format
@@ -258,6 +294,18 @@ msgstr "Entrez le nom d'une série"
 #: app/templates/shows.html:45
 msgid "shows.search.error"
 msgstr "Une erreur s'est produite, merci de réessayer"
+
+#: app/templates/signup.html:9
+msgid "signup.heading"
+msgstr "Inscription"
+
+#: app/templates/signup.html:14
+msgid "signup.allfieldsrequired"
+msgstr "Tous les champs sont requis."
+
+#: app/templates/signup.html:30
+msgid "signup.submitbutton"
+msgstr "S'inscrire"
 
 #: app/templates/ajax/search_results.html:7
 msgid "shows.search.addbutton"
