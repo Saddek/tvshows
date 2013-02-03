@@ -143,11 +143,25 @@ def yearRange(started, ended):
 
     return '%d - %d' % (started, ended)
 
+
+def localizedShowStatus(status):
+    if status == 'Returning Series':
+        return gettext('showdetails.status.returning')
+    elif status == 'Canceled/Ended' or status == 'Ended':
+        return gettext('showdetails.status.ended')
+    elif status == 'New Series':
+        return gettext('showdetails.status.firstseason')
+    elif status == 'Final Season':
+        return gettext('showdetails.status.finalseason')
+    else:
+        return status
+
 app.jinja_env.filters['episodeNumber'] = episodeNumber
 app.jinja_env.filters['prettyDate'] = prettyDate
 app.jinja_env.filters['pirateBayLink'] = pirateBayLink
 app.jinja_env.filters['addic7edLink'] = addic7edLink
 app.jinja_env.filters['yearRange'] = yearRange
+app.jinja_env.filters['localizedShowStatus'] = localizedShowStatus
 app.jinja_env.add_extension('jinja2.ext.do')
 
 

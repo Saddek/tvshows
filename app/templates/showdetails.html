@@ -21,7 +21,7 @@
 
               <ul class="unstyled">
                 <li><strong>{{ _('showdetail.seasons') }}</strong> {{ show.seasons }}</li>
-                <li><strong>{{ _('showdetail.status') }}</strong> {{ show.status }}</li>
+                <li><strong>{{ _('showdetail.status') }}</strong> {{ show.status | localizedShowStatus }}</li>
                 <li><strong>{{ _('showdetail.network') }}</strong> {{ show.network }} (<img style="margin-bottom: 0.1em" src="{{ url_for('static', filename='flags/%s.png' % show.country.lower()) }}" alt="Flag" /> {{ show.country }})</li>
                 <li><strong>{{ _('showdetail.firstaired') }}</strong> {{ show.first_aired | prettyDate(forceYear=True) }}</li>
                 {% if show.last_aired %}
