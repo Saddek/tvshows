@@ -6,7 +6,7 @@
 
 {% block content %}
       <div class="container">
-        <div id="showdetails">
+        <div id="showdetails" data-show-id="{{ show.show_id }}">
           <div class="clearfix">
             {% if show.poster %}
             <img class="pull-left img-polaroid" src="{{ url_for('get_thumbnail', posterPath=show.poster, size='187x275') }}" alt="{{ show.name }}">
@@ -40,14 +40,14 @@
                 <th colspan="4">{{ _('showdetail.season_%(num)d', num=ep.season) }}</th>
               </tr>
               {% endif %}
-              <tr{% if ep.episode_id <= show.last_seen %} class="muted"{% endif %}>
+              <tr {% if ep.episode_id <= show.last_seen %}class="muted" {% endif %}data-episode-id="{{ ep.episode_id }}">
                 <td>{{ ep | episodeNumber }}</td>
                 <td>{{ ep.title }}</td>
                 <td>{{ ep.airdate | prettyDate(forceYear=True) }}</td>
                 <td style="text-align: right">
                   <a class="btn btn-mini" href="{{ show | pirateBayLink(ep) }}" target="_blank"><i class="icon-magnet"></i> {{ _('torrent') }}</a>
                   <a class="btn btn-mini" href="{{ show | addic7edLink(ep) }}" target="_blank"><i class="icon-align-left"></i> {{ _('subtitles') }}</a>
-                  <a class="btn btn-mini" data-action="seen" data-episode-id="{{ ep.episode_id }}" href="javascript:void(0)"><i class="icon-eye-open"></i> {{ _('seen') }}</a>
+                  <a class="btn btn-mini" data-action="seen" href="javascript:void(0)"><i class="icon-eye-open"></i> {{ _('seen') }}</a>
                 </td>
               </tr>
               {% endfor %}

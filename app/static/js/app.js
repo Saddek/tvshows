@@ -11,7 +11,7 @@
 
       var div = button.closest('div[data-show-id]');
       var showId = div.data('showId');
-      var episodeId = button.data('episodeId');
+      var episodeId = button.closest('*[data-episode-id]').data('episodeId');
 
       if (!showId || !episodeId) {
         throw new Error('No show and/or episode ID found');
@@ -22,9 +22,28 @@
 
       $.getJSON(SCRIPT_ROOT + '/ajax/unseen/' + showId + '/' + episodeId, function(data, status, xhr) {
         if (xhr.status === 200) {
-          div.html(data.unseen);
-          setupButtons(div);
-          $('table#upcoming').html(data.upcoming);
+          if (div.attr('id') == 'showdetails') {
+            // if we're in the show details page, just reset the button and update which row has the "muted" class (seen episodes)
+            button.find('> i').removeClass('icon-loader').addClass('icon-eye-open');
+            button.removeClass('disabled');
+            
+            $('tr[data-episode-id]').each(function (index, element) {
+              if ($(this).data('episodeId') <= episodeId) {
+                $(this).addClass('muted');
+              } else {
+                $(this).removeClass('muted');
+              }
+            });
+          } else {
+            // else we're on the front page, update the div's content with the one sent by the server
+            div.html(data.unseen);
+
+            // setup the buttons again, or they won't be clickable
+            setupButtons(div);
+
+            // update the upcoming episodes table
+            $('table#upcoming').html(data.upcoming);
+          }
         }
       }).error(function () {
         button.find('> i').removeClass('icon-loader').addClass('icon-eye-open');
@@ -36,7 +55,7 @@
   setupButtons();
 
   $('.sortable').sortable().bind('sortupdate', function() {
-    var ordering = {}
+    var ordering = {};
     
     $(this).find('> li[data-show-id]').each(function (index, element) {
       ordering[$(element).data('showId')] = index;
