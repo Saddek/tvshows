@@ -5,37 +5,55 @@
 {% set page_name = show.name -%}
 
 {% block content %}
-    <div class="container">
-      <h2>
-        {{ show.name }}
-        <button class="btn btn-small btn-danger" type="button" data-toggle="modal" data-target="#deleteDialog"><i class="icon-trash icon-white"></i> {{ _('delete') }}</button>
-      </h2>
-      {% if show.poster_path %}
-        <img src="{{ show.poster_path }}" width="187" height="275" alt="{{ show.name }}">
-      {% else %}
-        <img data-src="holder.js/187x275/text:{{ show.name }}" alt="{{ show.name }}">
-      {% endif %}
+      <div class="container">
+        <div id="showdetails">
+          <div class="clearfix">
+            {% if show.poster %}
+            <img class="pull-left img-polaroid" src="{{ url_for('get_thumbnail', posterPath=show.poster, size='187x275') }}" alt="{{ show.name }}">
+            {% else %}
+            <img class="pull-left img-polaroid" data-src="holder.js/187x275/text:{{ show.name }}" alt="{{ show.name }}">
+            {% endif %}
 
-      <h3>Saison 1</h3>
-      
-      {% for ep in show.episodes %}
-        {% if (ep.episode == 1 and not loop.first) or loop.last %}
-          </tbody>
-        </table>
-        <hr>
-        {% endif %}
+            <div>
+              <a class="btn btn-danger" data-toggle="modal" data-target="#deleteDialog"><i class="icon-eye-close icon-white"></i> {{ _('showdetail.unwatch') }}</a>
+              
+              <h2>{{ show.name }}</h2>
 
-        {% if ep.episode == 1 %}
-        <table class="table table-striped" style="width: 70%; margin: 0 auto;">
-          <tbody>
-        {% endif %}
+              <ul class="unstyled">
+                <li><strong>{{ _('showdetail.seasons') }}</strong> {{ show.seasons }}</li>
+                <li><strong>{{ _('showdetail.status') }}</strong> {{ show.status }}</li>
+                <li><strong>{{ _('showdetail.network') }}</strong> {{ show.network }} (<img style="margin-bottom: 0.1em" src="{{ url_for('static', filename='flags/%s.png' % show.country.lower()) }}" alt="Flag" /> {{ show.country }})</li>
+                <li><strong>{{ _('showdetail.firstaired') }}</strong> {{ show.first_aired | prettyDate(forceYear=True) }}</li>
+                {% if show.last_aired %}
+                <li><strong>{{ _('showdetail.lastaired') }}</strong> {{ show.last_aired | prettyDate(forceYear=True) }}</li>
+                {% endif %}
+                <li></li>
+              </ul>
+            </div>
+          </div>
 
-            <tr>
-              <td>{{ ep | episodeNumber }}</td>
-              <td>{{ ep.title }}</td>
-              <td>{{ ep.airdate | prettyDate(forceYear=True) }}</td>
-            </tr>
-      {% endfor %}
+          <table class="table table-striped">
+            <tbody>
+              {% for ep in show.episodes %}
+              {% if ep.episode == 1 %}
+              <tr>
+                <th colspan="4">{{ _('showdetail.season_%(num)d', num=ep.season) }}</th>
+              </tr>
+              {% endif %}
+              <tr{% if ep.episode_id <= show.last_seen %} class="muted"{% endif %}>
+                <td>{{ ep | episodeNumber }}</td>
+                <td>{{ ep.title }}</td>
+                <td>{{ ep.airdate | prettyDate(forceYear=True) }}</td>
+                <td style="text-align: right">
+                  <a class="btn btn-mini" href="{{ show | pirateBayLink(ep) }}" target="_blank"><i class="icon-magnet"></i> {{ _('torrent') }}</a>
+                  <a class="btn btn-mini" href="{{ show | addic7edLink(ep) }}" target="_blank"><i class="icon-align-left"></i> {{ _('subtitles') }}</a>
+                  <a class="btn btn-mini" data-action="seen" data-episode-id="{{ ep.episode_id }}" href="javascript:void(0)"><i class="icon-eye-open"></i> {{ _('seen') }}</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
     </div>
 
     <div id="deleteDialog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deleteDialogLabel" aria-hidden="true">

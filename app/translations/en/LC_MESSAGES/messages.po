@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-13 15:49+0100\n"
+"POT-Creation-Date: 2013-02-03 14:58+0100\n"
 "PO-Revision-Date: 2013-01-06 00:06+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,70 +17,70 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: __init__.py:35
+#: __init__.py:55
 msgid "login.authentication_required"
 msgstr "Please login to access this page"
 
-#: __init__.py:71
+#: __init__.py:102
 msgid "date.unknown"
 msgstr "unknown"
 
-#: __init__.py:75
+#: __init__.py:106
 msgid "date.format.year_only"
 msgstr "yyyy"
 
-#: __init__.py:78
+#: __init__.py:109
 #, python-format
 msgid "date.in_year_%(year)s"
 msgstr "in %(year)s"
 
-#: __init__.py:81
+#: __init__.py:112
 msgid "date.format.year_month"
 msgstr "MMMM yyyy"
 
-#: __init__.py:84
+#: __init__.py:115
 #, python-format
 msgid "date.in_month_%(month)s"
 msgstr "in %(month)s"
 
-#: __init__.py:87
+#: __init__.py:118
 msgid "date.format.date_with_year"
 msgstr "MMMM d, yyyy"
 
-#: __init__.py:87
+#: __init__.py:118
 msgid "date.format.date_without_year"
 msgstr "MMMM d"
 
-#: __init__.py:90
+#: __init__.py:121
 #, python-format
 msgid "date.on_day_%(day)s"
 msgstr "on %(day)s"
 
-#: __init__.py:94
+#: __init__.py:125
 msgid "date.tonight"
 msgstr "Tonight"
 
-#: __init__.py:96
+#: __init__.py:127
 msgid "date.yesterday_night"
 msgstr "yesterday night"
 
-#: __init__.py:98
+#: __init__.py:129
 msgid "date.tomorrow_night"
 msgstr "Tomorrow night"
 
-#: __init__.py:100
+#: __init__.py:131
 msgid "date.format.next_day"
 msgstr "'Next' EEEE"
 
-#: __init__.py:102
+#: __init__.py:133
 msgid "date.format.previous_day"
 msgstr "'last' EEEE"
 
-#: __init__.py:222
+#: __init__.py:264
 msgid "login.authentication_failed"
 msgstr "Invalid credentials"
 
-#: __init__.py:230
+#: __init__.py:273
 msgid "login.successful_logout"
 msgstr "Successfully logged out"
 
@@ -151,15 +151,15 @@ msgstr[1] "%(num)d episodes"
 msgid "aired"
 msgstr "aired"
 
-#: templates/parts.html:11
+#: templates/parts.html:11 templates/showdetails.html:48
 msgid "torrent"
 msgstr "Torrent"
 
-#: templates/parts.html:12
+#: templates/parts.html:12 templates/showdetails.html:49
 msgid "subtitles"
 msgstr "Subtitles"
 
-#: templates/parts.html:13
+#: templates/parts.html:13 templates/showdetails.html:50
 msgid "seen"
 msgstr "Seen"
 
@@ -170,22 +170,51 @@ msgid_plural "unseen.%(num)d_others"
 msgstr[0] "1 other…"
 msgstr[1] "%(num)d others…"
 
-#: templates/showdetails.html:11 templates/showdetails.html:51
-msgid "delete"
-msgstr "Delete"
+#: templates/showdetails.html:18
+msgid "showdetail.unwatch"
+msgstr "Unwatch this show"
 
-#: templates/showdetails.html:44
+#: templates/showdetails.html:23
+msgid "showdetail.seasons"
+msgstr "Seasons:"
+
+#: templates/showdetails.html:24
+msgid "showdetail.status"
+msgstr "Status:"
+
+#: templates/showdetails.html:25
+msgid "showdetail.network"
+msgstr "Network:"
+
+#: templates/showdetails.html:26
+msgid "showdetail.firstaired"
+msgstr "First aired:"
+
+#: templates/showdetails.html:28
+msgid "showdetail.lastaired"
+msgstr "Last aired:"
+
+#: templates/showdetails.html:40
+#, python-format
+msgid "showdetail.season_%(num)d"
+msgstr "Season %(num)d"
+
+#: templates/showdetails.html:62
 msgid "showdetail.deletedialog.title"
 msgstr "Delete show"
 
-#: templates/showdetails.html:47
+#: templates/showdetails.html:65
 #, python-format
 msgid "showdetail.deletedialog.text_%(show)s"
 msgstr "Are you sure you want to delete %(show)s? This action cannot be undone."
 
-#: templates/showdetails.html:50 templates/shows.html:48
+#: templates/showdetails.html:68 templates/shows.html:48
 msgid "cancel"
 msgstr "Cancel"
+
+#: templates/showdetails.html:69
+msgid "delete"
+msgstr "Delete"
 
 #: templates/shows.html:11
 msgid "shows.addbutton"
