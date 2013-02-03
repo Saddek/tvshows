@@ -1,1 +1,1 @@
-SERIES_API_URL = 'http://seriesv2.madjawa.net/api'
+SERIES_API_URL = 'https://series.madjawa.net/api'
