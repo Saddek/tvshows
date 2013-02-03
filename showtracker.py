@@ -211,8 +211,18 @@ class SeriesDatabase:
 
         pipe = self.db.pipeline()
 
+        pipe.delete('show:%s' % showId)
+
         pipe.hset('show:%s' % showId, 'name', showName)
         pipe.hset('show:%s' % showId, 'seasons', int(tree.xpath('count(/Show/Episodelist/Season)')))
+        pipe.hset('show:%s' % showId, 'status', tree.xpath('/Show/status')[0].text)
+
+        country = tree.xpath('/Show/origin_country')[0].text
+        pipe.hset('show:%s' % showId, 'country', country)
+
+        network = tree.xpath('/Show/network[@country="%s"]' % country)
+        if network:
+            pipe.hset('show:%s' % showId, 'network', network[0].text)
 
         pipe.delete('show:%s:episodes' % showId)
         for season in tree.xpath('/Show/Episodelist/Season'):
@@ -234,13 +244,17 @@ class SeriesDatabase:
 
         pipe.execute()
 
-        episodes = self.__getEpisodes(showId, limit=1)
-        firstAired = episodes[0]['airdate'] if len(episodes) > 0 else None
+        # the date format in "started" and "ended" tags of the feed are not in a standard date format
+        # so we retrieve the first episode of the list to get the show's first airing date
+        episodes = self.__getEpisodes(showId)
+        if len(episodes) > 0:
+            self.db.hset('show:%s' % showId, 'firstaired', episodes[0]['airdate'])
 
-        self.db.hset('show:%s' % showId, 'firstaired', firstAired)
+            if tree.xpath('/Show/ended[node()]'):
+                self.db.hset('show:%s' % showId, 'lastaired', episodes[-1]['airdate'])
 
         if not os.path.exists(self.posterFilename(showId)):
-            self.downloadPoster({'show_id': showId, 'name': showName, 'first_aired': firstAired})
+            self.downloadPoster({'show_id': showId, 'name': showName, 'first_aired': episodes[0]['airdate'] if len(episodes) > 0 else None})
 
     @retry(requests.ConnectionError, tries=4, delay=1)
     def update(self):
@@ -313,11 +327,17 @@ class SeriesDatabase:
         showInfo = {
             'show_id': showId,
             'name': self.db.hget('show:%s' % showId, 'name'),
+            'status': self.db.hget('show:%s' % showId, 'status'),
+            'country': self.db.hget('show:%s' % showId, 'country'),
+            'network': self.db.hget('show:%s' % showId, 'network'),
             'seasons': self.db.hget('show:%s' % showId, 'seasons'),
+            'last_seen': self.getLastSeen(user, showId),
             'first_aired': self.db.hget('show:%s' % showId, 'firstaired')
         }
 
-        showInfo['last_seen'] = self.getLastSeen(user, showId)
+        lastAired = self.db.hget('show:%s' % showId, 'lastaired')
+        if lastAired:
+            showInfo['last_aired'] = lastAired
 
         if os.path.exists(self.posterFilename(showId, user=user)):
             showInfo['poster'] = 'static/posters/%s/%s.jpg' % (user, showId)
