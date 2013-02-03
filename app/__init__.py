@@ -265,7 +265,7 @@ def show_delete(showId):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = User(request.form['username'])
+        user = User(request.form['username'].lower())
         password = request.form['password']
         remember = bool(request.form.get('remember', False))
 
