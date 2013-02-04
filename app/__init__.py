@@ -63,8 +63,11 @@ def credentials():
 
 @login_manager.user_loader
 def load_user(userId):
+    if not 'password' in session:
+        return None
+
     user = User(userId)
-    user.password = session['password'] if 'password' in session else None
+    user.password = session['password']
     return user
 
 
@@ -289,8 +292,8 @@ def login():
         r = requests.get('%s/user/shows' % apiURL, auth=(user.id, password), verify=False)
 
         if r.status_code == 200:
-            login_user(user, remember=remember)
             session['password'] = password
+            login_user(user, remember=remember)
             return redirect(request.args.get('next') or url_for('home'))
         else:
             flash(gettext(u'login.authentication_failed'), 'error')
