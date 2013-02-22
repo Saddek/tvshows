@@ -73,7 +73,8 @@ def load_user(userId):
 
 @babel.localeselector
 def get_locale():
-    return request.accept_languages.best_match(['fr', 'en'])
+    # TODO: make sure it returns a locale also supported by WTForms to prevent errors
+    return 'fr'  # request.accept_languages.best_match(['fr', 'en'])
 
 
 def episodeNumber(episode):
