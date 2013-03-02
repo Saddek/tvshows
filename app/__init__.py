@@ -88,7 +88,7 @@ def pirateBayLink(show, episode):
     strippedName = re.sub(r'\(.+?\)|([^\s\w])+', '', show['name']).strip()
     searchString = '%s %s' % (strippedName, episodeNumber(episode))
 
-    return 'http://thepiratebay.se/search/%s/0/99/208' % urllib.quote_plus(searchString)
+    return 'http://thepiratebay.se/search/%s/0/7/208' % urllib.quote_plus(searchString)
 
 
 def addic7edLink(show, episode):
