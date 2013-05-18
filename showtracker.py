@@ -3,7 +3,6 @@ import errno
 import os
 import re
 from seriesdatabase import SeriesDatabase
-import requests
 from functools import wraps
 
 app = Flask(__name__)
@@ -25,9 +24,6 @@ if not app.debug:
     file_handler = TimedRotatingFileHandler(os.path.join(logsDir, 'error.log'), when='midnight', backupCount=5)
     file_handler.setLevel(logging.WARNING)
     app.logger.addHandler(file_handler)
-
-# TODO: remove this
-tvdbBannerURLFormat = 'http://thetvdb.com/banners/%s'
 
 
 def str2bool(v):
@@ -74,20 +70,11 @@ def set_custom_poster(showid):
     if not series.userHasShow(request.authorization.username, showid):
         abort(404)
 
-    req = requests.get(tvdbBannerURLFormat % request.form['posterURL'])
+    statusCode = series.setCustomPoster(request.authorization.username, showid, request.form['posterURL'])
 
-    posterFile = series.posterFilename(showid, user=request.authorization.username)
-    posterDir = os.path.dirname(posterFile)
-
-    if not os.path.exists(posterDir):
-        os.makedirs(os.path.dirname(posterFile))
-
-    if req.status_code == 200:
-        with open(posterFile, 'wb') as code:
-            code.write(req.content)
-
+    if statusCode == 200:
         return Response(status=204)
-    elif req.status_code == 404:
+    elif statusCode == 404:
         response = jsonify(message='Invalid posterURL')
         response.status_code = 400
         return response

@@ -162,8 +162,23 @@ class SeriesDatabase:
 
         req = requests.get(tvdbBannerURLFormat % posters[0])
         if req.status_code == 200:
-            with open(self.posterFilename(showInfo['show_id']), 'wb') as code:
-                code.write(req.content)
+            with open(self.posterFilename(showInfo['show_id']), 'wb') as f:
+                f.write(req.content)
+
+    def setCustomPoster(self, user, showId, posterURL):
+        req = requests.get(tvdbBannerURLFormat % posterURL)
+
+        posterFile = self.posterFilename(showId, user=user)
+        posterDir = os.path.dirname(posterFile)
+
+        if not os.path.exists(posterDir):
+            os.makedirs(os.path.dirname(posterFile))
+
+        if req.status_code == 200:
+            with open(posterFile, 'wb') as f:
+                f.write(req.content)
+
+        return req.status_code
 
     def deleteCustomPoster(self, user, showId):
         posterFile = self.posterFilename(showId, user=user)
