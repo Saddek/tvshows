@@ -12,4 +12,4 @@ import monitor
 monitor.start(interval=1.0)
 monitor.track(os.path.join(os.path.dirname(__file__)))
 
-from app import app as application
+from series import app as application

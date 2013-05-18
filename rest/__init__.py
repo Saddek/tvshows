@@ -1,1 +1,1 @@
-from showtracker import app as application
+from showtracker import rest

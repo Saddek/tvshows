@@ -12,9 +12,11 @@ import ConfigParser
 import errno
 import os
 import re
-import requests
 import urllib
 import wtforms.ext.i18n.form
+from seriesdatabase import SeriesDatabase
+
+series = SeriesDatabase()
 
 
 class User(UserMixin):
@@ -194,9 +196,12 @@ def airdateKey(airdate):
 
 
 def getShowsOverview():
-    res = requests.get('%s/user/shows?episodes=true&unseen=true' % apiURL, auth=credentials(), verify=False)
+    shows = []
+    for showId in series.getUserShowList(current_user.id):
+        show = series.getShowInfo(current_user.id, showId, withEpisodes=True, onlyUnseen=True)
 
-    shows = [show for show in res.json()['shows'] if len(show['episodes']) > 0]
+        if (len(show['episodes']) > 0):
+            shows.append(show)
 
     today = date.today().strftime('%Y-%m-%d')
     for show in shows:
@@ -223,9 +228,10 @@ def home():
 @app.route('/shows/')
 @login_required
 def shows():
-    res = requests.get('%s/user/shows' % apiURL, auth=credentials(), verify=False)
-
-    shows = res.json()['shows']
+    shows = []
+    for showId in series.getUserShowList(current_user.id):
+        show = series.getShowInfo(current_user.id, showId)
+        shows.append(show)
 
     return render_template('shows.html', shows=shows)
 
@@ -233,9 +239,7 @@ def shows():
 @app.route('/show/<showId>/')
 @login_required
 def show_details(showId):
-    res = requests.get('%s/user/shows/%s' % (apiURL, showId), auth=credentials(), verify=False)
-
-    show = res.json()
+    show = series.getShowInfo(current_user.id, showId)
 
     if 'poster' in show:
         show['poster_path'] = '%s/%s' % (apiURL, show['poster'])
@@ -246,10 +250,8 @@ def show_details(showId):
 @app.route('/add/<showId>')
 @login_required
 def show_add(showId):
-    r = requests.put('%s/user/shows/%s' % (apiURL, showId), auth=credentials(), verify=False)
-
-    if r.status_code != 200 and r.status_code != 201:
-        return Response(status=500)
+    if not series.userHasShow(current_user.id, showId):
+        series.addShowToUser(current_user.id, showId)
 
     return redirect(url_for('shows'))
 
@@ -257,13 +259,7 @@ def show_add(showId):
 @app.route('/delete/<showId>')
 @login_required
 def show_delete(showId):
-    r = requests.delete('%s/user/shows/%s' % (apiURL, showId), auth=credentials(), verify=False)
-
-    if r.status_code == 404:
-        return Response(status=404)
-
-    if r.status_code != 204:
-        return Response(status=500)
+    series.deleteShowFromUser(current_user.id, showId)
 
     return redirect(url_for('shows'))
 
@@ -290,9 +286,7 @@ def login():
         password = form.password.data
         remember = bool(form.remember.data)
 
-        r = requests.get('%s/user/shows' % apiURL, auth=(user.id, password), verify=False)
-
-        if r.status_code == 200:
+        if series.checkAuth(user.id, password):
             session['password'] = password
             login_user(user, remember=remember)
             return redirect(request.args.get('next') or url_for('home'))
@@ -316,20 +310,14 @@ def signup():
     form = RegistrationForm()
 
     if form.validate_on_submit():
-        data = {
-            'username': form.username.data,
-            'password': form.password.data
-        }
+        username = form.username.data.lower()
 
-        r = requests.post('%s/signup' % apiURL, data=data, verify=False)
-
-        if r.status_code == 204:
+        if not series.userExists(username):
+            series.addUser(username, form.password.data)
             flash(gettext('login.successful_signup'), 'success')
             return redirect(url_for('login'))
-        elif r.status_code == 409:
-            flash(gettext('signup.usernametaken'), 'error')
         else:
-            flash(gettext('internalerror'), 'error')
+            flash(gettext('signup.usernametaken'), 'error')
 
     return render_template('signup.html', form=form)
 
@@ -345,10 +333,7 @@ def logout():
 @app.route('/ajax/unseen/<showId>/<episodeId>')
 @login_required
 def ajax_home_unseen(showId, episodeId):
-    r = requests.put('%s/user/shows/%s/last_seen' % (apiURL, showId), data=episodeId, auth=credentials(), verify=False)
-
-    if (r.status_code != 204):
-        return Response(status=500)
+    series.setLastSeen(current_user.id, showId, episodeId)
 
     unseen, upcoming = getShowsOverview()
 
@@ -367,15 +352,13 @@ def ajax_set_show_order():
     ordering = {}
 
     for showId, order in request.form.iteritems():
-        if not showId.isdigit() or not order.isdigit():
+        if not showId.isdigit() or not order.isdigit() or not series.userHasShow(current_user.id, showId):
             return Response(status=400)
 
         ordering[showId] = order
 
-    res = requests.post('%s/user/shows_order' % apiURL, data=ordering, auth=credentials(), verify=False)
-
-    if res.status_code != 204:
-        return Response(status=500)
+    for showId, order in ordering.iteritems():
+        series.addShowToUser(current_user.id, showId, order)
 
     return Response(status=204)
 
@@ -383,16 +366,14 @@ def ajax_set_show_order():
 @app.route('/ajax/search/<showName>')
 @login_required
 def ajax_search_show(showName):
-    r = requests.get('%s/search/%s' % (apiURL, urllib.quote_plus(showName)), verify=False)
+    results = series.searchShow(showName)
 
-    if r.status_code != 200:
-        abort(500)
+    userShows = []
+    for showId in series.getUserShowList(current_user.id):
+        show = series.getShowInfo(current_user.id, showId, withEpisodes=False)
+        userShows.append(show['show_id'])
 
-    results = r.json()['results']
-
-    r = requests.get('%s/user/shows' % apiURL, auth=credentials(), verify=False)
-
-    userShows = [show['show_id'] for show in r.json()['shows']]
+    print userShows
 
     return render_template('ajax/search_results.html', results=results, userShows=userShows)
 
@@ -407,9 +388,7 @@ def get_thumbnail(size, posterPath):
 
     width, height = [int(component) for component in splittedSize]
 
-    r = requests.get('%s/%s' % (apiURL, posterPath), stream=True, verify=False)
-
-    img = Image.open(StringIO(r.content))
+    img = Image.open(app.open_resource('../' + posterPath))
 
     img.thumbnail((width, height), Image.ANTIALIAS)
 

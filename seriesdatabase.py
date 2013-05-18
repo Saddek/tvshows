@@ -1,4 +1,5 @@
 from lxml import etree
+import ConfigParser
 import errno
 import hashlib
 import json
@@ -59,9 +60,12 @@ if not os.path.exists(postersDir):
 
 
 class SeriesDatabase:
-    def __init__(self, redisHost, redisPort, redisDB, tvdbAPIKey):
-        self.db = redis.StrictRedis(host=redisHost, port=redisPort, db=redisDB)
-        self.tvdbAPIKey = tvdbAPIKey
+    def __init__(self):
+        config = ConfigParser.ConfigParser()
+        config.read(os.path.join(os.path.dirname(__file__), 'config.cfg'))
+
+        self.db = redis.StrictRedis(host=config.get('redis', 'host'), port=config.getint('redis', 'port'), db=config.getint('redis', 'db'))
+        self.tvdbAPIKey = config.get('thetvdb', 'api_key')
 
     @retry(requests.ConnectionError, tries=4, delay=1)
     def searchShow(self, showName):
@@ -332,7 +336,7 @@ class SeriesDatabase:
 
         return not None in pipe.execute()
 
-    def getShowInfo(self, user, showId, withEpisodes=False, episodeLimit=None, onlyUnseen=False):
+    def getShowInfo(self, user, showId, withEpisodes=True, episodeLimit=None, onlyUnseen=False):
         showInfo = {
             'show_id': showId,
             'name': self.db.hget('show:%s' % showId, 'name'),

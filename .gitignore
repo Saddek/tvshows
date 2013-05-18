@@ -1,6 +1,8 @@
 app/config.cfg
 app/translations/messages.pot
 app/logs/
+static/posters/
+config.cfg
 
 ####
 

@@ -1,3 +1,3 @@
-from app import app
+from series import app
 
 app.run('0.0.0.0')
