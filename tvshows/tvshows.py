@@ -1,4 +1,4 @@
-from flask import Flask, session
+from flask import Flask
 from flask.ext.login import LoginManager
 from flask.ext.babel import Babel, lazy_gettext
 from .user import User
@@ -31,12 +31,7 @@ customfilters.setupCustomFilters(app)
 
 @login_manager.user_loader
 def load_user(userId):
-    if not 'password' in session:
-        return None
-
-    user = User(userId)
-    user.password = session['password']
-    return user
+    return User(userId)
 
 
 @babel.localeselector

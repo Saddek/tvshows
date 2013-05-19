@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, render_template, request, Response, jsonify, url_for, redirect, session, flash, abort, send_file, current_app
+from flask import Blueprint, render_template, request, Response, jsonify, url_for, redirect, flash, abort, send_file, current_app
 from flask.ext.login import login_user, logout_user, login_required, current_user
 from flask.ext.babel import gettext, lazy_gettext
 from flask.ext.wtf import Form, TextField, PasswordField, BooleanField, validators
@@ -127,7 +127,6 @@ def login():
         remember = bool(form.remember.data)
 
         if series.checkAuth(user.id, password):
-            session['password'] = password
             login_user(user, remember=remember)
             return redirect(request.args.get('next') or url_for('.home'))
         else:
