@@ -1,13 +1,14 @@
 from flask import Flask
-from flask.ext.login import LoginManager
 from flask.ext.babel import Babel, lazy_gettext
+from flask.ext.login import LoginManager
+
+import errno
+import os
+
+from .frontend import frontend
+from .rest import rest
 from .user import User
 from . import customfilters
-import os
-import errno
-
-from frontend import frontend
-from rest import rest
 
 app = Flask(__name__)
 
@@ -39,6 +40,7 @@ def get_locale():
     # TODO: make sure it returns a locale also supported by WTForms to prevent errors
     return 'fr'  # request.accept_languages.best_match(['fr', 'en'])
 
+# Log errors to file when not in debug mode
 if not app.debug:
     import logging
     from logging.handlers import TimedRotatingFileHandler

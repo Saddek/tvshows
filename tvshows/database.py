@@ -1,5 +1,5 @@
 from lxml import etree
-from .helpers import retry
+
 import ConfigParser
 import errno
 import hashlib
@@ -8,6 +8,8 @@ import os
 import re
 import redis
 import requests
+
+from .helpers import retry
 
 
 class SeriesDatabase:

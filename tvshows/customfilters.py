@@ -1,9 +1,10 @@
-from flask.ext.babel import gettext, format_date
 from datetime import date
+from flask.ext.babel import gettext, format_date
+
 import ConfigParser
+import os
 import re
 import urllib
-import os
 
 overrides = ConfigParser.ConfigParser()
 overrides.read(os.path.join(os.path.dirname(__file__), 'config', 'overrides.cfg'))

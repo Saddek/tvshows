@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, render_template, request, Response, jsonify, url_for, redirect, flash, abort, send_file, current_app
-from flask.ext.login import login_user, logout_user, login_required, current_user
-from flask.ext.babel import gettext, lazy_gettext
-from flask.ext.wtf import Form, TextField, PasswordField, BooleanField, validators
 from datetime import date
+from flask import Blueprint, render_template, request, Response, jsonify, url_for, redirect, flash, abort, send_file, current_app
+from flask.ext.babel import gettext, lazy_gettext
+from flask.ext.login import login_user, logout_user, login_required, current_user
+from flask.ext.wtf import Form, TextField, PasswordField, BooleanField, validators
 from PIL import Image, ImageFile
 from StringIO import StringIO
-from ..user import User
+
 import calendar
 import wtforms.ext.i18n.form
+
 from ..database import SeriesDatabase
+from ..user import User
 
 series = SeriesDatabase()
 

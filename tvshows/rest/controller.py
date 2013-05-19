@@ -1,6 +1,7 @@
 from flask import Blueprint, request, Response, abort, jsonify
-from ..database import SeriesDatabase
 from functools import wraps
+
+from ..database import SeriesDatabase
 
 rest = Blueprint('rest', __name__)
 
