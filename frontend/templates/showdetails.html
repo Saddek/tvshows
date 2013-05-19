@@ -9,7 +9,7 @@
         <div id="showdetails" data-show-id="{{ show.show_id }}">
           <div class="clearfix">
             {% if show.poster %}
-            <img class="pull-left img-polaroid" src="{{ url_for('get_thumbnail', posterPath=show.poster, size='187x275') }}" alt="{{ show.name }}">
+            <img class="pull-left img-polaroid" src="{{ url_for('.get_thumbnail', posterPath=show.poster, size='187x275') }}" alt="{{ show.name }}">
             {% else %}
             <img class="pull-left img-polaroid" data-src="holder.js/187x275/text:{{ show.name }}" alt="{{ show.name }}">
             {% endif %}
@@ -66,7 +66,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('cancel') }}</button>
-        <a href="{{ url_for('show_delete', showId=show.show_id) }}" class="btn btn-danger">{{ _('delete') }}</a>
+        <a href="{{ url_for('.show_delete', showId=show.show_id) }}" class="btn btn-danger">{{ _('delete') }}</a>
       </div>
     </div>
 {% endblock %}

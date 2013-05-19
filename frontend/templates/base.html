@@ -1,13 +1,13 @@
 {% if current_user.is_authenticated() %}
 {% set navigation_bar = [
-    (url_for('home'), 'home', _('home.pagetitle')),
-    (url_for('shows'), 'shows', _('myshows.pagetitle')),
-    (url_for('logout'), 'logout', _('logout'))
+    (url_for('.home'), 'home', _('home.pagetitle')),
+    (url_for('.shows'), 'shows', _('myshows.pagetitle')),
+    (url_for('.logout'), 'logout', _('logout'))
 ] -%}
 {% else %}
 {% set navigation_bar = [
-    (url_for('login'), 'login', _('login.pagetitle')),
-    (url_for('signup'), 'signup', _('signup.pagetitle'))
+    (url_for('.login'), 'login', _('login.pagetitle')),
+    (url_for('.signup'), 'signup', _('signup.pagetitle'))
 ] -%}
 {% endif -%}
 
@@ -43,7 +43,7 @@
   {% endblock -%}
   </head>
 
-  <body class="page_{{ request.endpoint }}">
+  <body class="page_{{ request.endpoint | replace(request.blueprint+'.', '') }}">
     <div class="navbar navbar-inverse navbar-static-top">
       <div class="navbar-inner">
         <div class="container">
@@ -52,7 +52,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="{{ url_for('home') }}">{{ _('tvshows') }} <sup class="beta">BETA</sup></a>
+          <a class="brand" href="{{ url_for('.home') }}">{{ _('tvshows') }} <sup class="beta">BETA</sup></a>
           <div class="nav-collapse collapse">
             <ul class="nav">
               {% for href, id, caption in navigation_bar %}

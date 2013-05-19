@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, render_template, request, Response, jsonify, url_for, redirect, session, flash, abort, send_file
-from flask.ext.login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
-from flask.ext.babel import Babel, gettext, lazy_gettext, format_date
+from flask import Blueprint, render_template, request, Response, jsonify, url_for, redirect, session, flash, abort, send_file, current_app
+from flask.ext.login import login_user, logout_user, login_required, current_user, UserMixin
+from flask.ext.babel import gettext, lazy_gettext
 from flask.ext.wtf import Form, TextField, PasswordField, BooleanField, validators
 from datetime import date
 from PIL import Image, ImageFile
 from StringIO import StringIO
 import calendar
-import ConfigParser
-import os
-import re
-import urllib
 import wtforms.ext.i18n.form
 from seriesdatabase import SeriesDatabase
 
@@ -23,132 +19,8 @@ class User(UserMixin):
         super(User, self).__init__()
         self.id = userId
 
-app = Flask(__name__)
-login_manager = LoginManager()
 
-overrides = ConfigParser.ConfigParser()
-overrides.read(os.path.join(os.path.dirname(__file__), 'overrides.cfg'))
-
-babel = Babel(app)
-
-login_manager.setup_app(app)
-login_manager.login_view = 'login'
-login_manager.login_message = lazy_gettext(u'login.authentication_required')
-
-
-def credentials():
-    return (current_user.id, current_user.password)
-
-
-@login_manager.user_loader
-def load_user(userId):
-    if not 'password' in session:
-        return None
-
-    user = User(userId)
-    user.password = session['password']
-    return user
-
-
-@babel.localeselector
-def get_locale():
-    # TODO: make sure it returns a locale also supported by WTForms to prevent errors
-    return 'fr'  # request.accept_languages.best_match(['fr', 'en'])
-
-
-def episodeNumber(episode):
-    return 'S%02dE%02d' % (episode['season'], episode['episode'])
-
-
-def pirateBayLink(show, episode):
-    # Remove content in parenthesis from the name if they are present (like the year)
-    # because they are not included in release names most of the time
-    # Also remove everything that is not alphanumeric or whitespace (such has apostrophes)
-    strippedName = re.sub(r'\(.+?\)|([^\s\w])+', '', show['name']).strip()
-    searchString = '%s %s' % (strippedName, episodeNumber(episode))
-
-    return 'http://thepiratebay.se/search/%s/0/7/208' % urllib.quote_plus(searchString)
-
-
-def addic7edLink(show, episode):
-    if overrides.has_option(show['show_id'], 'addic7ed_str'):
-        # get the addic7ed string from the overrides file if it's defined
-        strippedName = overrides.get(show['show_id'], 'addic7ed_str')
-    else:
-        # else, remove content in parenthesis AND keep only alphanum, spaces and colon
-        strippedName = re.sub(r'[^\s\w:]', '', re.sub(r'\(.+?\)', '', show['name'])).strip().replace(' ', '_')
-
-    return 'http://www.addic7ed.com/serie/%s/%s/%s/episode' % (urllib.quote_plus(strippedName), episode['season'], episode['episode'])
-
-
-def prettyDate(dateStr, forceYear=False, addPrefix=False):
-    year, month, day = [int(component) for component in dateStr.split('-')]
-
-    if year == 0:
-        return gettext('date.unknown')
-
-    if month == 0:
-        parsedDate = date(year, 1, 1)
-        format = gettext('date.format.year_only')
-
-        if addPrefix:
-            format = gettext('date.in_year_%(year)s', year=format)
-    elif day == 0:
-        parsedDate = date(year, month, 1)
-        format = gettext('date.format.year_month')
-
-        if addPrefix:
-            format = gettext('date.in_month_%(month)s', month=format)
-    else:
-        parsedDate = date(year, month, day)
-        format = gettext('date.format.date_with_year') if forceYear or year != date.today().year else gettext('date.format.date_without_year')
-
-        if addPrefix:
-            format = gettext('date.on_day_%(day)s', day=format)
-
-    daysDiff = (parsedDate - date.today()).days
-    if daysDiff == 0:
-        return gettext('date.tonight')
-    elif daysDiff == -1:
-        return gettext('date.yesterday_night')
-    elif daysDiff == 1:
-        return gettext('date.tomorrow_night')
-    elif daysDiff > 0 and daysDiff < 7:
-        format = gettext('date.format.next_day')
-    elif daysDiff < 0 and daysDiff > -7:
-        format = gettext('date.format.previous_day')
-
-    formattedDate = format_date(parsedDate, format)
-
-    return formattedDate
-
-
-def yearRange(started, ended):
-    if ended == 0:
-        return started
-
-    return '%d - %d' % (started, ended)
-
-
-def localizedShowStatus(status):
-    if status == 'Returning Series':
-        return gettext('showdetails.status.returning')
-    elif status == 'Canceled/Ended' or status == 'Ended':
-        return gettext('showdetails.status.ended')
-    elif status == 'New Series':
-        return gettext('showdetails.status.firstseason')
-    elif status == 'Final Season':
-        return gettext('showdetails.status.finalseason')
-    else:
-        return status
-
-app.jinja_env.filters['episodeNumber'] = episodeNumber
-app.jinja_env.filters['prettyDate'] = prettyDate
-app.jinja_env.filters['pirateBayLink'] = pirateBayLink
-app.jinja_env.filters['addic7edLink'] = addic7edLink
-app.jinja_env.filters['yearRange'] = yearRange
-app.jinja_env.filters['localizedShowStatus'] = localizedShowStatus
-app.jinja_env.add_extension('jinja2.ext.do')
+frontend = Blueprint('frontend', __name__, template_folder='templates')
 
 
 # sorts episodes by date
@@ -194,7 +66,7 @@ def getShowsOverview():
     return unseen, upcoming
 
 
-@app.route('/')
+@frontend.route('/')
 @login_required
 def home():
     unseen, upcoming = getShowsOverview()
@@ -202,7 +74,7 @@ def home():
     return render_template('home.html', unseen=unseen, upcoming=upcoming)
 
 
-@app.route('/shows/')
+@frontend.route('/shows/')
 @login_required
 def shows():
     shows = []
@@ -213,7 +85,7 @@ def shows():
     return render_template('shows.html', shows=shows)
 
 
-@app.route('/show/<showId>/')
+@frontend.route('/show/<showId>/')
 @login_required
 def show_details(showId):
     show = series.getShowInfo(current_user.id, showId)
@@ -221,21 +93,21 @@ def show_details(showId):
     return render_template('showdetails.html', show=show)
 
 
-@app.route('/add/<showId>')
+@frontend.route('/add/<showId>')
 @login_required
 def show_add(showId):
     if not series.userHasShow(current_user.id, showId):
         series.addShowToUser(current_user.id, showId)
 
-    return redirect(url_for('shows'))
+    return redirect(url_for('.shows'))
 
 
-@app.route('/delete/<showId>')
+@frontend.route('/delete/<showId>')
 @login_required
 def show_delete(showId):
     series.deleteShowFromUser(current_user.id, showId)
 
-    return redirect(url_for('shows'))
+    return redirect(url_for('.shows'))
 
 
 class UserForm(Form, wtforms.ext.i18n.form.Form):
@@ -246,10 +118,10 @@ class UserForm(Form, wtforms.ext.i18n.form.Form):
     password = PasswordField(lazy_gettext('login.placeholder.password'), [validators.Required()])
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@frontend.route('/login', methods=['GET', 'POST'])
 def login():
     class LoginForm(UserForm):
-        LANGUAGES = [get_locale()]
+        LANGUAGES = ['fr']  # [get_locale()]
 
         remember = BooleanField(lazy_gettext('login.rememberme'))
 
@@ -263,17 +135,17 @@ def login():
         if series.checkAuth(user.id, password):
             session['password'] = password
             login_user(user, remember=remember)
-            return redirect(request.args.get('next') or url_for('home'))
+            return redirect(request.args.get('next') or url_for('.home'))
         else:
             flash(gettext(u'login.authentication_failed'), 'error')
 
     return render_template('login.html', form=form)
 
 
-@app.route('/signup', methods=['GET', 'POST'])
+@frontend.route('/signup', methods=['GET', 'POST'])
 def signup():
     class RegistrationForm(UserForm):
-        LANGUAGES = [get_locale()]
+        LANGUAGES = ['fr']  # [get_locale()]
 
         password = PasswordField(lazy_gettext('login.placeholder.password'), [
             validators.Required(),
@@ -289,22 +161,22 @@ def signup():
         if not series.userExists(username):
             series.addUser(username, form.password.data)
             flash(gettext('login.successful_signup'), 'success')
-            return redirect(url_for('login'))
+            return redirect(url_for('.login'))
         else:
             flash(gettext('signup.usernametaken'), 'error')
 
     return render_template('signup.html', form=form)
 
 
-@app.route("/logout")
+@frontend.route("/logout")
 @login_required
 def logout():
     logout_user()
     flash(gettext(u'login.successful_logout'), 'success')
-    return redirect(url_for('login'))
+    return redirect(url_for('.login'))
 
 
-@app.route('/ajax/unseen/<showId>/<episodeId>')
+@frontend.route('/ajax/unseen/<showId>/<episodeId>')
 @login_required
 def ajax_home_unseen(showId, episodeId):
     series.setLastSeen(current_user.id, showId, episodeId)
@@ -320,7 +192,7 @@ def ajax_home_unseen(showId, episodeId):
                    upcoming=render_template('ajax/home_upcoming.html', upcoming=upcoming))
 
 
-@app.route('/ajax/showsorder', methods=['POST'])
+@frontend.route('/ajax/showsorder', methods=['POST'])
 @login_required
 def ajax_set_show_order():
     ordering = {}
@@ -337,7 +209,7 @@ def ajax_set_show_order():
     return Response(status=204)
 
 
-@app.route('/ajax/search/<showName>')
+@frontend.route('/ajax/search/<showName>')
 @login_required
 def ajax_search_show(showName):
     results = series.searchShow(showName)
@@ -352,7 +224,7 @@ def ajax_search_show(showName):
     return render_template('ajax/search_results.html', results=results, userShows=userShows)
 
 
-@app.route('/thumbs/<size>/<path:posterPath>', methods=['GET'])
+@frontend.route('/thumbs/<size>/<path:posterPath>', methods=['GET'])
 def get_thumbnail(size, posterPath):
     # width and height are separated by an 'x' (e.g. 187x275)
     splittedSize = size.split('x')
@@ -362,7 +234,7 @@ def get_thumbnail(size, posterPath):
 
     width, height = [int(component) for component in splittedSize]
 
-    img = Image.open(app.open_resource('../' + posterPath))
+    img = Image.open(current_app.open_resource(posterPath))
 
     img.thumbnail((width, height), Image.ANTIALIAS)
 

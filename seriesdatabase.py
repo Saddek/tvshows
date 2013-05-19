@@ -62,7 +62,7 @@ if not os.path.exists(postersDir):
 class SeriesDatabase:
     def __init__(self):
         config = ConfigParser.ConfigParser()
-        config.read(os.path.join(os.path.dirname(__file__), 'config.cfg'))
+        config.read(os.path.join(os.path.dirname(__file__), 'config', 'config.cfg'))
 
         self.db = redis.StrictRedis(host=config.get('redis', 'host'), port=config.getint('redis', 'port'), db=config.getint('redis', 'db'))
         self.tvdbAPIKey = config.get('thetvdb', 'api_key')
