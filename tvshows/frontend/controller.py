@@ -1,24 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, render_template, request, Response, jsonify, url_for, redirect, session, flash, abort, send_file, current_app
-from flask.ext.login import login_user, logout_user, login_required, current_user, UserMixin
+from flask.ext.login import login_user, logout_user, login_required, current_user
 from flask.ext.babel import gettext, lazy_gettext
 from flask.ext.wtf import Form, TextField, PasswordField, BooleanField, validators
 from datetime import date
 from PIL import Image, ImageFile
 from StringIO import StringIO
+from ..user import User
 import calendar
 import wtforms.ext.i18n.form
-from seriesdatabase import SeriesDatabase
+from ..database import SeriesDatabase
 
 series = SeriesDatabase()
-
-
-class User(UserMixin):
-    def __init__(self, userId):
-        super(User, self).__init__()
-        self.id = userId
-
 
 frontend = Blueprint('frontend', __name__, template_folder='templates')
 

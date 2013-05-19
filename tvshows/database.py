@@ -1,4 +1,5 @@
 from lxml import etree
+from .helpers import retry
 import ConfigParser
 import errno
 import hashlib
@@ -7,65 +8,21 @@ import os
 import re
 import redis
 import requests
-import time
-
-
-def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
-    """Retry calling the decorated function using an exponential backoff.
-
-    http://www.saltycrane.com/blog/2009/11/trying-out-retry-decorator-python/
-    original from: http://wiki.python.org/moin/PythonDecoratorLibrary#Retry
-
-    :param ExceptionToCheck: the exception to check. may be a tuple of
-        excpetions to check
-    :type ExceptionToCheck: Exception or tuple
-    :param tries: number of times to try (not retry) before giving up
-    :type tries: int
-    :param delay: initial delay between retries in seconds
-    :type delay: int
-    :param backoff: backoff multiplier e.g. value of 2 will double the delay
-        each retry
-    :type backoff: int
-    :param logger: logger to use. If None, print
-    :type logger: logging.Logger instance
-    """
-    def deco_retry(f):
-        def f_retry(*args, **kwargs):
-            mtries, mdelay = tries, delay
-            try_one_last_time = True
-            while mtries > 1:
-                try:
-                    return f(*args, **kwargs)
-                    try_one_last_time = False
-                    break
-                except ExceptionToCheck, e:
-                    msg = "%s, Retrying in %d seconds..." % (str(e), mdelay)
-                    if logger:
-                        logger.warning(msg)
-                    else:
-                        print msg
-                    time.sleep(mdelay)
-                    mtries -= 1
-                    mdelay *= backoff
-            if try_one_last_time:
-                return f(*args, **kwargs)
-            return
-        return f_retry  # true decorator
-    return deco_retry
-
-tvdbBannerURLFormat = 'http://thetvdb.com/banners/%s'
-postersDir = os.path.join(os.path.dirname(__file__), 'static', 'posters')
-if not os.path.exists(postersDir):
-    os.makedirs(postersDir)
 
 
 class SeriesDatabase:
+    tvdbBannerURLFormat = 'http://thetvdb.com/banners/%s'
+    postersDir = os.path.join(os.path.dirname(__file__), 'static', 'posters')
+
     def __init__(self):
         config = ConfigParser.ConfigParser()
         config.read(os.path.join(os.path.dirname(__file__), 'config', 'config.cfg'))
 
         self.db = redis.StrictRedis(host=config.get('redis', 'host'), port=config.getint('redis', 'port'), db=config.getint('redis', 'db'))
         self.tvdbAPIKey = config.get('thetvdb', 'api_key')
+
+        if not os.path.exists(SeriesDatabase.postersDir):
+            os.makedirs(SeriesDatabase.postersDir)
 
     @retry(requests.ConnectionError, tries=4, delay=1)
     def searchShow(self, showName):
@@ -164,13 +121,13 @@ class SeriesDatabase:
         if len(posters) == 0:
             return
 
-        req = requests.get(tvdbBannerURLFormat % posters[0])
+        req = requests.get(SeriesDatabase.tvdbBannerURLFormat % posters[0])
         if req.status_code == 200:
             with open(self.posterFilename(showInfo['show_id']), 'wb') as f:
                 f.write(req.content)
 
     def setCustomPoster(self, user, showId, posterURL):
-        req = requests.get(tvdbBannerURLFormat % posterURL)
+        req = requests.get(SeriesDatabase.tvdbBannerURLFormat % posterURL)
 
         posterFile = self.posterFilename(showId, user=user)
         posterDir = os.path.dirname(posterFile)
@@ -207,9 +164,9 @@ class SeriesDatabase:
         filename = '%s.jpg' % showId
 
         if user:
-            return os.path.join(postersDir, user, filename)
+            return os.path.join(SeriesDatabase.postersDir, user, filename)
 
-        return os.path.join(postersDir, filename)
+        return os.path.join(SeriesDatabase.postersDir, filename)
 
     @retry(requests.ConnectionError, tries=4, delay=1)
     def downloadShow(self, showId):

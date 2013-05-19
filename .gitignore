@@ -1,7 +1,7 @@
-config/config.cfg
-translations/messages.pot
-logs/
-static/posters/
+tvshows/config/config.cfg
+tvshows/translations/messages.pot
+tvshows/logs/
+tvshows/static/posters/
 
 ####
 
