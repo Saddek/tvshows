@@ -12,7 +12,8 @@ from rest import rest
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.urandom(24)
-app.debug = True
+
+app.debug = True if os.environ.get('DEBUG') else False
 
 app.register_blueprint(frontend)
 app.register_blueprint(rest, url_prefix='/rest')
