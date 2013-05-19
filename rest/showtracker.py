@@ -1,33 +1,14 @@
 from flask import Blueprint, request, Response, abort, jsonify
-import re
 from seriesdatabase import SeriesDatabase
 from functools import wraps
 
 rest = Blueprint('rest', __name__)
 
-# TODO: check that all needed config variables are set
-#app.config.from_pyfile('config.cfg')
-
-# if not current_app.debug:
-#     import logging
-#     from logging.handlers import TimedRotatingFileHandler
-
-#     logsDir = os.path.join(os.path.dirname(__file__), 'logs')
-#     try:
-#         os.makedirs(logsDir)
-#     except OSError as exception:
-#         if exception.errno != errno.EEXIST:
-#             raise
-
-#     file_handler = TimedRotatingFileHandler(os.path.join(logsDir, 'error.log'), when='midnight', backupCount=5)
-#     file_handler.setLevel(logging.WARNING)
-#     app.logger.addHandler(file_handler)
+series = SeriesDatabase()
 
 
 def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
-
-series = SeriesDatabase()
 
 
 def authenticate():
@@ -200,27 +181,3 @@ def reorder_shows():
         series.addShowToUser(request.authorization.username, showId, order)
 
     return Response(status=204)
-
-
-# @rest.route('/signup', methods=['POST'])
-# def signup():
-#     username = request.form['username'].lower()
-#     if re.match('^[\w-]+$', username) is None:
-#         response = jsonify(message='Invalid username')
-#         response.status_code = 400
-#         return response
-
-#     if series.userExists(username):
-#         return Response(status=409)
-
-#     password = request.form['password']
-
-#     if len(password) == 0:
-#         return Response(status=400)
-
-#     series.addUser(username, password)
-
-#     return Response(status=204)
-
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5001)

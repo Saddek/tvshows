@@ -9,7 +9,6 @@ from PIL import Image, ImageFile
 from StringIO import StringIO
 import calendar
 import ConfigParser
-import errno
 import os
 import re
 import urllib
@@ -27,32 +26,10 @@ class User(UserMixin):
 app = Flask(__name__)
 login_manager = LoginManager()
 
-app.config['SECRET_KEY'] = os.urandom(24)
-
-# TODO: check that all needed config variables are set
-app.config.from_pyfile('config.cfg')
-
-if not app.debug:
-    import logging
-    from logging.handlers import TimedRotatingFileHandler
-
-    logsDir = os.path.join(os.path.dirname(__file__), 'logs')
-    try:
-        os.makedirs(logsDir)
-    except OSError as exception:
-        if exception.errno != errno.EEXIST:
-            raise
-
-    file_handler = TimedRotatingFileHandler(os.path.join(logsDir, 'error.log'), when='midnight', backupCount=5)
-    file_handler.setLevel(logging.WARNING)
-    app.logger.addHandler(file_handler)
-
 overrides = ConfigParser.ConfigParser()
 overrides.read(os.path.join(os.path.dirname(__file__), 'overrides.cfg'))
 
 babel = Babel(app)
-
-apiURL = app.config['SERIES_API_URL']
 
 login_manager.setup_app(app)
 login_manager.login_view = 'login'
@@ -240,9 +217,6 @@ def shows():
 @login_required
 def show_details(showId):
     show = series.getShowInfo(current_user.id, showId)
-
-    if 'poster' in show:
-        show['poster_path'] = '%s/%s' % (apiURL, show['poster'])
 
     return render_template('showdetails.html', show=show)
 
