@@ -9,6 +9,7 @@ import os
 import re
 import redis
 import requests
+import sys
 
 from .helpers import retry
 
@@ -18,8 +19,14 @@ class SeriesDatabase:
     postersDir = os.path.join(os.path.dirname(__file__), 'static', 'posters')
 
     def __init__(self):
+        configFilename = os.path.join(os.path.dirname(__file__), 'config', 'config.cfg')
+
+        if not os.path.exists(configFilename):
+            print >> sys.stderr, 'Missing config/config.cfg file, exiting.'
+            sys.exit(1)
+
         config = ConfigParser.ConfigParser()
-        config.read(os.path.join(os.path.dirname(__file__), 'config', 'config.cfg'))
+        config.read(configFilename)
 
         self.db = redis.StrictRedis(host=config.get('redis', 'host'), port=config.getint('redis', 'port'), db=config.getint('redis', 'db'))
         self.tvdbAPIKey = config.get('thetvdb', 'api_key')
