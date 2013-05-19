@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import date
 from flask import Blueprint, render_template, request, Response, jsonify, url_for, redirect, flash, abort, send_file, current_app
-from flask.ext.babel import gettext, lazy_gettext
+from flask.ext.babel import gettext, lazy_gettext, get_locale
 from flask.ext.login import login_user, logout_user, login_required, current_user
 from flask.ext.wtf import Form, TextField, PasswordField, BooleanField, validators
 from PIL import Image, ImageFile
@@ -116,7 +116,7 @@ class UserForm(Form, wtforms.ext.i18n.form.Form):
 @frontend.route('/login', methods=['GET', 'POST'])
 def login():
     class LoginForm(UserForm):
-        LANGUAGES = ['fr']  # [get_locale()]
+        LANGUAGES = [get_locale().language]
 
         remember = BooleanField(lazy_gettext('login.rememberme'))
 
@@ -139,7 +139,7 @@ def login():
 @frontend.route('/signup', methods=['GET', 'POST'])
 def signup():
     class RegistrationForm(UserForm):
-        LANGUAGES = ['fr']  # [get_locale()]
+        LANGUAGES = [get_locale().language]
 
         password = PasswordField(lazy_gettext('login.placeholder.password'), [
             validators.Required(),

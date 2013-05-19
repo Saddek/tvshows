@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from flask import Flask
+from babel import Locale
+from flask import Flask, request
 from flask.ext.babel import Babel, lazy_gettext
 from flask.ext.login import LoginManager
 
@@ -38,8 +39,7 @@ def load_user(userId):
 
 @babel.localeselector
 def get_locale():
-    # TODO: make sure it returns a locale also supported by WTForms to prevent errors
-    return 'fr'  # request.accept_languages.best_match(['fr', 'en'])
+    return Locale.negotiate(request.accept_languages.values(), ['en', 'fr'])
 
 # Log errors to file when not in debug mode
 if not app.debug:
