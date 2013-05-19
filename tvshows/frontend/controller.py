@@ -4,10 +4,11 @@ from flask import Blueprint, render_template, request, Response, jsonify, url_fo
 from flask.ext.babel import gettext, lazy_gettext, get_locale
 from flask.ext.login import login_user, logout_user, login_required, current_user
 from flask.ext.wtf import Form, TextField, PasswordField, BooleanField, validators
-from PIL import Image, ImageFile
 from StringIO import StringIO
 
 import calendar
+import Image
+import ImageFile
 import wtforms.ext.i18n.form
 
 from ..database import SeriesDatabase
