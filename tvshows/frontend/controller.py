@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from datetime import date
 from flask import Blueprint, render_template, request, Response, jsonify, url_for, redirect, flash, abort, send_file, current_app
 from flask.ext.babel import gettext, lazy_gettext

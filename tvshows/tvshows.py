@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import Flask
 from flask.ext.babel import Babel, lazy_gettext
 from flask.ext.login import LoginManager

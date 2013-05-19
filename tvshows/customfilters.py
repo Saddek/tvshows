@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from datetime import date
 from flask.ext.babel import gettext, format_date
 
