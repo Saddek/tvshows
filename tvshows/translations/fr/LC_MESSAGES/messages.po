@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-02-03 22:33+0100\n"
+"POT-Creation-Date: 2013-05-20 22:58+0200\n"
 "PO-Revision-Date: 2013-01-06 00:06+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -17,305 +17,301 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: app/__init__.py:57
-msgid "login.authentication_required"
-msgstr "Vous devez être connecté pour accéder à cette page"
-
-#: app/__init__.py:105
+#: customfilters.py:43
 msgid "date.unknown"
 msgstr "inconnu"
 
-#: app/__init__.py:109
+#: customfilters.py:47
 msgid "date.format.year_only"
 msgstr "yyyy"
 
-#: app/__init__.py:112
+#: customfilters.py:50
 #, python-format
 msgid "date.in_year_%(year)s"
 msgstr "en %(year)s"
 
-#: app/__init__.py:115
+#: customfilters.py:53
 msgid "date.format.year_month"
 msgstr "MMMM yyyy"
 
-#: app/__init__.py:118
+#: customfilters.py:56
 #, python-format
 msgid "date.in_month_%(month)s"
 msgstr "en %(month)s"
 
-#: app/__init__.py:121
+#: customfilters.py:59
 msgid "date.format.date_with_year"
 msgstr "d MMMM yyyy"
 
-#: app/__init__.py:121
+#: customfilters.py:59
 msgid "date.format.date_without_year"
 msgstr "d MMMM"
 
-#: app/__init__.py:124
+#: customfilters.py:62
 #, python-format
 msgid "date.on_day_%(day)s"
 msgstr "'le' %(day)s"
 
-#: app/__init__.py:128
+#: customfilters.py:66
 msgid "date.tonight"
 msgstr "ce soir"
 
-#: app/__init__.py:130
+#: customfilters.py:68
 msgid "date.yesterday_night"
 msgstr "hier soir"
 
-#: app/__init__.py:132
+#: customfilters.py:70
 msgid "date.tomorrow_night"
 msgstr "demain soir"
 
-#: app/__init__.py:134
+#: customfilters.py:72
 msgid "date.format.next_day"
 msgstr "EEEE 'prochain'"
 
-#: app/__init__.py:136
+#: customfilters.py:74
 msgid "date.format.previous_day"
 msgstr "EEEE 'dernier'"
 
-#: app/__init__.py:152
+#: customfilters.py:90
 msgid "showdetails.status.returning"
 msgstr "En production"
 
-#: app/__init__.py:154
+#: customfilters.py:92
 msgid "showdetails.status.ended"
 msgstr "Terminée"
 
-#: app/__init__.py:156
+#: customfilters.py:94
 msgid "showdetails.status.firstseason"
 msgstr "Nouvelle série"
 
-#: app/__init__.py:158
+#: customfilters.py:96
 msgid "showdetails.status.finalseason"
 msgstr "Saison finale"
 
-#: app/__init__.py:270
+#: tvshows.py:30
+msgid "login.authentication_required"
+msgstr "Vous devez être connecté pour accéder à cette page"
+
+#: frontend/controller.py:110
 msgid "login.placeholder.username"
 msgstr "Nom d'utilisateur"
 
-#: app/__init__.py:272
+#: frontend/controller.py:112
 msgid "signup.error.alphanum"
 msgstr "Ne doit contenir que des caractères alphanumériques"
 
-#: app/__init__.py:274 app/__init__.py:282
+#: frontend/controller.py:114 frontend/controller.py:145
 msgid "login.placeholder.password"
 msgstr "Mot de passe"
 
-#: app/__init__.py:278 app/templates/login.html:25
+#: frontend/controller.py:122 frontend/templates/login.html:25
 msgid "login.rememberme"
 msgstr "Se souvenir de moi"
 
-#: app/__init__.py:284
-msgid "signup.error.passwordsmatch"
-msgstr "Les mots de passe doivent correspondre"
-
-#: app/__init__.py:286
-msgid "signup.placeholder.confirmpassword"
-msgstr "Confirmez le mot de passe"
-
-#: app/__init__.py:305
+#: frontend/controller.py:135
 msgid "login.authentication_failed"
 msgstr "Identifiants invalides"
 
-#: app/__init__.py:323
+#: frontend/controller.py:147
+msgid "signup.error.passwordsmatch"
+msgstr "Les mots de passe doivent correspondre"
+
+#: frontend/controller.py:149
+msgid "signup.placeholder.confirmpassword"
+msgstr "Confirmez le mot de passe"
+
+#: frontend/controller.py:158
 msgid "login.successful_signup"
 msgstr "Inscription réussie. Vous pouvez maintenant vous connecter"
 
-#: app/__init__.py:326
+#: frontend/controller.py:161
 msgid "signup.usernametaken"
 msgstr "Nom d'utilisateur déjà pris"
 
-#: app/__init__.py:328
-msgid "internalerror"
-msgstr "Erreur interne, merci de réessayer plus tard"
-
-#: app/__init__.py:337
+#: frontend/controller.py:170
 msgid "login.successful_logout"
 msgstr "Déconnecté avec succès"
 
-#: app/templates/base.html:3
+#: frontend/templates/base.html:3
 msgid "home.pagetitle"
 msgstr "Accueil"
 
-#: app/templates/base.html:4 app/templates/shows.html:5
-#: app/templates/shows.html:10
+#: frontend/templates/base.html:4 frontend/templates/shows.html:5
+#: frontend/templates/shows.html:10
 msgid "myshows.pagetitle"
 msgstr "Mes séries"
 
-#: app/templates/base.html:5
+#: frontend/templates/base.html:5
 msgid "logout"
 msgstr "Déconnexion"
 
-#: app/templates/base.html:9 app/templates/login.html:4
+#: frontend/templates/base.html:9 frontend/templates/login.html:4
 msgid "login.pagetitle"
 msgstr "Connexion"
 
-#: app/templates/base.html:10 app/templates/signup.html:4
+#: frontend/templates/base.html:10 frontend/templates/signup.html:4
 msgid "signup.pagetitle"
 msgstr "Inscription"
 
-#: app/templates/base.html:23 app/templates/base.html:55
+#: frontend/templates/base.html:23 frontend/templates/base.html:55
 msgid "tvshows"
 msgstr "Séries TV"
 
-#: app/templates/home.html:7
+#: frontend/templates/home.html:7
 msgid "home.unseen"
 msgstr "À voir"
 
-#: app/templates/home.html:14
+#: frontend/templates/home.html:14
 msgid "home.nounseen"
 msgstr "Rien à regarder :("
 
-#: app/templates/home.html:19
+#: frontend/templates/home.html:19
 msgid "home.upcoming"
 msgstr "Prochainement"
 
-#: app/templates/home.html:26
+#: frontend/templates/home.html:26
 msgid "home.noupcoming"
 msgstr "Rien à venir :("
 
-#: app/templates/login.html:9
+#: frontend/templates/login.html:9
 msgid "login.heading"
 msgstr "Login"
 
-#: app/templates/login.html:28
+#: frontend/templates/login.html:28
 msgid "login.submitbutton"
 msgstr "Connexion"
 
-#: app/templates/login.html:29
+#: frontend/templates/login.html:29
 msgid "login.noaccount"
 msgstr "Pas de compte ?"
 
-#: app/templates/login.html:29
+#: frontend/templates/login.html:29
 msgid "login.signup"
 msgstr "S'inscrire"
 
-#: app/templates/parts.html:4
+#: frontend/templates/parts.html:4
 #, python-format
 msgid "unseen.%(num)d_episode"
 msgid_plural "unseen.%(num)d_episodes"
 msgstr[0] "1 épisode"
 msgstr[1] "%(num)d épisodes"
 
-#: app/templates/parts.html:9
+#: frontend/templates/parts.html:9
 msgid "aired"
 msgstr "diffusé"
 
-#: app/templates/parts.html:11 app/templates/showdetails.html:48
+#: frontend/templates/parts.html:11 frontend/templates/showdetails.html:48
 msgid "torrent"
 msgstr "Torrent"
 
-#: app/templates/parts.html:12 app/templates/showdetails.html:49
+#: frontend/templates/parts.html:12 frontend/templates/showdetails.html:49
 msgid "subtitles"
 msgstr "Sous-titres"
 
-#: app/templates/parts.html:13 app/templates/showdetails.html:50
+#: frontend/templates/parts.html:13 frontend/templates/showdetails.html:50
 msgid "seen"
 msgstr "Vu"
 
-#: app/templates/parts.html:19
+#: frontend/templates/parts.html:19
 #, python-format
 msgid "unseen.%(num)d_other"
 msgid_plural "unseen.%(num)d_others"
 msgstr[0] "1 autre…"
 msgstr[1] "%(num)d autres…"
 
-#: app/templates/showdetails.html:18
+#: frontend/templates/showdetails.html:18
 msgid "showdetail.unwatch"
-msgstr "Ne plus regarder"
+msgstr "Ne plus suivre"
 
-#: app/templates/showdetails.html:23
+#: frontend/templates/showdetails.html:23
 msgid "showdetail.seasons"
 msgstr "Saisons :"
 
-#: app/templates/showdetails.html:24
+#: frontend/templates/showdetails.html:24
 msgid "showdetail.status"
 msgstr "Status :"
 
-#: app/templates/showdetails.html:25
+#: frontend/templates/showdetails.html:25
 msgid "showdetail.network"
 msgstr "Chaîne :"
 
-#: app/templates/showdetails.html:26
+#: frontend/templates/showdetails.html:26
 msgid "showdetail.firstaired"
 msgstr "Première diffusion :"
 
-#: app/templates/showdetails.html:28
+#: frontend/templates/showdetails.html:28
 msgid "showdetail.lastaired"
 msgstr "Dernière diffusion :"
 
-#: app/templates/showdetails.html:40
+#: frontend/templates/showdetails.html:40
 #, python-format
 msgid "showdetail.season_%(num)d"
 msgstr "Saison %(num)d"
 
-#: app/templates/showdetails.html:62
+#: frontend/templates/showdetails.html:62
 msgid "showdetail.deletedialog.title"
 msgstr "Supprimer la série"
 
-#: app/templates/showdetails.html:65
+#: frontend/templates/showdetails.html:65
 #, python-format
 msgid "showdetail.deletedialog.text_%(show)s"
 msgstr ""
 "Êtes-vous sûr de vouloir supprimer %(show)s ? Cette action est "
 "irréversible."
 
-#: app/templates/showdetails.html:68 app/templates/shows.html:48
+#: frontend/templates/showdetails.html:68 frontend/templates/shows.html:48
 msgid "cancel"
 msgstr "Annuler"
 
-#: app/templates/showdetails.html:69
+#: frontend/templates/showdetails.html:69
 msgid "delete"
 msgstr "Supprimer"
 
-#: app/templates/shows.html:11
+#: frontend/templates/shows.html:11
 msgid "shows.addbutton"
 msgstr "Ajouter"
 
-#: app/templates/shows.html:29
+#: frontend/templates/shows.html:29
 msgid "myshows.noshow"
 msgstr "Aucune (ajoutez-en une !)"
 
-#: app/templates/shows.html:36
+#: frontend/templates/shows.html:36
 msgid "shows.search.title"
 msgstr "Ajouter une série"
 
-#: app/templates/shows.html:42
+#: frontend/templates/shows.html:42
 msgid "shows.search.searchbutton"
 msgstr "Rechercher"
 
-#: app/templates/shows.html:45
+#: frontend/templates/shows.html:45
 msgid "shows.search.placeholder"
 msgstr "Entrez le nom d'une série"
 
-#: app/templates/shows.html:45
+#: frontend/templates/shows.html:45
 msgid "shows.search.error"
 msgstr "Une erreur s'est produite, merci de réessayer"
 
-#: app/templates/signup.html:9
+#: frontend/templates/signup.html:9
 msgid "signup.heading"
 msgstr "Inscription"
 
-#: app/templates/signup.html:14
+#: frontend/templates/signup.html:14
 msgid "signup.allfieldsrequired"
 msgstr "Tous les champs sont requis."
 
-#: app/templates/signup.html:30
+#: frontend/templates/signup.html:30
 msgid "signup.submitbutton"
 msgstr "S'inscrire"
 
-#: app/templates/ajax/search_results.html:7
+#: frontend/templates/ajax/search_results.html:7
 msgid "shows.search.addbutton"
 msgstr "Ajouter"
 
-#: app/templates/ajax/search_results.html:9
+#: frontend/templates/ajax/search_results.html:9
 msgid "shows.search.alreadyadded"
 msgstr "Déjà ajouté"
 
-#: app/templates/ajax/search_results.html:20
+#: frontend/templates/ajax/search_results.html:20
 msgid "shows.search.noresults"
 msgstr "Pas de résultats"
 
