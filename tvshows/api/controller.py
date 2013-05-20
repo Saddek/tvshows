@@ -4,7 +4,7 @@ from functools import wraps
 
 from ..database import SeriesDatabase
 
-rest = Blueprint('rest', __name__)
+api = Blueprint('api', __name__)
 
 series = SeriesDatabase()
 
@@ -31,7 +31,7 @@ def requires_auth(f):
     return decorated
 
 
-@rest.route('/posters/<showid>', methods=['GET'])
+@api.route('/posters/<showid>', methods=['GET'])
 @requires_auth
 def get_poster(showid):
     if not series.userHasShow(request.authorization.username, showid):
@@ -44,7 +44,7 @@ def get_poster(showid):
     return jsonify(posters=posters)
 
 
-@rest.route('/posters/<showid>', methods=['POST'])
+@api.route('/posters/<showid>', methods=['POST'])
 @requires_auth
 def set_custom_poster(showid):
     if not series.userHasShow(request.authorization.username, showid):
@@ -62,7 +62,7 @@ def set_custom_poster(showid):
         abort(500)
 
 
-@rest.route('/posters/<showid>', methods=['DELETE'])
+@api.route('/posters/<showid>', methods=['DELETE'])
 @requires_auth
 def delete_custom_poster(showid):
     if not series.userHasShow(request.authorization.username, showid):
@@ -76,7 +76,7 @@ def delete_custom_poster(showid):
     return Response(status=204)
 
 
-@rest.route('/update', methods=['POST'])
+@api.route('/update', methods=['POST'])
 def update_shows():
     if not request.authorization or request.authorization.username != 'alex':
         return Response(status=401)
@@ -86,12 +86,12 @@ def update_shows():
     return Response(status=204)
 
 
-@rest.route('/search/<show_name>', methods=['GET'])
+@api.route('/search/<show_name>', methods=['GET'])
 def search_show(show_name):
     return jsonify(results=series.searchShow(show_name))
 
 
-@rest.route('/user/shows', methods=['GET'])
+@api.route('/user/shows', methods=['GET'])
 @requires_auth
 def get_user_shows():
     withEpisodes = str2bool(request.args.get('episodes', 'false'))
@@ -105,7 +105,7 @@ def get_user_shows():
     return jsonify(shows=shows)
 
 
-@rest.route('/user/shows/<showid>', methods=['GET'])
+@api.route('/user/shows/<showid>', methods=['GET'])
 @requires_auth
 def get_show(showid):
     if not series.userHasShow(request.authorization.username, showid):
@@ -120,7 +120,7 @@ def get_show(showid):
     return jsonify(showInfo)
 
 
-@rest.route('/user/shows/<showid>', methods=['PUT'])
+@api.route('/user/shows/<showid>', methods=['PUT'])
 @requires_auth
 def add_show(showid):
     shouldAdd = not series.userHasShow(request.authorization.username, showid)
@@ -135,7 +135,7 @@ def add_show(showid):
     return response
 
 
-@rest.route('/user/shows/<showid>/last_seen', methods=['PUT'])
+@api.route('/user/shows/<showid>/last_seen', methods=['PUT'])
 @requires_auth
 def change_show(showid):
     if not series.userHasShow(request.authorization.username, showid):
@@ -155,7 +155,7 @@ def change_show(showid):
     return Response(status=204)
 
 
-@rest.route('/user/shows/<showid>', methods=['DELETE'])
+@api.route('/user/shows/<showid>', methods=['DELETE'])
 @requires_auth
 def delete_show(showid):
     if not series.userHasShow(request.authorization.username, showid):
@@ -166,7 +166,7 @@ def delete_show(showid):
     return Response(status=204)
 
 
-@rest.route('/user/shows_order', methods=['POST'])
+@api.route('/user/shows_order', methods=['POST'])
 @requires_auth
 def reorder_shows():
     if not series.userHasShows(request.authorization.username, request.form.keys()):
