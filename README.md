@@ -58,6 +58,11 @@ The application will them be available on `http://localhost:5000`
 
 Any error will be logged to `tvshows/log/error.log`.
 
+You can specify the port and/or bind address:
+
+    python run.py 8080
+    python run.py 127.0.0.1 8080
+
 You can also run in debug mode in order to see the errors in your browser and use Werkzeug's debug console :
 
 	DEBUG=1 python run.py
