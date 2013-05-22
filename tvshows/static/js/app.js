@@ -50,6 +50,35 @@
         button.removeClass('disabled');
       });
     });
+
+    $('a[data-action="more"]', context).click(function() {
+      var button = $(this);
+
+      var div = button.closest('div[data-show-id]');
+      var showId = div.data('showId');
+
+      if (!showId) {
+        throw new Error('No show ID found');
+      }
+
+      // we backup the link before replacing it with the loader to put it back in case there is an error
+      var backup = button.clone(true, true);
+
+      var loader = $('<i class="icon-loader"></i>');
+      button.replaceWith(loader);
+
+      $.getJSON(SCRIPT_ROOT + '/ajax/more/' + showId + '/' + button.data('mult'), function(data, status, xhr) {
+        if (xhr.status === 200) {
+          // update the div's content with the one sent by the server
+          div.html(data.unseen);
+
+          // setup the buttons again, or they won't be clickable
+          setupButtons(div);
+        }
+      }).error(function () {
+        loader.replaceWith(backup);
+      });
+    });
   }
 
   setupButtons();

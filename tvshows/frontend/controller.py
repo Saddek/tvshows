@@ -187,6 +187,19 @@ def ajax_home_unseen(showId, episodeId):
                    upcoming=render_template('ajax/home_upcoming.html', upcoming=upcoming))
 
 
+@frontend.route('/ajax/more/<showId>/<int:moreMult>')
+@login_required
+def ajax_home_show_more(showId, moreMult):
+    unseen, upcoming = getShowsOverview()
+
+    show = None
+    for s in unseen:
+        if s['show_id'] == showId:
+            show = s
+
+    return jsonify(unseen=render_template('ajax/home_unseen.html', show=show, moreMult=moreMult))
+
+
 @frontend.route('/ajax/showsorder', methods=['POST'])
 @login_required
 def ajax_set_show_order():
