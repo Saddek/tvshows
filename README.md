@@ -83,3 +83,11 @@ Create a VHost and add the following directives to it:
     </Directory>
 
 Don't forget to change the path to where you cloned the repository.
+
+## Credits
+
+Font Awesome by Dave Gandy - http://fontawesome.io
+
+Some icons by [Yusuke Kamiyamane](http://p.yusukekamiyamane.com/). Licensed under a [Creative Commons Attribution 3.0 License](http://creativecommons.org/licenses/by/3.0/).
+
+Flag icons by [Icon Drawer](http://www.icondrawer.com).
