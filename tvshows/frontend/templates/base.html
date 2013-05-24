@@ -56,10 +56,12 @@
 
           <a class="brand" href="{{ url_for('.home') }}">{{ _('tvshows') }} <sup class="beta">BETA</sup></a>
 
+          {% if current_user.is_authenticated() %}
           <ul class="nav pull-right">
-            <li><a href="#"><i class="icon icon-cog icon-large"></i></a></li>
+            <li{% if active_page == 'settings' %} class="active"{% endif %}><a href="#"><i class="icon icon-cog icon-large"></i></a></li>
             <li class="divider-vertical"></li>
           </ul>
+          {% endif %}
 
           <div class="nav-collapse collapse">
             <ul class="nav">
