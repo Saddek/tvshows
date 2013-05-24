@@ -3,7 +3,7 @@ from datetime import date
 from flask import Blueprint, render_template, request, Response, jsonify, url_for, redirect, flash, abort, send_file, current_app
 from flask.ext.babel import gettext, lazy_gettext, get_locale
 from flask.ext.login import login_user, logout_user, login_required, current_user
-from flask.ext.wtf import Form, TextField, PasswordField, BooleanField, validators
+from flask.ext.wtf import Form, TextField, PasswordField, BooleanField, SelectField, IntegerField, validators
 from StringIO import StringIO
 
 import calendar
@@ -114,6 +114,11 @@ class UserForm(Form, wtforms.ext.i18n.form.Form):
     password = PasswordField(lazy_gettext('login.placeholder.password'), [validators.Required()])
 
 
+class SettingsForm(Form, wtforms.ext.i18n.form.Form):
+    language = SelectField('Language', choices=[('auto', 'Auto-detect'), ('en', 'English'), ('fr', u'Français')])
+    episodesPerShow = IntegerField('Episodes per show', default=4)
+
+
 @frontend.route('/login', methods=['GET', 'POST'])
 def login():
     class LoginForm(UserForm):
@@ -135,6 +140,14 @@ def login():
             flash(gettext(u'login.authentication_failed'), 'error')
 
     return render_template('login.html', form=form)
+
+
+@frontend.route('/settings')
+@login_required
+def settings():
+    form = SettingsForm()
+
+    return render_template('settings.html', form=form)
 
 
 @frontend.route('/signup', methods=['GET', 'POST'])

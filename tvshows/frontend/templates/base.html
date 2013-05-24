@@ -58,7 +58,7 @@
 
           {% if current_user.is_authenticated() %}
           <ul class="nav pull-right">
-            <li{% if active_page == 'settings' %} class="active"{% endif %}><a href="#"><i class="icon icon-cog icon-large"></i></a></li>
+            <li{% if active_page == 'settings' %} class="active"{% endif %}><a href="{{ url_for('.settings') }}"><i class="icon icon-cog icon-large"></i></a></li>
             <li class="divider-vertical"></li>
           </ul>
           {% endif %}

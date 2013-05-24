@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% set active_page = 'settings' -%}
+{% set page_name = _('Settings') -%}
+
+{% block content %}
+<div id="settings" class="container">
+    <form class="form-horizontal" method="POST">
+      <h3>{{ _('Settings') }}</h3>
+      {{ parts.displayFlashes() }}
+      {{ parts.displayFormErrors(form) }}
+
+      <fieldset>
+        {{ form.csrf_token }}
+
+        <div class="control-group">
+          <label class="control-label" for="language">{{form.language.label.text}}</label>
+          <div class="controls">
+            {{ form.language }}
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="episodesPerShow">{{form.episodesPerShow.label.text}}</label>
+          <div class="controls">
+            {{ form.episodesPerShow(class_='input-mini') }}
+            <span class="help-block">Number of episodes per show displayed on the home page.</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="controls">
+            <button type="submit" class="btn btn-primary">Save settings</button>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+</div>
+{% endblock %}
