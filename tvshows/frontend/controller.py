@@ -142,10 +142,13 @@ def login():
     return render_template('login.html', form=form)
 
 
-@frontend.route('/settings')
+@frontend.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
     form = SettingsForm()
+
+    if form.validate_on_submit():
+        flash('Settings saved successfully.', 'success')
 
     return render_template('settings.html', form=form)
 

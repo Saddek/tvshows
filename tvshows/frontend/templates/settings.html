@@ -13,14 +13,14 @@
       <fieldset>
         {{ form.csrf_token }}
 
-        <div class="control-group">
+        <div class="control-group{% if form.language.errors %} error{% endif %}">
           <label class="control-label" for="language">{{form.language.label.text}}</label>
           <div class="controls">
             {{ form.language }}
           </div>
         </div>
 
-        <div class="control-group">
+        <div class="control-group{% if form.episodesPerShow.errors %} error{% endif %}">
           <label class="control-label" for="episodesPerShow">{{form.episodesPerShow.label.text}}</label>
           <div class="controls">
             {{ form.episodesPerShow(class_='input-mini') }}
