@@ -18,6 +18,13 @@ class SeriesDatabase:
     tvdbBannerURLFormat = 'http://thetvdb.com/banners/%s'
     postersDir = os.path.join(os.path.dirname(__file__), 'static', 'posters')
 
+    instance = None
+
+    def __new__(myClass):
+        if myClass.instance is None:
+            myClass.instance = object.__new__(myClass)
+        return myClass.instance
+
     def __init__(self):
         configFilename = os.path.join(os.path.dirname(__file__), 'config', 'config.cfg')
 
@@ -302,6 +309,15 @@ class SeriesDatabase:
             pipe.zscore('user:%s:shows' % user, showId)
 
         return not None in pipe.execute()
+
+    def getUserConfigValue(self, user, key):
+        return self.db.hget('user:%s' % user, key)
+
+    def setUserConfigValue(self, user, key, value):
+        if value is not None:
+            self.db.hset('user:%s' % user, key, value)
+        else:
+            self.db.hdel('user:%s' % user, key)
 
     def getShowInfo(self, user, showId, withEpisodes=True, episodeLimit=None, onlyUnseen=False):
         showInfo = {

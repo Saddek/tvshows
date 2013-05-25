@@ -1,10 +1,8 @@
-{% set maxUnseen = 4 %}
-
-{% macro unseenEpisodes(show, moreMult) -%}
+{% macro unseenEpisodes(show, maxUnseen, moreMult) -%}
   {% set moreMult = moreMult or 1 %}
   <h4><a href="/show/{{show.show_id}}/">{{show.name}}</a> <small>{{ ngettext('unseen.%(num)d_episode', 'unseen.%(num)d_episodes', show.unseenEpisodes|count) }}</small></h4>
   <ul class="unseen">
-  {%- for episode in show.unseenEpisodes[:maxUnseen * moreMult] %}
+  {%- for episode in show.unseenEpisodes[:maxUnseen|int * moreMult] %}
     <li>
       <strong>{{episode | episodeNumber}}:</strong> {{episode.title}}
       <small>({{ _('aired') }} {{ episode.airdate | prettyDate(addPrefix=True) }})</small>
@@ -15,7 +13,7 @@
       </div>
     </li>
   {%- endfor %}
-  {%- set leftEpisodes = show.unseenEpisodes|count - maxUnseen * moreMult -%}
+  {%- set leftEpisodes = show.unseenEpisodes|count - maxUnseen|int * moreMult -%}
   {%- if leftEpisodes > 0 %}
     <li><a data-action="more" data-mult="{{moreMult+1}}" href="javascript:void(0)"><i>{{ ngettext('unseen.%(num)d_other', 'unseen.%(num)d_others', leftEpisodes) }}</i></a></li>
   {%- endif %}

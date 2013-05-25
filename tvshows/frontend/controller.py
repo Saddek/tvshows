@@ -114,11 +114,6 @@ class UserForm(Form, wtforms.ext.i18n.form.Form):
     password = PasswordField(lazy_gettext('login.placeholder.password'), [validators.Required()])
 
 
-class SettingsForm(Form, wtforms.ext.i18n.form.Form):
-    language = SelectField('Language', choices=[('auto', 'Auto-detect'), ('en', 'English'), ('fr', u'Français')])
-    episodesPerShow = IntegerField('Episodes per show', default=4)
-
-
 @frontend.route('/login', methods=['GET', 'POST'])
 def login():
     class LoginForm(UserForm):
@@ -140,17 +135,6 @@ def login():
             flash(gettext(u'login.authentication_failed'), 'error')
 
     return render_template('login.html', form=form)
-
-
-@frontend.route('/settings', methods=['GET', 'POST'])
-@login_required
-def settings():
-    form = SettingsForm()
-
-    if form.validate_on_submit():
-        flash('Settings saved successfully.', 'success')
-
-    return render_template('settings.html', form=form)
 
 
 @frontend.route('/signup', methods=['GET', 'POST'])
@@ -177,6 +161,32 @@ def signup():
             flash(gettext('signup.usernametaken'), 'error')
 
     return render_template('signup.html', form=form)
+
+
+@frontend.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    class SettingsForm(Form, wtforms.ext.i18n.form.Form):
+        LANGUAGES = [get_locale().language]
+
+        language = SelectField(lazy_gettext('settings.language'), default=current_user.config.language, choices=[
+            ('auto', lazy_gettext('settings.language.autodetect')),
+            ('en', u'English'),
+            ('fr', u'Français')
+        ])
+        episodesPerShow = IntegerField(lazy_gettext('settings.episodesPerShow'), default=current_user.config.episodesPerShow, validators=[
+            validators.NumberRange(min=1)
+        ])
+
+    form = SettingsForm()
+
+    if form.validate_on_submit():
+        for field, value in form.data.items():
+            current_user.config[field] = value
+
+        flash(gettext('settings.savesuccess'), 'success')
+
+    return render_template('settings.html', form=form)
 
 
 @frontend.route("/logout")

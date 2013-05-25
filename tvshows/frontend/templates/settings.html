@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% set active_page = 'settings' -%}
-{% set page_name = _('Settings') -%}
+{% set page_name = _('settings.pagetitle') -%}
 
 {% block content %}
 <div id="settings" class="container">
     <form class="form-horizontal" method="POST">
-      <h3>{{ _('Settings') }}</h3>
+      <h3>{{ _('settings.heading') }}</h3>
       {{ parts.displayFlashes() }}
       {{ parts.displayFormErrors(form) }}
 
@@ -24,13 +24,13 @@
           <label class="control-label" for="episodesPerShow">{{form.episodesPerShow.label.text}}</label>
           <div class="controls">
             {{ form.episodesPerShow(class_='input-mini') }}
-            <span class="help-block">Number of episodes per show displayed on the home page.</span>
+            <span class="help-block">{{ _('settings.episodesPerShow.helpmessage_%(default)d', default=current_user.defaults.episodesPerShow) }}</span>
           </div>
         </div>
 
         <div class="control-group">
           <div class="controls">
-            <button type="submit" class="btn btn-primary">Save settings</button>
+            <button type="submit" class="btn btn-primary">{{ _('settings.save') }}</button>
           </div>
         </div>
       </fieldset>

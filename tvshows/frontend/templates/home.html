@@ -8,7 +8,7 @@
 
           {%- for show in unseen %}
             <div data-show-id="{{ show.show_id }}">
-              {{ parts.unseenEpisodes(show) }}
+              {{ parts.unseenEpisodes(show, current_user.config.episodesPerShow) }}
             </div>
           {% else %}
           <h3 class="muted">{{ _('home.nounseen') }}</h3>

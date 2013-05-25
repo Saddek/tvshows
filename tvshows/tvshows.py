@@ -2,7 +2,7 @@
 from babel import Locale
 from flask import Flask, request
 from flask.ext.babel import Babel, lazy_gettext
-from flask.ext.login import LoginManager
+from flask.ext.login import LoginManager, current_user
 
 import errno
 import os
@@ -37,9 +37,17 @@ def load_user(userId):
     return User(userId)
 
 
+LANGUAGES = ['en', 'fr']  # TODO: fetch from translations folder
+
+
 @babel.localeselector
 def get_locale():
-    return Locale.negotiate(request.accept_languages.values(), ['en', 'fr'])
+    userLanguage = current_user.config.language if current_user.is_authenticated() else None
+
+    if userLanguage and userLanguage in LANGUAGES:
+        return userLanguage
+    else:
+        return Locale.negotiate(request.accept_languages.values(), LANGUAGES)
 
 # Log errors to file when not in debug mode
 if not app.debug:

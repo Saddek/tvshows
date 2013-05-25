@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-20 22:58+0200\n"
+"POT-Creation-Date: 2013-05-25 17:30+0200\n"
 "PO-Revision-Date: 2013-01-06 00:06+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -17,301 +17,344 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: customfilters.py:43
+#: tvshows/customfilters.py:43
 msgid "date.unknown"
 msgstr "inconnu"
 
-#: customfilters.py:47
+#: tvshows/customfilters.py:47
 msgid "date.format.year_only"
 msgstr "yyyy"
 
-#: customfilters.py:50
+#: tvshows/customfilters.py:50
 #, python-format
 msgid "date.in_year_%(year)s"
 msgstr "en %(year)s"
 
-#: customfilters.py:53
+#: tvshows/customfilters.py:53
 msgid "date.format.year_month"
 msgstr "MMMM yyyy"
 
-#: customfilters.py:56
+#: tvshows/customfilters.py:56
 #, python-format
 msgid "date.in_month_%(month)s"
 msgstr "en %(month)s"
 
-#: customfilters.py:59
+#: tvshows/customfilters.py:59
 msgid "date.format.date_with_year"
 msgstr "d MMMM yyyy"
 
-#: customfilters.py:59
+#: tvshows/customfilters.py:59
 msgid "date.format.date_without_year"
 msgstr "d MMMM"
 
-#: customfilters.py:62
+#: tvshows/customfilters.py:62
 #, python-format
 msgid "date.on_day_%(day)s"
 msgstr "'le' %(day)s"
 
-#: customfilters.py:66
+#: tvshows/customfilters.py:66
 msgid "date.tonight"
 msgstr "ce soir"
 
-#: customfilters.py:68
+#: tvshows/customfilters.py:68
 msgid "date.yesterday_night"
 msgstr "hier soir"
 
-#: customfilters.py:70
+#: tvshows/customfilters.py:70
 msgid "date.tomorrow_night"
 msgstr "demain soir"
 
-#: customfilters.py:72
+#: tvshows/customfilters.py:72
 msgid "date.format.next_day"
 msgstr "EEEE 'prochain'"
 
-#: customfilters.py:74
+#: tvshows/customfilters.py:74
 msgid "date.format.previous_day"
 msgstr "EEEE 'dernier'"
 
-#: customfilters.py:90
+#: tvshows/customfilters.py:90
 msgid "showdetails.status.returning"
 msgstr "En production"
 
-#: customfilters.py:92
+#: tvshows/customfilters.py:92
 msgid "showdetails.status.ended"
 msgstr "Terminée"
 
-#: customfilters.py:94
+#: tvshows/customfilters.py:94
 msgid "showdetails.status.firstseason"
 msgstr "Nouvelle série"
 
-#: customfilters.py:96
+#: tvshows/customfilters.py:96
 msgid "showdetails.status.finalseason"
 msgstr "Saison finale"
 
-#: tvshows.py:30
+#: tvshows/tvshows.py:30
 msgid "login.authentication_required"
 msgstr "Vous devez être connecté pour accéder à cette page"
 
-#: frontend/controller.py:110
+#: tvshows/frontend/controller.py:110
 msgid "login.placeholder.username"
 msgstr "Nom d'utilisateur"
 
-#: frontend/controller.py:112
+#: tvshows/frontend/controller.py:112
 msgid "signup.error.alphanum"
 msgstr "Ne doit contenir que des caractères alphanumériques"
 
-#: frontend/controller.py:114 frontend/controller.py:145
+#: tvshows/frontend/controller.py:114 tvshows/frontend/controller.py:145
 msgid "login.placeholder.password"
 msgstr "Mot de passe"
 
-#: frontend/controller.py:122 frontend/templates/login.html:25
+#: tvshows/frontend/controller.py:122 tvshows/frontend/templates/login.html:25
 msgid "login.rememberme"
 msgstr "Se souvenir de moi"
 
-#: frontend/controller.py:135
+#: tvshows/frontend/controller.py:135
 msgid "login.authentication_failed"
 msgstr "Identifiants invalides"
 
-#: frontend/controller.py:147
+#: tvshows/frontend/controller.py:147
 msgid "signup.error.passwordsmatch"
 msgstr "Les mots de passe doivent correspondre"
 
-#: frontend/controller.py:149
+#: tvshows/frontend/controller.py:149
 msgid "signup.placeholder.confirmpassword"
 msgstr "Confirmez le mot de passe"
 
-#: frontend/controller.py:158
+#: tvshows/frontend/controller.py:158
 msgid "login.successful_signup"
 msgstr "Inscription réussie. Vous pouvez maintenant vous connecter"
 
-#: frontend/controller.py:161
+#: tvshows/frontend/controller.py:161
 msgid "signup.usernametaken"
 msgstr "Nom d'utilisateur déjà pris"
 
-#: frontend/controller.py:170
+#: tvshows/frontend/controller.py:170
+msgid "settings.language"
+msgstr "Langue"
+
+#: tvshows/frontend/controller.py:171
+msgid "settings.language.autodetect"
+msgstr "Automatique"
+
+#: tvshows/frontend/controller.py:175
+msgid "settings.episodesPerShow"
+msgstr "Épisodes par série"
+
+#: tvshows/frontend/controller.py:185
+msgid "settings.savesuccess"
+msgstr "Paramètres sauvegardés avec succès"
+
+#: tvshows/frontend/controller.py:194
 msgid "login.successful_logout"
 msgstr "Déconnecté avec succès"
 
-#: frontend/templates/base.html:3
+#: tvshows/frontend/templates/base.html:3
 msgid "home.pagetitle"
 msgstr "Accueil"
 
-#: frontend/templates/base.html:4 frontend/templates/shows.html:5
-#: frontend/templates/shows.html:10
+#: tvshows/frontend/templates/base.html:4
+#: tvshows/frontend/templates/shows.html:5
+#: tvshows/frontend/templates/shows.html:10
 msgid "myshows.pagetitle"
 msgstr "Mes séries"
 
-#: frontend/templates/base.html:5
+#: tvshows/frontend/templates/base.html:5
 msgid "logout"
 msgstr "Déconnexion"
 
-#: frontend/templates/base.html:9 frontend/templates/login.html:4
+#: tvshows/frontend/templates/base.html:9
+#: tvshows/frontend/templates/login.html:4
 msgid "login.pagetitle"
 msgstr "Connexion"
 
-#: frontend/templates/base.html:10 frontend/templates/signup.html:4
+#: tvshows/frontend/templates/base.html:10
+#: tvshows/frontend/templates/signup.html:4
 msgid "signup.pagetitle"
 msgstr "Inscription"
 
-#: frontend/templates/base.html:23 frontend/templates/base.html:55
+#: tvshows/frontend/templates/base.html:23
+#: tvshows/frontend/templates/base.html:57
 msgid "tvshows"
 msgstr "Séries TV"
 
-#: frontend/templates/home.html:7
+#: tvshows/frontend/templates/home.html:7
 msgid "home.unseen"
 msgstr "À voir"
 
-#: frontend/templates/home.html:14
+#: tvshows/frontend/templates/home.html:14
 msgid "home.nounseen"
 msgstr "Rien à regarder :("
 
-#: frontend/templates/home.html:19
+#: tvshows/frontend/templates/home.html:19
 msgid "home.upcoming"
 msgstr "Prochainement"
 
-#: frontend/templates/home.html:26
+#: tvshows/frontend/templates/home.html:26
 msgid "home.noupcoming"
 msgstr "Rien à venir :("
 
-#: frontend/templates/login.html:9
+#: tvshows/frontend/templates/login.html:9
 msgid "login.heading"
 msgstr "Login"
 
-#: frontend/templates/login.html:28
+#: tvshows/frontend/templates/login.html:28
 msgid "login.submitbutton"
 msgstr "Connexion"
 
-#: frontend/templates/login.html:29
+#: tvshows/frontend/templates/login.html:29
 msgid "login.noaccount"
 msgstr "Pas de compte ?"
 
-#: frontend/templates/login.html:29
+#: tvshows/frontend/templates/login.html:29
 msgid "login.signup"
 msgstr "S'inscrire"
 
-#: frontend/templates/parts.html:4
+#: tvshows/frontend/templates/parts.html:3
 #, python-format
 msgid "unseen.%(num)d_episode"
 msgid_plural "unseen.%(num)d_episodes"
 msgstr[0] "1 épisode"
 msgstr[1] "%(num)d épisodes"
 
-#: frontend/templates/parts.html:9
+#: tvshows/frontend/templates/parts.html:8
 msgid "aired"
 msgstr "diffusé"
 
-#: frontend/templates/parts.html:11 frontend/templates/showdetails.html:48
+#: tvshows/frontend/templates/parts.html:10
+#: tvshows/frontend/templates/showdetails.html:48
 msgid "torrent"
 msgstr "Torrent"
 
-#: frontend/templates/parts.html:12 frontend/templates/showdetails.html:49
+#: tvshows/frontend/templates/parts.html:11
+#: tvshows/frontend/templates/showdetails.html:49
 msgid "subtitles"
 msgstr "Sous-titres"
 
-#: frontend/templates/parts.html:13 frontend/templates/showdetails.html:50
+#: tvshows/frontend/templates/parts.html:12
+#: tvshows/frontend/templates/showdetails.html:50
 msgid "seen"
 msgstr "Vu"
 
-#: frontend/templates/parts.html:19
+#: tvshows/frontend/templates/parts.html:18
 #, python-format
 msgid "unseen.%(num)d_other"
 msgid_plural "unseen.%(num)d_others"
 msgstr[0] "1 autre…"
 msgstr[1] "%(num)d autres…"
 
-#: frontend/templates/showdetails.html:18
+#: tvshows/frontend/templates/settings.html:4
+msgid "settings.pagetitle"
+msgstr "Paramètres"
+
+#: tvshows/frontend/templates/settings.html:9
+msgid "settings.heading"
+msgstr "Paramètres"
+
+#: tvshows/frontend/templates/settings.html:27
+#, python-format
+msgid "settings.episodesPerShow.helpmessage_%(default)d"
+msgstr ""
+"Nombre d'épisodes affichés pour chaque série sur l'accueil (défaut: "
+"%(default)d)"
+
+#: tvshows/frontend/templates/settings.html:33
+msgid "settings.save"
+msgstr "Enregistrer"
+
+#: tvshows/frontend/templates/showdetails.html:18
 msgid "showdetail.unwatch"
 msgstr "Ne plus suivre"
 
-#: frontend/templates/showdetails.html:23
+#: tvshows/frontend/templates/showdetails.html:23
 msgid "showdetail.seasons"
 msgstr "Saisons :"
 
-#: frontend/templates/showdetails.html:24
+#: tvshows/frontend/templates/showdetails.html:24
 msgid "showdetail.status"
 msgstr "Status :"
 
-#: frontend/templates/showdetails.html:25
+#: tvshows/frontend/templates/showdetails.html:25
 msgid "showdetail.network"
 msgstr "Chaîne :"
 
-#: frontend/templates/showdetails.html:26
+#: tvshows/frontend/templates/showdetails.html:26
 msgid "showdetail.firstaired"
 msgstr "Première diffusion :"
 
-#: frontend/templates/showdetails.html:28
+#: tvshows/frontend/templates/showdetails.html:28
 msgid "showdetail.lastaired"
 msgstr "Dernière diffusion :"
 
-#: frontend/templates/showdetails.html:40
+#: tvshows/frontend/templates/showdetails.html:40
 #, python-format
 msgid "showdetail.season_%(num)d"
 msgstr "Saison %(num)d"
 
-#: frontend/templates/showdetails.html:62
+#: tvshows/frontend/templates/showdetails.html:62
 msgid "showdetail.deletedialog.title"
 msgstr "Supprimer la série"
 
-#: frontend/templates/showdetails.html:65
+#: tvshows/frontend/templates/showdetails.html:65
 #, python-format
 msgid "showdetail.deletedialog.text_%(show)s"
 msgstr ""
 "Êtes-vous sûr de vouloir supprimer %(show)s ? Cette action est "
 "irréversible."
 
-#: frontend/templates/showdetails.html:68 frontend/templates/shows.html:48
+#: tvshows/frontend/templates/showdetails.html:68
+#: tvshows/frontend/templates/shows.html:48
 msgid "cancel"
 msgstr "Annuler"
 
-#: frontend/templates/showdetails.html:69
+#: tvshows/frontend/templates/showdetails.html:69
 msgid "delete"
 msgstr "Supprimer"
 
-#: frontend/templates/shows.html:11
+#: tvshows/frontend/templates/shows.html:11
 msgid "shows.addbutton"
 msgstr "Ajouter"
 
-#: frontend/templates/shows.html:29
+#: tvshows/frontend/templates/shows.html:29
 msgid "myshows.noshow"
 msgstr "Aucune (ajoutez-en une !)"
 
-#: frontend/templates/shows.html:36
+#: tvshows/frontend/templates/shows.html:36
 msgid "shows.search.title"
 msgstr "Ajouter une série"
 
-#: frontend/templates/shows.html:42
+#: tvshows/frontend/templates/shows.html:42
 msgid "shows.search.searchbutton"
 msgstr "Rechercher"
 
-#: frontend/templates/shows.html:45
+#: tvshows/frontend/templates/shows.html:45
 msgid "shows.search.placeholder"
 msgstr "Entrez le nom d'une série"
 
-#: frontend/templates/shows.html:45
+#: tvshows/frontend/templates/shows.html:45
 msgid "shows.search.error"
 msgstr "Une erreur s'est produite, merci de réessayer"
 
-#: frontend/templates/signup.html:9
+#: tvshows/frontend/templates/signup.html:9
 msgid "signup.heading"
 msgstr "Inscription"
 
-#: frontend/templates/signup.html:14
+#: tvshows/frontend/templates/signup.html:14
 msgid "signup.allfieldsrequired"
 msgstr "Tous les champs sont requis."
 
-#: frontend/templates/signup.html:30
+#: tvshows/frontend/templates/signup.html:30
 msgid "signup.submitbutton"
 msgstr "S'inscrire"
 
-#: frontend/templates/ajax/search_results.html:7
+#: tvshows/frontend/templates/ajax/search_results.html:7
 msgid "shows.search.addbutton"
 msgstr "Ajouter"
 
-#: frontend/templates/ajax/search_results.html:9
+#: tvshows/frontend/templates/ajax/search_results.html:9
 msgid "shows.search.alreadyadded"
 msgstr "Déjà ajouté"
 
-#: frontend/templates/ajax/search_results.html:20
+#: tvshows/frontend/templates/ajax/search_results.html:20
 msgid "shows.search.noresults"
 msgstr "Pas de résultats"
 
