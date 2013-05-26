@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import date
 from flask import Blueprint, render_template, request, Response, jsonify, url_for, redirect, flash, abort, send_file, current_app
-from flask.ext.babel import gettext, lazy_gettext, get_locale
+from flask.ext.babel import gettext, lazy_gettext, get_locale, refresh as refresh_locale
 from flask.ext.login import login_user, logout_user, login_required, current_user
 from flask.ext.wtf import Form, TextField, PasswordField, BooleanField, SelectField, IntegerField, validators
 from StringIO import StringIO
@@ -183,6 +183,8 @@ def settings():
     if form.validate_on_submit():
         for field, value in form.data.items():
             current_user.config[field] = value
+
+        refresh_locale()
 
         flash(gettext('settings.savesuccess'), 'success')
 
