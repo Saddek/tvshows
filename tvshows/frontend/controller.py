@@ -255,8 +255,6 @@ def ajax_search_show(showName):
         show = series.getShowInfo(current_user.id, showId, withEpisodes=False)
         userShows.append(show['show_id'])
 
-    print userShows
-
     return render_template('ajax/search_results.html', results=results, userShows=userShows)
 
 

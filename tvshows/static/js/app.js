@@ -108,6 +108,8 @@
   });
 
   $('#search-form').submit(function() {
+    if (!$('#search-query').val()) return false; // don't search if the field is empty
+
     $('#search-results').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>');
     $('#search-results').load(SCRIPT_ROOT + '/ajax/search/' + encodeURIComponent($('#search-query').val()), function(response, textStatus, xhr) {
       if (xhr.status != 200) {

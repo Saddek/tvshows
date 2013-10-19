@@ -43,7 +43,7 @@ class SeriesDatabase:
 
     @retry(requests.ConnectionError, tries=4, delay=1)
     def searchShow(self, showName):
-        req = requests.get('http://services.tvrage.com/feeds/search.php?show=%s' % showName)
+        req = requests.get('http://services.tvrage.com/feeds/search.php', params={'show': showName})
         tree = etree.fromstring(req.text.encode(req.encoding))
 
         results = []
