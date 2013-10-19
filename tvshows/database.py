@@ -68,7 +68,7 @@ class SeriesDatabase:
 
     @retry(requests.ConnectionError, tries=4, delay=1)
     def getTVDBID(self, showInfo):
-        print 'Searching TVDB for "%s"...' % showInfo['name']
+        print 'Getting TVDB ID for "%s" (%s)...' % (showInfo['name'], showInfo['show_id'])
         req = requests.get('http://www.thetvdb.com/api/GetSeries.php?seriesname=%s' % showInfo['name'])
         tree = etree.fromstring(req.text.encode(req.encoding))
 
@@ -84,16 +84,12 @@ class SeriesDatabase:
                 print ' Still nothing, giving up.'
                 return None
 
-        print 'We got results! Getting the results with the same air date'
+        print 'Matches found. Searching the first result with the same air date.'
         matches = tree.xpath('/Data/Series[FirstAired="%s"]/seriesid' % showInfo['first_aired'])
 
         if len(matches) == 0:
-            print 'Nothing. Getting first result instead'
+            print 'No air date matching. Getting first result instead.'
             matches = tree.xpath('/Data/Series/seriesid')
-
-            if len(matches) == 0:
-                print 'What the fuck?'
-                return None
 
         print 'TVDB ID for %s: %s' % (showInfo['name'], matches[0].text)
         return matches[0].text
@@ -238,11 +234,12 @@ class SeriesDatabase:
                 self.db.hset('show:%s' % showId, 'lastaired', episodes[-1]['airdate'])
 
         if not os.path.exists(self.posterFilename(showId)):
+            print 'Downloading poster for "%s" on TheTVDB.' % showName
             self.downloadPoster({'show_id': showId, 'name': showName, 'first_aired': episodes[0]['airdate'] if len(episodes) > 0 else None})
 
     @retry(requests.ConnectionError, tries=4, delay=1)
     def update(self):
-        print "Starting daily update..."
+        print "Starting update..."
         allShows = set(self.db.hkeys('shows'))
 
         req = requests.get('http://services.tvrage.com/feeds/last_updates.php?hours=36')

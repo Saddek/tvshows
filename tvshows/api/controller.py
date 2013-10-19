@@ -76,16 +76,6 @@ def delete_custom_poster(showid):
     return Response(status=204)
 
 
-@api.route('/update', methods=['POST'])
-def update_shows():
-    if not request.authorization or request.authorization.username != 'alex':
-        return Response(status=401)
-
-    series.update()
-
-    return Response(status=204)
-
-
 @api.route('/search/<show_name>', methods=['GET'])
 def search_show(show_name):
     return jsonify(results=series.searchShow(show_name))

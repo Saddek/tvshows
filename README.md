@@ -48,6 +48,12 @@ Once it's done, just copy config.cfg.sample to config.cfg in tvshows/config and 
 
 You also need an API key from [TheTVDB](http://thetvdb.com/) in order to fetch show posters. Register [here](http://thetvdb.com/?tab=register), then go to your account and add a new application in order to get your API key. Then put it in your config.cfg file.
 
+**Important!** In order to keep the show database regularily up to date, you must run the `update.py` script periodically. Once a day is enough.
+
+Example cron job (every day at 3am):
+
+    0 3 * * * /path/to/your/virtualenv/bin/python /path/to/your/virtualenv/update.py
+
 ## Usage
 
 To run the application locally, just do the following:
