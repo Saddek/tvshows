@@ -253,9 +253,20 @@ class SeriesDatabase:
 
         print "Update done."
 
-    def addShowToUser(self, user, showId, order=0):
+    def addShowToUser(self, user, showId, order=None):
         if not self.db.exists('show:%s' % showId):
             self.downloadShow(showId)
+
+        # we want the new show to be at the top of the list when added
+        if order is None:
+            # get the first show in the list to get its order number
+            showList = self.db.zrange('user:%s:shows' % user, 0, 0, withscores=True)
+
+            if showList:
+                # we take the first show's order number minus 1 for the new show
+                order = showList[0][1] - 1
+            else:
+                order = 0
 
         count = self.db.zadd('user:%s:shows' % user, order, showId)
         if count == 1:
