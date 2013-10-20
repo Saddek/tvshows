@@ -42,7 +42,7 @@ class SeriesDatabase:
         if not os.path.exists(SeriesDatabase.postersDir):
             os.makedirs(SeriesDatabase.postersDir)
 
-    @retry(requests.ConnectionError, tries=4, delay=1)
+    @retry((requests.ConnectionError, etree.XMLSyntaxError), tries=4, delay=1)
     def searchShow(self, showName):
         req = requests.get('http://services.tvrage.com/feeds/search.php', params={'show': showName})
         tree = etree.fromstring(req.text.encode(req.encoding))
@@ -67,7 +67,7 @@ class SeriesDatabase:
     def addUser(self, user, password):
         self.db.hset('user:%s' % user, 'password', hashlib.sha256(password).hexdigest())
 
-    @retry(requests.ConnectionError, tries=4, delay=1)
+    @retry((requests.ConnectionError, etree.XMLSyntaxError), tries=4, delay=1)
     def getTVDBID(self, showInfo):
         print 'Getting TVDB ID for "%s" (%s)...' % (showInfo['name'], showInfo['show_id'])
         req = requests.get('http://www.thetvdb.com/api/GetSeries.php?language=all&seriesname=%s' % showInfo['name'])
@@ -95,7 +95,7 @@ class SeriesDatabase:
         print 'TVDB ID for %s: %s' % (showInfo['name'], matches[0].text)
         return matches[0].text
 
-    @retry(requests.ConnectionError, tries=4, delay=1)
+    @retry((requests.ConnectionError, etree.XMLSyntaxError), tries=4, delay=1)
     def getTVDBPosters(self, showInfo):
         tvdbId = self.getTVDBID(showInfo)
 
@@ -185,7 +185,7 @@ class SeriesDatabase:
 
         return os.path.join(SeriesDatabase.postersDir, filename)
 
-    @retry(requests.ConnectionError, tries=4, delay=1)
+    @retry((requests.ConnectionError, etree.XMLSyntaxError), tries=4, delay=1)
     def downloadShow(self, showId):
         print 'Downloading show info for ID %s' % showId
         req = requests.get('http://services.tvrage.com/feeds/full_show_info.php?sid=%s' % showId)
@@ -242,7 +242,7 @@ class SeriesDatabase:
             print 'Downloading poster for "%s" on TheTVDB.' % showName
             self.downloadPoster({'show_id': showId, 'name': showName, 'first_aired': episodes[0]['airdate'] if len(episodes) > 0 else None})
 
-    @retry(requests.ConnectionError, tries=4, delay=1)
+    @retry((requests.ConnectionError, etree.XMLSyntaxError), tries=4, delay=1)
     def update(self):
         print "Starting update..."
         allShows = set(self.db.hkeys('shows'))
