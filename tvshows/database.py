@@ -293,7 +293,12 @@ class SeriesDatabase:
                     os.remove(posterFile)
 
     def getLastSeen(self, user, showId):
-        return self.db.hget('user:%s:lastseen' % user, showId)
+        lastSeen = self.db.hget('user:%s:lastseen' % user, showId)
+
+        if lastSeen:
+            return lastSeen.decode('utf-8')
+        else:
+            return None
 
     def setLastSeen(self, user, showId, episodeId):
         if episodeId:
@@ -336,18 +341,18 @@ class SeriesDatabase:
     def getShowInfo(self, user, showId, withEpisodes=True, episodeLimit=None, onlyUnseen=False):
         showInfo = {
             'show_id': showId,
-            'name': self.db.hget('show:%s' % showId, 'name'),
-            'status': self.db.hget('show:%s' % showId, 'status'),
-            'country': self.db.hget('show:%s' % showId, 'country'),
-            'network': self.db.hget('show:%s' % showId, 'network'),
-            'seasons': self.db.hget('show:%s' % showId, 'seasons'),
+            'name': self.db.hget('show:%s' % showId, 'name').decode('utf-8'),
+            'status': self.db.hget('show:%s' % showId, 'status').decode('utf-8'),
+            'country': self.db.hget('show:%s' % showId, 'country').decode('utf-8'),
+            'network': self.db.hget('show:%s' % showId, 'network').decode('utf-8'),
+            'seasons': self.db.hget('show:%s' % showId, 'seasons').decode('utf-8'),
             'last_seen': self.getLastSeen(user, showId),
-            'first_aired': self.db.hget('show:%s' % showId, 'firstaired')
+            'first_aired': self.db.hget('show:%s' % showId, 'firstaired').decode('utf-8')
         }
 
         lastAired = self.db.hget('show:%s' % showId, 'lastaired')
         if lastAired:
-            showInfo['last_aired'] = lastAired
+            showInfo['last_aired'] = lastAired.decode('utf-8')
 
         if os.path.exists(self.posterFilename(showId, user=user)):
             showInfo['poster'] = 'static/posters/%s/%s.jpg' % (user, showId)
@@ -357,6 +362,7 @@ class SeriesDatabase:
         if withEpisodes:
             if onlyUnseen:
                 lastEpisode = self.db.hget('user:%s:lastseen' % user, showId) or '-inf'
+                lastEpisode = lastEpisode.decode('utf-8')
                 showInfo['episodes'] = self.__getEpisodes(showId, begin='(' + lastEpisode, limit=episodeLimit)
             else:
                 showInfo['episodes'] = self.__getEpisodes(showId, limit=episodeLimit)
