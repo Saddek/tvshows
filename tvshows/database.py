@@ -292,14 +292,6 @@ class SeriesDatabase:
                 if os.path.exists(posterFile):
                     os.remove(posterFile)
 
-    def getLastSeen(self, user, showId):
-        lastSeen = self.db.hget('user:%s:lastseen' % user, showId)
-
-        if lastSeen:
-            return lastSeen.decode('utf-8')
-        else:
-            return None
-
     def setLastSeen(self, user, showId, episodeId):
         if episodeId:
             lastEpisode = str(episodeId).zfill(8)
@@ -341,18 +333,23 @@ class SeriesDatabase:
     def getShowInfo(self, user, showId, withEpisodes=True, episodeLimit=None, onlyUnseen=False):
         showInfo = {
             'show_id': showId,
-            'name': self.db.hget('show:%s' % showId, 'name').decode('utf-8'),
-            'status': self.db.hget('show:%s' % showId, 'status').decode('utf-8'),
-            'country': self.db.hget('show:%s' % showId, 'country').decode('utf-8'),
-            'network': self.db.hget('show:%s' % showId, 'network').decode('utf-8'),
-            'seasons': self.db.hget('show:%s' % showId, 'seasons').decode('utf-8'),
-            'last_seen': self.getLastSeen(user, showId),
-            'first_aired': self.db.hget('show:%s' % showId, 'firstaired').decode('utf-8')
+            'name': self.db.hget('show:%s' % showId, 'name'),
+            'status': self.db.hget('show:%s' % showId, 'status'),
+            'country': self.db.hget('show:%s' % showId, 'country'),
+            'network': self.db.hget('show:%s' % showId, 'network'),
+            'seasons': self.db.hget('show:%s' % showId, 'seasons'),
+            'last_seen': self.db.hget('user:%s:lastseen' % user, showId),
+            'first_aired': self.db.hget('show:%s' % showId, 'firstaired')
         }
 
         lastAired = self.db.hget('show:%s' % showId, 'lastaired')
         if lastAired:
-            showInfo['last_aired'] = lastAired.decode('utf-8')
+            showInfo['last_aired'] = lastAired
+
+        # decode UTF-8 from db
+        for key in showInfo:
+            if key in showInfo and showInfo[key]:
+                showInfo[key] = showInfo[key].decode('utf-8')
 
         if os.path.exists(self.posterFilename(showId, user=user)):
             showInfo['poster'] = 'static/posters/%s/%s.jpg' % (user, showId)
