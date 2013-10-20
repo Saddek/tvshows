@@ -69,7 +69,7 @@ class SeriesDatabase:
     @retry(requests.ConnectionError, tries=4, delay=1)
     def getTVDBID(self, showInfo):
         print 'Getting TVDB ID for "%s" (%s)...' % (showInfo['name'], showInfo['show_id'])
-        req = requests.get('http://www.thetvdb.com/api/GetSeries.php?seriesname=%s' % showInfo['name'])
+        req = requests.get('http://www.thetvdb.com/api/GetSeries.php?language=all&seriesname=%s' % showInfo['name'])
         tree = etree.fromstring(req.text.encode(req.encoding))
 
         if len(tree) == 0:
@@ -77,7 +77,7 @@ class SeriesDatabase:
             strippedName = re.compile('\(.+?\)').sub('', showInfo['name']).strip()
 
             print ' No results, trying "%s"...' % strippedName
-            req = requests.get('http://www.thetvdb.com/api/GetSeries.php?seriesname=%s' % strippedName)
+            req = requests.get('http://www.thetvdb.com/api/GetSeries.php?language=all&seriesname=%s' % strippedName)
             tree = etree.fromstring(req.text.encode(req.encoding))
 
             if len(tree) == 0:
@@ -97,6 +97,9 @@ class SeriesDatabase:
     @retry(requests.ConnectionError, tries=4, delay=1)
     def getTVDBPosters(self, showInfo):
         tvdbId = self.getTVDBID(showInfo)
+
+        if not tvdbId:
+            return []
 
         req = requests.get('http://www.thetvdb.com/api/%s/series/%s/banners.xml' % (self.tvdbAPIKey, tvdbId))
         tree = etree.fromstring(req.text.encode(req.encoding))
@@ -131,7 +134,7 @@ class SeriesDatabase:
     def downloadPoster(self, showInfo):
         posters = self.getTVDBPosters(showInfo)
 
-        if len(posters) == 0:
+        if not posters:
             return
 
         req = requests.get(SeriesDatabase.tvdbBannerURLFormat % posters[0])
