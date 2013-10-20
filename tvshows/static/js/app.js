@@ -83,15 +83,17 @@
 
   setupButtons();
 
-  $('.sortable').sortable().bind('sortupdate', function() {
-    var ordering = {};
-    
-    $(this).find('> li[data-show-id]').each(function (index, element) {
-      ordering[$(element).data('showId')] = index;
-    });
+  if ($('.sortable').length > 0) {
+    $('.sortable').sortable().bind('sortupdate', function() {
+      var ordering = {};
+      
+      $(this).find('> li[data-show-id]').each(function (index, element) {
+        ordering[$(element).data('showId')] = index;
+      });
 
-    $.post('/ajax/showsorder', ordering);
-  });
+      $.post('/ajax/showsorder', ordering);
+    });
+  }
 
   $('#searchModal').on('show', function () {
     $('#search-results').html('<p class="lead">' + $('#search-results').data('placeholderText') + '</p>');
