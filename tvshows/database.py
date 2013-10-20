@@ -10,6 +10,7 @@ import re
 import redis
 import requests
 import sys
+import time
 
 from .helpers import retry
 
@@ -186,6 +187,7 @@ class SeriesDatabase:
 
     @retry(requests.ConnectionError, tries=4, delay=1)
     def downloadShow(self, showId):
+        print 'Downloading show info for ID %s' % showId
         req = requests.get('http://services.tvrage.com/feeds/full_show_info.php?sid=%s' % showId)
 
         tree = etree.fromstring(req.text.encode(req.encoding))
@@ -251,6 +253,7 @@ class SeriesDatabase:
         updatedShows = tree.xpath('/updates/show/id/text()')
 
         for show in allShows.intersection(updatedShows):
+            time.sleep(1)
             self.downloadShow(show)
             print " - Updated", show
 
