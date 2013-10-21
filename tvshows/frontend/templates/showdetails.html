@@ -13,7 +13,7 @@
             
             <div class="pull-left img-polaroid">
               <img {% if show.poster %}src="{{ url_for('.get_thumbnail', posterPath=show.poster, size='187x275') }}"{% else %}data-src="holder.js/187x275/text:{{ show.name }}"{% endif %} alt="{{ show.name }}">
-              <div><a class="btn" data-toggle="modal" data-target="#posterDialog"><i class="icon-pencil"></i> Changer le poster</a></div>
+              <div><a class="btn" data-toggle="modal" data-target="#posterDialog"><i class="icon-pencil"></i> {{ _('showdetail.changeposter') }}</a></div>
             </div>
 
             <div id="show-info">
@@ -75,13 +75,13 @@
     <div id="posterDialog" style="width: 750px; margin-left:-375px" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="posterDialogLabel" aria-hidden="true">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="posterDialogLabel">Choix d'un poster</h3>
+        <h3 id="posterDialogLabel">{{ _('showdetail.posterdialog.title') }}</h3>
       </div>
       <div class="modal-body" style="max-height: 610px; padding-bottom:0px">
-        <div id="posters-list" data-error-text="{{ _('shows.search.error') }}"></div>
+        <div id="posters-list" data-error-text="{{ _('showdetail.posterdialog.loaderror') }}"></div>
       </div>
       <div class="modal-footer">
-        <a href="{{ url_for('.set_poster', showId=show.show_id) }}" class="btn btn-primary" aria-hidden="true"><i class="icon fonticon-reply"></i> Rétablir le poster par défaut</a>
+        <a href="{{ url_for('.set_poster', showId=show.show_id) }}" class="btn btn-primary" aria-hidden="true"><i class="icon fonticon-reply"></i> {{ _('showdetail.posterdialog.setdefault') }}</a>
         <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('cancel') }}</button>
       </div>
     </div>

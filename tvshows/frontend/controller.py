@@ -276,12 +276,12 @@ def ajax_posters_choice(showId):
 def set_poster(showId, posterPath=None):
     if posterPath:
         if series.setCustomPoster(current_user.id, showId, posterPath) == 200:
-            flash(gettext('Poster changed successfully'), 'success')
+            flash(gettext('showdetail.posterchange.success'), 'success')
         else:
-            flash(gettext('Error while changing poster'), 'error')
+            flash(gettext('showdetail.posterchange.error'), 'error')
     else:
         if series.deleteCustomPoster(current_user.id, showId):
-            flash(gettext('Poster changed successfully'), 'success')
+            flash(gettext('showdetail.posterchange.success'), 'success')
         # deleteCustomPoster returns False if there is no custom poster set, so we display nothing if it doesn't return True
 
     return redirect(url_for('.show_details', showId=showId))

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-25 17:30+0200\n"
+"POT-Creation-Date: 2013-10-21 15:37+0200\n"
 "PO-Revision-Date: 2013-01-06 00:06+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -92,61 +92,69 @@ msgstr "Final season"
 msgid "login.authentication_required"
 msgstr "Please login to access this page"
 
-#: tvshows/frontend/controller.py:110
+#: tvshows/frontend/controller.py:111
 msgid "login.placeholder.username"
 msgstr "Username"
 
-#: tvshows/frontend/controller.py:112
+#: tvshows/frontend/controller.py:113
 msgid "signup.error.alphanum"
 msgstr "Must contain only alphanumeric characters"
 
-#: tvshows/frontend/controller.py:114 tvshows/frontend/controller.py:145
+#: tvshows/frontend/controller.py:115 tvshows/frontend/controller.py:146
 msgid "login.placeholder.password"
 msgstr "Password"
 
-#: tvshows/frontend/controller.py:122 tvshows/frontend/templates/login.html:25
+#: tvshows/frontend/controller.py:123 tvshows/frontend/templates/login.html:25
 msgid "login.rememberme"
 msgstr "Remember me"
 
-#: tvshows/frontend/controller.py:135
+#: tvshows/frontend/controller.py:136
 msgid "login.authentication_failed"
 msgstr "Invalid credentials"
 
-#: tvshows/frontend/controller.py:147
+#: tvshows/frontend/controller.py:148
 msgid "signup.error.passwordsmatch"
 msgstr "Passwords must match"
 
-#: tvshows/frontend/controller.py:149
+#: tvshows/frontend/controller.py:150
 msgid "signup.placeholder.confirmpassword"
 msgstr "Confirm password"
 
-#: tvshows/frontend/controller.py:158
+#: tvshows/frontend/controller.py:159
 msgid "login.successful_signup"
 msgstr "Sign up successful. You can now login"
 
-#: tvshows/frontend/controller.py:161
+#: tvshows/frontend/controller.py:162
 msgid "signup.usernametaken"
 msgstr "Username already taken"
 
-#: tvshows/frontend/controller.py:170
+#: tvshows/frontend/controller.py:173
 msgid "settings.language"
 msgstr "Language"
 
-#: tvshows/frontend/controller.py:171
+#: tvshows/frontend/controller.py:174
 msgid "settings.language.autodetect"
 msgstr "Automatic"
 
-#: tvshows/frontend/controller.py:175
+#: tvshows/frontend/controller.py:178
 msgid "settings.episodesPerShow"
 msgstr "Episodes per show"
 
-#: tvshows/frontend/controller.py:185
+#: tvshows/frontend/controller.py:190
 msgid "settings.savesuccess"
 msgstr "Settings saved successfully"
 
-#: tvshows/frontend/controller.py:194
+#: tvshows/frontend/controller.py:199
 msgid "login.successful_logout"
 msgstr "Successfully logged out"
+
+#: tvshows/frontend/controller.py:279 tvshows/frontend/controller.py:284
+msgid "showdetail.posterchange.success"
+msgstr "Poster changed successfully"
+
+#: tvshows/frontend/controller.py:281
+msgid "showdetail.posterchange.error"
+msgstr "Could not change poster, an error occurred"
 
 #: tvshows/frontend/templates/base.html:3
 msgid "home.pagetitle"
@@ -173,7 +181,7 @@ msgid "signup.pagetitle"
 msgstr "Sign up"
 
 #: tvshows/frontend/templates/base.html:23
-#: tvshows/frontend/templates/base.html:57
+#: tvshows/frontend/templates/base.html:59
 msgid "tvshows"
 msgstr "TV Shows"
 
@@ -221,17 +229,17 @@ msgid "aired"
 msgstr "aired"
 
 #: tvshows/frontend/templates/parts.html:10
-#: tvshows/frontend/templates/showdetails.html:48
+#: tvshows/frontend/templates/showdetails.html:50
 msgid "torrent"
 msgstr "Torrent"
 
 #: tvshows/frontend/templates/parts.html:11
-#: tvshows/frontend/templates/showdetails.html:49
+#: tvshows/frontend/templates/showdetails.html:51
 msgid "subtitles"
 msgstr "Subtitles"
 
 #: tvshows/frontend/templates/parts.html:12
-#: tvshows/frontend/templates/showdetails.html:50
+#: tvshows/frontend/templates/showdetails.html:52
 msgid "seen"
 msgstr "Seen"
 
@@ -261,52 +269,69 @@ msgstr ""
 msgid "settings.save"
 msgstr "Save settings"
 
-#: tvshows/frontend/templates/showdetails.html:18
+#: tvshows/frontend/templates/showdetails.html:16
+msgid "showdetail.changeposter"
+msgstr "Change poster"
+
+#: tvshows/frontend/templates/showdetails.html:20
 msgid "showdetail.unwatch"
 msgstr "Unwatch this show"
 
-#: tvshows/frontend/templates/showdetails.html:23
+#: tvshows/frontend/templates/showdetails.html:25
 msgid "showdetail.seasons"
 msgstr "Seasons:"
 
-#: tvshows/frontend/templates/showdetails.html:24
+#: tvshows/frontend/templates/showdetails.html:26
 msgid "showdetail.status"
 msgstr "Status:"
 
-#: tvshows/frontend/templates/showdetails.html:25
+#: tvshows/frontend/templates/showdetails.html:27
 msgid "showdetail.network"
 msgstr "Network:"
 
-#: tvshows/frontend/templates/showdetails.html:26
+#: tvshows/frontend/templates/showdetails.html:28
 msgid "showdetail.firstaired"
 msgstr "First aired:"
 
-#: tvshows/frontend/templates/showdetails.html:28
+#: tvshows/frontend/templates/showdetails.html:30
 msgid "showdetail.lastaired"
 msgstr "Last aired:"
 
-#: tvshows/frontend/templates/showdetails.html:40
+#: tvshows/frontend/templates/showdetails.html:42
 #, python-format
 msgid "showdetail.season_%(num)d"
 msgstr "Season %(num)d"
 
-#: tvshows/frontend/templates/showdetails.html:62
+#: tvshows/frontend/templates/showdetails.html:64
 msgid "showdetail.deletedialog.title"
 msgstr "Delete show"
 
-#: tvshows/frontend/templates/showdetails.html:65
+#: tvshows/frontend/templates/showdetails.html:67
 #, python-format
 msgid "showdetail.deletedialog.text_%(show)s"
 msgstr "Are you sure you want to delete %(show)s? This action cannot be undone."
 
-#: tvshows/frontend/templates/showdetails.html:68
+#: tvshows/frontend/templates/showdetails.html:70
+#: tvshows/frontend/templates/showdetails.html:85
 #: tvshows/frontend/templates/shows.html:48
 msgid "cancel"
 msgstr "Cancel"
 
-#: tvshows/frontend/templates/showdetails.html:69
+#: tvshows/frontend/templates/showdetails.html:71
 msgid "delete"
 msgstr "Delete"
+
+#: tvshows/frontend/templates/showdetails.html:78
+msgid "showdetail.posterdialog.title"
+msgstr "Choose custom poster"
+
+#: tvshows/frontend/templates/showdetails.html:81
+msgid "showdetail.posterdialog.loaderror"
+msgstr "An error occurred, please try again"
+
+#: tvshows/frontend/templates/showdetails.html:84
+msgid "showdetail.posterdialog.setdefault"
+msgstr "Revert to default poster"
 
 #: tvshows/frontend/templates/shows.html:11
 msgid "shows.addbutton"
