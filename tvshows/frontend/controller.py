@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from datetime import date
+from datetime import date, datetime
 from flask import Blueprint, render_template, request, Response, jsonify, url_for, redirect, flash, abort, send_file, current_app
 from flask.ext.babel import gettext, lazy_gettext, get_locale, refresh as refresh_locale
 from flask.ext.login import login_user, logout_user, login_required, current_user
@@ -9,7 +9,9 @@ from StringIO import StringIO
 import calendar
 import Image
 import ImageFile
+import os
 import requests
+import time
 import wtforms.ext.i18n.form
 
 from ..database import SeriesDatabase
@@ -307,7 +309,14 @@ def get_thumbnail(size, posterPath):
 
     width, height = [int(component) for component in splittedSize]
 
-    img = Image.open(current_app.open_resource(posterPath))
+    f = current_app.open_resource(posterPath)
+    img = Image.open(f)
+
+    lastModified = int(os.path.getmtime(f.name))
+    
+    # caching
+    if request.if_modified_since and datetime.fromtimestamp(lastModified) <= request.if_modified_since:
+        return Response(status=304)
 
     img.thumbnail((width, height), Image.ANTIALIAS)
 
@@ -322,4 +331,7 @@ def get_thumbnail(size, posterPath):
 
     thumbnail.seek(0)
 
-    return send_file(thumbnail, mimetype='image/jpeg')
+    res = send_file(thumbnail, mimetype='image/jpeg', cache_timeout=0)
+    res.last_modified = time.localtime(lastModified)
+
+    return res
