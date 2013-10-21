@@ -33,9 +33,10 @@
   </tbody>
 {%- endmacro %}
 
-{% macro displayFlashes() %}
+{% macro displayFlashes(closeable) %}
+{% set closeable = closeable or False %}
 {% for category, message in get_flashed_messages(with_categories=True) %}
-<div class="alert alert-{{ category }}">
+<div class="alert alert-{{ category }}">{% if closeable %}<button type="button" class="close" data-dismiss="alert">&times;</button>{% endif %}
   {{ message }}
 </div>
 {% endfor %}
