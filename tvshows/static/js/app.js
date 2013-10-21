@@ -95,6 +95,18 @@
     });
   }
 
+  $('#posterDialog').on('show', function () {
+    $('#posters-list').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>');
+
+    var showId = $('#showdetails').data('showId');
+
+    $('#posters-list').load(SCRIPT_ROOT + '/ajax/posters/' + encodeURIComponent(showId), function(response, textStatus, xhr) {
+      if (xhr.status != 200) {
+        $('#posters-list').html('<p class="lead">' + $('#posters-list').data('errorText') + '</p>');
+      }
+    });
+  });
+
   $('#searchModal').on('show', function () {
     $('#search-results').html('<p class="lead">' + $('#search-results').data('placeholderText') + '</p>');
     $('#search-form input').val('');

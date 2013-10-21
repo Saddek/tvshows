@@ -17,6 +17,7 @@ from .helpers import retry
 
 class SeriesDatabase:
     tvdbBannerURLFormat = 'http://thetvdb.com/banners/%s'
+    tvdbBannerCacheURLFormat = 'http://thetvdb.com/banners/_cache/%s'
     postersDir = os.path.join(os.path.dirname(__file__), 'static', 'posters')
 
     instance = None

@@ -115,12 +115,12 @@ h4 > a {
   color: @headingsColor;
 }
 
-#search-results > .lead {
+#search-results > .lead, #posters-list > .lead {
   text-align: center;
   margin-bottom: 0;
 }
 
-#search-results > .progress {
+#search-results > .progress, #posters-list > .progress {
   text-align: center;
   margin: 0 auto 10px;
   width: 75%;
@@ -136,7 +136,7 @@ h4 > a {
   }
 }
 
-.sortable .thumbnail > img {
+.sortable .thumbnail > img, #posterDialog .thumbnail > img {
   width: 187px;
   height: 275px;
 }
@@ -161,7 +161,33 @@ h4 > a {
   > div {
     margin: 20px 0;
 
-    > div {
+    .img-polaroid {
+      position:relative;
+    }
+
+    /* displays the 'Change banner' button when hovering the poster */
+    .img-polaroid > div {
+      display: none;
+      margin: 4px;
+      width: 187px;
+      height: 275px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      text-align: center;
+
+      > .btn {
+        margin-top: 230px;
+      }
+    }
+
+    .img-polaroid:hover > div {
+      display: block;
+    }
+
+
+
+    > #show-info {
       padding-left: 20px;
       overflow: auto;
 

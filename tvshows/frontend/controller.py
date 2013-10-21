@@ -9,6 +9,7 @@ from StringIO import StringIO
 import calendar
 import Image
 import ImageFile
+import requests
 import wtforms.ext.i18n.form
 
 from ..database import SeriesDatabase
@@ -256,6 +257,44 @@ def ajax_search_show(showName):
         userShows.append(show['show_id'])
 
     return render_template('ajax/search_results.html', results=results, userShows=userShows)
+
+
+# Returns a partial view containing the posters for a show to be displayed in a popup window
+@frontend.route('/ajax/posters/<showId>')
+@login_required
+def ajax_posters_choice(showId):
+    show = series.getShowInfo(current_user.id, showId, withEpisodes=False)
+
+    return render_template('ajax/poster_choice.html', showId=showId, posters=series.getTVDBPosters(show))
+
+
+# Sets the user's custom poster. posterPath is a relative path from RheTVDB
+# If no path is set, the custom poster is deleted
+@frontend.route('/poster/<showId>')
+@frontend.route('/poster/<showId>/<path:posterPath>')
+@login_required
+def set_poster(showId, posterPath=None):
+    if posterPath:
+        if series.setCustomPoster(current_user.id, showId, posterPath) == 200:
+            flash(gettext('Poster changed successfully'), 'success')
+        else:
+            flash(gettext('Error while changing poster'), 'error')
+    else:
+        if series.deleteCustomPoster(current_user.id, showId):
+            flash(gettext('Poster changed successfully'), 'success')
+        # deleteCustomPoster returns False if there is no custom poster set, so we display nothing if it doesn't return True
+
+    return redirect(url_for('.show_details', showId=showId))
+
+
+# Downloads a poster's thumbnail from TheTVDB and passes it through to the client
+# Needed because TheTVDB checks the referrer to prevent hotlinking
+# We only need it to display the lightweight thumbnails, not full-res pictures
+@frontend.route('/remote/thumb/<path:posterPath>')
+def get_remote_thumbnail(posterPath):
+    r = requests.get(SeriesDatabase.tvdbBannerCacheURLFormat % posterPath, stream=True)
+
+    return Response(r.iter_content(chunk_size=512), mimetype=r.headers['content-type'])
 
 
 @frontend.route('/thumbs/<size>/<path:posterPath>', methods=['GET'])

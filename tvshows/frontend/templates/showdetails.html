@@ -7,14 +7,16 @@
 {% block content %}
       <div class="container">
         <div id="showdetails" data-show-id="{{ show.show_id }}">
-          <div class="clearfix">
-            {% if show.poster %}
-            <img class="pull-left img-polaroid" src="{{ url_for('.get_thumbnail', posterPath=show.poster, size='187x275') }}" alt="{{ show.name }}">
-            {% else %}
-            <img class="pull-left img-polaroid" data-src="holder.js/187x275/text:{{ show.name }}" alt="{{ show.name }}">
-            {% endif %}
+          {{ parts.displayFlashes(True) }}
 
-            <div>
+          <div class="clearfix">
+            
+            <div class="pull-left img-polaroid">
+              <img {% if show.poster %}src="{{ url_for('.get_thumbnail', posterPath=show.poster, size='187x275') }}"{% else %}data-src="holder.js/187x275/text:{{ show.name }}"{% endif %} alt="{{ show.name }}">
+              <div><a class="btn" data-toggle="modal" data-target="#posterDialog"><i class="icon-pencil"></i> Changer le poster</a></div>
+            </div>
+
+            <div id="show-info">
               <a class="btn btn-danger" data-toggle="modal" data-target="#deleteDialog"><i class="icon-eye-close icon-white"></i> {{ _('showdetail.unwatch') }}</a>
               
               <h2>{{ show.name }}</h2>
@@ -67,6 +69,20 @@
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('cancel') }}</button>
         <a href="{{ url_for('.show_delete', showId=show.show_id) }}" class="btn btn-danger">{{ _('delete') }}</a>
+      </div>
+    </div>
+
+    <div id="posterDialog" style="width: 750px; margin-left:-375px" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="posterDialogLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="posterDialogLabel">Choix d'un poster</h3>
+      </div>
+      <div class="modal-body" style="max-height: 610px; padding-bottom:0px">
+        <div id="posters-list" data-error-text="{{ _('shows.search.error') }}"></div>
+      </div>
+      <div class="modal-footer">
+        <a href="{{ url_for('.set_poster', showId=show.show_id) }}" class="btn btn-primary" aria-hidden="true"><i class="icon fonticon-reply"></i> Rétablir le poster par défaut</a>
+        <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('cancel') }}</button>
       </div>
     </div>
 {% endblock %}
