@@ -2,7 +2,7 @@
   {% for poster in posters %}
   <li>
     <a href="{{ url_for('.set_poster', showId=showId, posterPath=poster) }}" class="thumbnail">
-      <img src="{{ url_for('.get_remote_thumbnail', posterPath=poster) }}" alt="Show" width="187" height="275">
+      <img src="{{ url_for('.get_remote_thumbnail', posterPath=poster) }}" alt="Poster {{ loop.index }}" width="187" height="275">
     </a>
   </li>
   {% endfor %}
