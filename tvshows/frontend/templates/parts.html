@@ -7,7 +7,7 @@
       <strong>{{episode | episodeNumber}}:</strong> {{episode.title}}
       <small>({{ _('aired') }} {{ episode.airdate | prettyDate(addPrefix=True) }})</small>
       <div class="detail-hover">
-        <a class="btn btn-mini" href="{{ show | pirateBayLink(episode) }}" target="_blank"><i class="icon-magnet"></i> {{ _('torrent') }}</a>
+        <a class="btn btn-mini" href="{{ show | downloadLink(episode) }}" target="_blank"><i class="icon-magnet"></i> {{ _('torrent') }}</a>
         <a class="btn btn-mini" href="{{ show | addic7edLink(episode) }}" target="_blank"><i class="icon-align-left"></i> {{ _('subtitles') }}</a>
         <a class="btn btn-mini" data-action="seen" data-episode-id="{{ episode.episode_id }}" href="javascript:void(0)"><i class="icon-eye-open"></i> {{ _('seen') }}</a>
       </div>

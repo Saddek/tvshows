@@ -47,7 +47,7 @@
                 <td>{{ ep.title }}</td>
                 <td>{{ ep.airdate | prettyDate(forceYear=True) }}</td>
                 <td style="text-align: right">
-                  <a class="btn btn-mini" href="{{ show | pirateBayLink(ep) }}" target="_blank"><i class="icon-magnet"></i> {{ _('torrent') }}</a>
+                  <a class="btn btn-mini" href="{{ show | downloadLink(ep) }}" target="_blank"><i class="icon-magnet"></i> {{ _('torrent') }}</a>
                   <a class="btn btn-mini" href="{{ show | addic7edLink(ep) }}" target="_blank"><i class="icon-align-left"></i> {{ _('subtitles') }}</a>
                   <a class="btn btn-mini" data-action="seen" href="javascript:void(0)"><i class="icon-eye-open"></i> {{ _('seen') }}</a>
                 </td>
