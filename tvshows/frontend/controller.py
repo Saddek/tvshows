@@ -7,8 +7,7 @@ from flask.ext.wtf import Form, TextField, PasswordField, BooleanField, SelectFi
 from StringIO import StringIO
 
 import calendar
-import Image
-import ImageFile
+from PIL import Image, ImageFile
 import os
 import requests
 import time
