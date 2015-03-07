@@ -121,17 +121,14 @@ def login():
     class LoginForm(UserForm):
         LANGUAGES = [get_locale().language]
 
-        remember = BooleanField(lazy_gettext('login.rememberme'))
-
     form = LoginForm()
 
     if form.validate_on_submit():
         user = User(form.username.data.lower())
         password = form.password.data
-        remember = bool(form.remember.data)
 
         if series.checkAuth(user.id, password):
-            login_user(user, remember=remember)
+            login_user(user, remember=True)
             return redirect(request.args.get('next') or url_for('.home'))
         else:
             flash(gettext(u'login.authentication_failed'), 'error')

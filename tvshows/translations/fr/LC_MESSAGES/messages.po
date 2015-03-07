@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-21 15:37+0200\n"
+"POT-Creation-Date: 2015-03-07 12:19+0100\n"
 "PO-Revision-Date: 2013-01-06 00:06+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -92,67 +92,63 @@ msgstr "Saison finale"
 msgid "login.authentication_required"
 msgstr "Vous devez être connecté pour accéder à cette page"
 
-#: tvshows/frontend/controller.py:111
+#: tvshows/frontend/controller.py:113
 msgid "login.placeholder.username"
 msgstr "Nom d'utilisateur"
 
-#: tvshows/frontend/controller.py:113
+#: tvshows/frontend/controller.py:115
 msgid "signup.error.alphanum"
 msgstr "Ne doit contenir que des caractères alphanumériques"
 
-#: tvshows/frontend/controller.py:115 tvshows/frontend/controller.py:146
+#: tvshows/frontend/controller.py:117 tvshows/frontend/controller.py:145
 msgid "login.placeholder.password"
 msgstr "Mot de passe"
 
-#: tvshows/frontend/controller.py:123 tvshows/frontend/templates/login.html:25
-msgid "login.rememberme"
-msgstr "Se souvenir de moi"
-
-#: tvshows/frontend/controller.py:136
+#: tvshows/frontend/controller.py:135
 msgid "login.authentication_failed"
 msgstr "Identifiants invalides"
 
-#: tvshows/frontend/controller.py:148
+#: tvshows/frontend/controller.py:147
 msgid "signup.error.passwordsmatch"
 msgstr "Les mots de passe doivent correspondre"
 
-#: tvshows/frontend/controller.py:150
+#: tvshows/frontend/controller.py:149
 msgid "signup.placeholder.confirmpassword"
 msgstr "Confirmez le mot de passe"
 
-#: tvshows/frontend/controller.py:159
+#: tvshows/frontend/controller.py:158
 msgid "login.successful_signup"
 msgstr "Inscription réussie. Vous pouvez maintenant vous connecter"
 
-#: tvshows/frontend/controller.py:162
+#: tvshows/frontend/controller.py:161
 msgid "signup.usernametaken"
 msgstr "Nom d'utilisateur déjà pris"
 
-#: tvshows/frontend/controller.py:173
+#: tvshows/frontend/controller.py:172
 msgid "settings.language"
 msgstr "Langue"
 
-#: tvshows/frontend/controller.py:174
+#: tvshows/frontend/controller.py:173
 msgid "settings.language.autodetect"
 msgstr "Automatique"
 
-#: tvshows/frontend/controller.py:178
+#: tvshows/frontend/controller.py:177
 msgid "settings.episodesPerShow"
 msgstr "Épisodes par série"
 
-#: tvshows/frontend/controller.py:190
+#: tvshows/frontend/controller.py:189
 msgid "settings.savesuccess"
 msgstr "Paramètres sauvegardés avec succès"
 
-#: tvshows/frontend/controller.py:199
+#: tvshows/frontend/controller.py:198
 msgid "login.successful_logout"
 msgstr "Déconnecté avec succès"
 
-#: tvshows/frontend/controller.py:279 tvshows/frontend/controller.py:284
+#: tvshows/frontend/controller.py:278 tvshows/frontend/controller.py:283
 msgid "showdetail.posterchange.success"
 msgstr "Poster changé avec succès"
 
-#: tvshows/frontend/controller.py:281
+#: tvshows/frontend/controller.py:280
 msgid "showdetail.posterchange.error"
 msgstr "Impossible de changer le poster, une erreur s'est produite"
 
@@ -205,15 +201,15 @@ msgstr "Rien à venir :("
 msgid "login.heading"
 msgstr "Login"
 
-#: tvshows/frontend/templates/login.html:28
+#: tvshows/frontend/templates/login.html:24
 msgid "login.submitbutton"
 msgstr "Connexion"
 
-#: tvshows/frontend/templates/login.html:29
+#: tvshows/frontend/templates/login.html:25
 msgid "login.noaccount"
 msgstr "Pas de compte ?"
 
-#: tvshows/frontend/templates/login.html:29
+#: tvshows/frontend/templates/login.html:25
 msgid "login.signup"
 msgstr "S'inscrire"
 

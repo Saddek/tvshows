@@ -21,10 +21,6 @@
           {{ form.password(class_='input-block-level', placeholder=form.password.label.text) }}
         </div>
 
-        <label class="checkbox">
-          <input type="checkbox" name="remember"> {{ _('login.rememberme') }}
-        </label>
-
         <button class="btn btn-primary pull-right" type="submit">{{ _('login.submitbutton') }}</button>
         <span class="pull-right">{{ _('login.noaccount')}} <a href="{{ url_for('.signup') }}">{{ _('login.signup') }}</a></span>
       </fieldset>
