@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from babel import Locale
-from flask import Flask, request
+from datetime import timedelta
+from flask import Flask, request, session
 from flask.ext.babel import Babel, lazy_gettext
 from flask.ext.login import LoginManager, current_user
 
@@ -10,11 +11,12 @@ import os
 from .frontend import frontend
 from .api import api
 from .user import User
+from .database import SeriesDatabase
 from . import customfilters
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.urandom(24)
+app.config['SECRET_KEY'] = SeriesDatabase().getAppSecretKey()
 
 app.debug = True if os.environ.get('DEBUG') else False
 
@@ -34,6 +36,7 @@ customfilters.setupCustomFilters(app)
 
 @login_manager.user_loader
 def load_user(userId):
+    session.permanent = True
     return User(userId)
 
 

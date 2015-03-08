@@ -331,6 +331,15 @@ class SeriesDatabase:
         else:
             self.db.hdel('user:%s' % user, key)
 
+    def getAppSecretKey(self):
+        secretKey = self.db.get('app:secretkey')
+
+        if not secretKey:
+            secretKey = os.urandom(24)
+            self.db.set('app:secretkey', secretKey)
+
+        return secretKey
+
     def getShowInfo(self, user, showId, withEpisodes=True, episodeLimit=None, onlyUnseen=False):
         showInfo = {
             'show_id': showId,
