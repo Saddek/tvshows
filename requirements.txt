@@ -10,3 +10,4 @@ Werkzeug==0.8.3
 lxml==3.2.1
 redis==2.7.5
 requests==1.2.0
+feedgen==0.3.1

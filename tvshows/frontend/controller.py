@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import date, datetime
+from feedgen.feed import FeedGenerator
 from flask import Blueprint, render_template, request, Response, jsonify, url_for, redirect, flash, abort, send_file, current_app
 from flask.ext.babel import gettext, lazy_gettext, get_locale, refresh as refresh_locale
 from flask.ext.login import login_user, logout_user, login_required, current_user
@@ -28,6 +29,10 @@ def unseenEpisodesKey(show):
 
 def upcomingEpisodesKey(show):
     return airdateKey(show['upcomingEpisodes'][0]['airdate'])
+
+def episodeAirdateKey(episodeTuple):
+    _, episode = episodeTuple
+    return airdateKey(episode['airdate'])
 
 
 def airdateKey(airdate):
@@ -63,6 +68,32 @@ def getShowsOverview():
 
     return unseen, upcoming
 
+@frontend.route('/rss/<userID>.rss')
+def latestRss(userID):
+    userID = userID.lower()
+
+    shows = {}
+    episodes = []
+    today = date.today().strftime('%Y-%m-%d')
+    for showID in series.getUserShowList(userID):
+        shows[showID] = series.getShowInfo(userID, showID, withEpisodes=True, onlyUnseen=True)
+        episodes.extend((showID, episode) for episode in shows[showID]['episodes'] if airdateKey(episode['airdate']) < today)
+
+    episodes.sort(key=episodeAirdateKey, reverse=True)
+
+    feed = FeedGenerator()
+    feed.id(userID)
+    feed.title('%s\'s shows' % userID)
+    feed.description('Unseen episodes')
+    feed.link(href=request.url_root)
+    feed.language('en')
+
+    for showID, episode in episodes:
+        entry = feed.add_entry()
+        entry.id('%s/%s' % (showID, episode['episode_id']))
+        entry.title('%s S%02dE%02d: %s' % (shows[showID]['name'], episode['season'], episode['episode'], episode['title']))
+
+    return feed.rss_str(pretty=True)
 
 @frontend.route('/')
 @login_required
