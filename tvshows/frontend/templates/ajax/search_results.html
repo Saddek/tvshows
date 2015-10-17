@@ -11,7 +11,7 @@
     </div>
     <p>
       <strong>{{ result.name }}</strong><br>
-      {{ result.started | yearRange(result.ended) }}{% if result.genres %} – {{ result.genres | join(', ') }}{% endif %}
+      {{ result.year }}{% if result.network %} – {{ result.network }}{% endif %}
     </p>
   </li>
   {% endfor %}

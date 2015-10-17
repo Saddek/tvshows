@@ -16,6 +16,7 @@ from .helpers import retry
 
 
 class SeriesDatabase:
+    tvdbAPIURLFormat = 'http://thetvdb.com/api/%s'
     tvdbBannerURLFormat = 'http://thetvdb.com/banners/%s'
     tvdbBannerCacheURLFormat = 'http://thetvdb.com/banners/_cache/%s'
     postersDir = os.path.join(os.path.dirname(__file__), 'static', 'posters')
@@ -45,19 +46,16 @@ class SeriesDatabase:
 
     @retry((requests.ConnectionError, etree.XMLSyntaxError), tries=4, delay=1)
     def searchShow(self, showName):
-        req = requests.get('http://services.tvrage.com/feeds/search.php', params={'show': showName})
+        req = requests.get(SeriesDatabase.tvdbAPIURLFormat % 'GetSeries.php', params={'seriesname': showName})
         tree = etree.fromstring(req.text.encode(req.encoding))
-
         results = []
-        for e in tree.xpath('/Results/show'):
-            showId = e.xpath('showid')[0].text
+        for e in tree.xpath('/Data/Series'):
+            showId = e.xpath('seriesid')[0].text
             results.append({
                 'id': showId,
-                'name': e.xpath('name')[0].text,
-                'seasons': int(e.xpath('seasons')[0].text),
-                'started': int(e.xpath('started')[0].text),
-                'ended': int(e.xpath('ended')[0].text),
-                'genres': [genre.text for genre in e.xpath('genres/genre')]
+                'name': e.xpath('SeriesName')[0].text,
+                'year': int(e.xpath('FirstAired')[0].text.split('-')[0]) if len(e.xpath('FirstAired')) > 0 else None,
+                'network': e.xpath('Network')[0].text if len(e.xpath('Network')) > 0 else None
             })
 
         return results
