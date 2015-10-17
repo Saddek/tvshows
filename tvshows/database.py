@@ -9,8 +9,10 @@ import os
 import re
 import redis
 import requests
+import StringIO
 import sys
 import time
+import zipfile 
 
 from .helpers import retry
 
@@ -187,54 +189,66 @@ class SeriesDatabase:
     @retry((requests.ConnectionError, etree.XMLSyntaxError), tries=4, delay=1)
     def downloadShow(self, showId):
         print 'Downloading show info for ID %s' % showId
-        req = requests.get('http://services.tvrage.com/feeds/full_show_info.php?sid=%s' % showId)
+        req = requests.get('http://thetvdb.com/api/%s/series/%s/all/en.zip' % (self.tvdbAPIKey, showId))
 
-        tree = etree.fromstring(req.text.encode(req.encoding))
+        zipContent = zipfile.ZipFile(StringIO.StringIO(req.content))
 
-        showName = tree.xpath('/Show/name')[0].text
+        tree = etree.parse(zipContent.open('en.xml'))
+
+        showName = tree.xpath('/Data/Series/SeriesName')[0].text
 
         pipe = self.db.pipeline()
 
         pipe.delete('show:%s' % showId)
 
         pipe.hset('show:%s' % showId, 'name', showName)
-        pipe.hset('show:%s' % showId, 'seasons', int(tree.xpath('count(/Show/Episodelist/Season)')))
-        pipe.hset('show:%s' % showId, 'status', tree.xpath('/Show/status')[0].text)
 
-        country = tree.xpath('/Show/origin_country')[0].text
-        pipe.hset('show:%s' % showId, 'country', country)
+        showStatus = tree.xpath('/Data/Series/Status')[0].text
+        pipe.hset('show:%s' % showId, 'status', showStatus)
 
-        network = tree.xpath('/Show/network[@country="%s"]' % country)
+        # TheTVDB doesn't return the show's country unlike the old TVRage API.
+        #pipe.hset('show:%s' % showId, 'country', 'xxxx')
+
+        network = tree.xpath('/Data/Series/Network')
         if network:
             pipe.hset('show:%s' % showId, 'network', network[0].text)
 
         pipe.delete('show:%s:episodes' % showId)
-        for season in tree.xpath('/Show/Episodelist/Season'):
-            seasonNum = int(season.get('no'))
 
-            for episode in season.xpath('episode'):
-                episodeNum = int(episode.xpath('seasonnum')[0].text)
-                episodeId = '%04d%04d' % (seasonNum, episodeNum)
+        maxSeason = 0
+        for episode in tree.xpath('/Data/Episode'):
+            seasonNum = int(episode.xpath('SeasonNumber')[0].text)
 
-                episodeInfo = {
-                    'episode_id': episodeId,
-                    'title': episode.xpath('title')[0].text,
-                    'season': seasonNum,
-                    'episode': episodeNum,
-                    'airdate': episode.xpath('airdate')[0].text
-                }
+            if seasonNum == 0: continue # ignore Season 0, contains special episodes
 
-                pipe.zadd('show:%s:episodes' % showId, episodeId, json.dumps(episodeInfo))
+            episodeNum = int(episode.xpath('EpisodeNumber')[0].text)
+            episodeId = '%04d%04d' % (seasonNum, episodeNum)
+
+            if (seasonNum > maxSeason):
+                maxSeason = seasonNum
+
+            episodeInfo = {
+                'episode_id': episodeId,
+                'title': episode.xpath('EpisodeName')[0].text,
+                'season': seasonNum,
+                'episode': episodeNum,
+                'airdate': episode.xpath('FirstAired')[0].text
+            }
+
+            pipe.zadd('show:%s:episodes' % showId, episodeId, json.dumps(episodeInfo))
+
+        pipe.hset('show:%s' % showId, 'seasons', maxSeason)
 
         pipe.execute()
 
         # the date format in "started" and "ended" tags of the feed are not in a standard date format
         # so we retrieve the first episode of the list to get the show's first airing date
+        # (this was done before switching to TheTVDB but it works well so we kept it)
         episodes = self.__getEpisodes(showId)
         if len(episodes) > 0:
             self.db.hset('show:%s' % showId, 'firstaired', episodes[0]['airdate'])
 
-            if tree.xpath('/Show/ended[node()]'):
+            if showStatus == 'Ended':
                 self.db.hset('show:%s' % showId, 'lastaired', episodes[-1]['airdate'])
 
         if not os.path.exists(self.posterFilename(showId)):
@@ -246,15 +260,32 @@ class SeriesDatabase:
         print "Starting update..."
         allShows = set(self.db.hkeys('shows'))
 
-        req = requests.get('http://services.tvrage.com/feeds/last_updates.php?hours=36')
-        tree = etree.fromstring(req.text.encode(req.encoding))
+        lastUpdate = int(self.db.get('app:lastupdate')) if self.db.get('app:lastupdate') else None
 
-        updatedShows = tree.xpath('/updates/show/id/text()')
+        if lastUpdate:
+            print 'Last update time: %d, fetching updated show since then...' % lastUpdate
+            req = requests.get(SeriesDatabase.tvdbAPIURLFormat % 'Updates.php', params={'type': 'all', 'time': lastUpdate})
+            tree = etree.fromstring(req.text.encode(req.encoding))
 
-        for show in allShows.intersection(updatedShows):
+            updatedShows = tree.xpath('/Items/Series/text()')
+            showsToUpdate = allShows.intersection(updatedShows)
+
+            lastUpdate = int(tree.xpath('/Items/Time')[0].text)
+        else:
+            print 'Last update time: NEVER, fetching current server date and updating all shows...'
+            req = requests.get(SeriesDatabase.tvdbAPIURLFormat % 'Updates.php', params={'type': 'none'})
+            tree = etree.fromstring(req.text.encode(req.encoding))
+
+            lastUpdate =  int(tree.xpath('/Items/Time')[0].text)
+
+            showsToUpdate = allShows
+
+        for show in showsToUpdate:
             time.sleep(1)
             self.downloadShow(show)
             print " - Updated", show
+
+        lastUpdate = self.db.set('app:lastupdate', lastUpdate)
 
         print "Update done."
 

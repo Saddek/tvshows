@@ -37,6 +37,9 @@ def addic7edLink(show, episode):
 
 
 def prettyDate(dateStr, forceYear=False, addPrefix=False):
+    if not dateStr:
+        return gettext('date.unknown')
+
     year, month, day = [int(component) for component in dateStr.split('-')]
 
     if year == 0:
@@ -86,14 +89,10 @@ def yearRange(started, ended):
 
 
 def localizedShowStatus(status):
-    if status == 'Returning Series':
+    if status == 'Continuing':
         return gettext('showdetails.status.returning')
-    elif status == 'Canceled/Ended' or status == 'Ended':
+    elif status == 'Ended':
         return gettext('showdetails.status.ended')
-    elif status == 'New Series':
-        return gettext('showdetails.status.firstseason')
-    elif status == 'Final Season':
-        return gettext('showdetails.status.finalseason')
     else:
         return status
 
