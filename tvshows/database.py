@@ -42,6 +42,7 @@ class SeriesDatabase:
 
         self.db = redis.StrictRedis(host=config.get('redis', 'host'), port=config.getint('redis', 'port'), db=config.getint('redis', 'db'))
         self.tvdbAPIKey = config.get('thetvdb', 'api_key')
+        self.tvdbAuthenticatedURLFormat = SeriesDatabase.tvdbAPIURLFormat % ('%s/%%s' % self.tvdbAPIKey) # build a format string like 'http://thetvdb.com/api/API_KEY/%s
 
         if not os.path.exists(SeriesDatabase.postersDir):
             os.makedirs(SeriesDatabase.postersDir)
@@ -69,41 +70,8 @@ class SeriesDatabase:
         self.db.hset('user:%s' % user, 'password', hashlib.sha256(password).hexdigest())
 
     @retry((requests.ConnectionError, etree.XMLSyntaxError), tries=4, delay=1)
-    def getTVDBID(self, showInfo):
-        print 'Getting TVDB ID for "%s" (%s)...' % (showInfo['name'], showInfo['show_id'])
-        req = requests.get('http://www.thetvdb.com/api/GetSeries.php?language=all&seriesname=%s' % showInfo['name'])
-        tree = etree.fromstring(req.text.encode(req.encoding))
-
-        if len(tree) == 0:
-            # remove parenthesis (TVRage sometimes include the country or year in the show name and not TVDB)
-            strippedName = re.compile('\(.+?\)').sub('', showInfo['name']).strip()
-
-            print ' No results, trying "%s"...' % strippedName
-            req = requests.get('http://www.thetvdb.com/api/GetSeries.php?language=all&seriesname=%s' % strippedName)
-            tree = etree.fromstring(req.text.encode(req.encoding))
-
-            if len(tree) == 0:
-                print ' Still nothing, giving up.'
-                return None
-
-        print 'Matches found. Searching the first result with the same air date.'
-        matches = tree.xpath('/Data/Series[FirstAired="%s"]/seriesid' % showInfo['first_aired'])
-
-        if len(matches) == 0:
-            print 'No air date matching. Getting first result instead.'
-            matches = tree.xpath('/Data/Series/seriesid')
-
-        print 'TVDB ID for %s: %s' % (showInfo['name'], matches[0].text)
-        return matches[0].text
-
-    @retry((requests.ConnectionError, etree.XMLSyntaxError), tries=4, delay=1)
     def getTVDBPosters(self, showInfo):
-        tvdbId = self.getTVDBID(showInfo)
-
-        if not tvdbId:
-            return []
-
-        req = requests.get('http://www.thetvdb.com/api/%s/series/%s/banners.xml' % (self.tvdbAPIKey, tvdbId))
+        req = requests.get(self.tvdbAuthenticatedURLFormat % 'series/%s/banners.xml' % showInfo['show_id'])
         tree = etree.fromstring(req.text.encode(req.encoding))
 
         posters = []
@@ -189,7 +157,7 @@ class SeriesDatabase:
     @retry((requests.ConnectionError, etree.XMLSyntaxError), tries=4, delay=1)
     def downloadShow(self, showId):
         print 'Downloading show info for ID %s' % showId
-        req = requests.get('http://thetvdb.com/api/%s/series/%s/all/en.zip' % (self.tvdbAPIKey, showId))
+        req = requests.get(self.tvdbAuthenticatedURLFormat % 'series/%s/all/en.zip' % showId)
 
         zipContent = zipfile.ZipFile(StringIO.StringIO(req.content))
 
