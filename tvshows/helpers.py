@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import time
 
+from flask import current_app, request
+from flask.ext.login import current_user
+from functools import wraps
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     """Retry calling the decorated function using an exponential backoff.
@@ -44,3 +47,21 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
             return
         return f_retry  # true decorator
     return deco_retry
+
+
+def logged_request(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        current_app.logger.info('%s request on %s' % (request.method, request.path), extra={
+            'method': request.method,
+            'path': request.path,
+            'ip': request.remote_addr,
+            'agent_platform': request.user_agent.platform,
+            'agent_browser': request.user_agent.browser,
+            'agent_browser_version': request.user_agent.version,
+            'agent': request.user_agent.string,
+            'user': current_user.id if not current_user.is_anonymous() else '<anonymous>'
+        })
+
+        return func(*args, **kwargs)
+    return decorated_view

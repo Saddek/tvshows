@@ -6,6 +6,7 @@ from flask.ext.babel import Babel, lazy_gettext
 from flask.ext.login import LoginManager, current_user
 
 import errno
+import logstash
 import os
 
 from .frontend import frontend
@@ -14,7 +15,29 @@ from .user import User
 from .database import SeriesDatabase
 from . import customfilters
 
-app = Flask(__name__)
+class LoggingFlask(Flask):
+    def log_exception(self, exc_info):
+        """Logs an exception.  This is called by :meth:`handle_exception`
+        if debugging is disabled and right before the handler is called.
+        The default implementation logs the exception as error on the
+        :attr:`logger`.
+        .. versionadded:: 0.8
+        """
+        self.logger.error('Exception on %s [%s]' % (
+            request.path,
+            request.method
+        ), exc_info=exc_info, extra={
+            'method': request.method,
+            'path': request.path,
+            'ip': request.remote_addr,
+            'agent_platform': request.user_agent.platform,
+            'agent_browser': request.user_agent.browser,
+            'agent_browser_version': request.user_agent.version,
+            'agent': request.user_agent.string,
+            'user': current_user.id if not current_user.is_anonymous() else '<anonymous>'
+        })
+
+app = LoggingFlask(__name__)
 
 app.config['SECRET_KEY'] = SeriesDatabase().getAppSecretKey()
 
@@ -64,6 +87,12 @@ if not app.debug:
         if exception.errno != errno.EEXIST:
             raise
 
+    app.logger.setLevel(logging.INFO)
+
     file_handler = TimedRotatingFileHandler(os.path.join(logsDir, 'error.log'), when='midnight', backupCount=5)
     file_handler.setLevel(logging.WARNING)
+
+    logstash_handler = logstash.TCPLogstashHandler('localhost', 5229, message_type=None, version=1) # no message type, let the logstash server decide
+
     app.logger.addHandler(file_handler)
+    app.logger.addHandler(logstash_handler)

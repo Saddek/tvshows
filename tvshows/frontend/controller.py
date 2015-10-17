@@ -15,6 +15,7 @@ import time
 import wtforms.ext.i18n.form
 
 from ..database import SeriesDatabase
+from ..helpers import logged_request
 from ..user import User
 
 series = SeriesDatabase()
@@ -69,6 +70,7 @@ def getShowsOverview():
     return unseen, upcoming
 
 @frontend.route('/rss/<userID>.rss')
+@logged_request
 def latestRss(userID):
     userID = userID.lower()
 
@@ -97,6 +99,7 @@ def latestRss(userID):
 
 @frontend.route('/')
 @login_required
+@logged_request
 def home():
     unseen, upcoming = getShowsOverview()
 
@@ -105,6 +108,7 @@ def home():
 
 @frontend.route('/shows/')
 @login_required
+@logged_request
 def shows():
     shows = []
     for showId in series.getUserShowList(current_user.id):
@@ -116,6 +120,7 @@ def shows():
 
 @frontend.route('/show/<showId>/')
 @login_required
+@logged_request
 def show_details(showId):
     show = series.getShowInfo(current_user.id, showId)
 
@@ -124,6 +129,7 @@ def show_details(showId):
 
 @frontend.route('/add/<showId>')
 @login_required
+@logged_request
 def show_add(showId):
     if not series.userHasShow(current_user.id, showId):
         series.addShowToUser(current_user.id, showId)
@@ -133,6 +139,7 @@ def show_add(showId):
 
 @frontend.route('/delete/<showId>')
 @login_required
+@logged_request
 def show_delete(showId):
     series.deleteShowFromUser(current_user.id, showId)
 
@@ -148,6 +155,7 @@ class UserForm(Form, wtforms.ext.i18n.form.Form):
 
 
 @frontend.route('/login', methods=['GET', 'POST'])
+@logged_request
 def login():
     class LoginForm(UserForm):
         LANGUAGES = [get_locale().language]
@@ -168,6 +176,7 @@ def login():
 
 
 @frontend.route('/signup', methods=['GET', 'POST'])
+@logged_request
 def signup():
     class RegistrationForm(UserForm):
         LANGUAGES = [get_locale().language]
@@ -195,6 +204,7 @@ def signup():
 
 @frontend.route('/settings', methods=['GET', 'POST'])
 @login_required
+@logged_request
 def settings():
     class SettingsForm(Form, wtforms.ext.i18n.form.Form):
         LANGUAGES = [get_locale().language]
@@ -223,6 +233,7 @@ def settings():
 
 @frontend.route("/logout")
 @login_required
+@logged_request
 def logout():
     logout_user()
     flash(gettext(u'login.successful_logout'), 'success')
@@ -231,6 +242,7 @@ def logout():
 
 @frontend.route('/ajax/unseen/<showId>/<episodeId>')
 @login_required
+@logged_request
 def ajax_home_unseen(showId, episodeId):
     series.setLastSeen(current_user.id, showId, episodeId)
 
@@ -247,6 +259,7 @@ def ajax_home_unseen(showId, episodeId):
 
 @frontend.route('/ajax/more/<showId>/<int:moreMult>')
 @login_required
+@logged_request
 def ajax_home_show_more(showId, moreMult):
     unseen, upcoming = getShowsOverview()
 
@@ -260,6 +273,7 @@ def ajax_home_show_more(showId, moreMult):
 
 @frontend.route('/ajax/showsorder', methods=['POST'])
 @login_required
+@logged_request
 def ajax_set_show_order():
     ordering = {}
 
@@ -277,6 +291,7 @@ def ajax_set_show_order():
 
 @frontend.route('/ajax/search/<showName>')
 @login_required
+@logged_request
 def ajax_search_show(showName):
     results = series.searchShow(showName)
 
@@ -291,6 +306,7 @@ def ajax_search_show(showName):
 # Returns a partial view containing the posters for a show to be displayed in a popup window
 @frontend.route('/ajax/posters/<showId>')
 @login_required
+@logged_request
 def ajax_posters_choice(showId):
     show = series.getShowInfo(current_user.id, showId, withEpisodes=False)
 
@@ -302,6 +318,7 @@ def ajax_posters_choice(showId):
 @frontend.route('/poster/<showId>')
 @frontend.route('/poster/<showId>/<path:posterPath>')
 @login_required
+@logged_request
 def set_poster(showId, posterPath=None):
     if posterPath:
         if series.setCustomPoster(current_user.id, showId, posterPath) == 200:
