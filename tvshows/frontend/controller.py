@@ -79,7 +79,7 @@ def latestRss(userID):
     today = date.today().strftime('%Y-%m-%d')
     for showID in series.getUserShowList(userID):
         shows[showID] = series.getShowInfo(userID, showID, withEpisodes=True, onlyUnseen=True)
-        episodes.extend((showID, episode) for episode in shows[showID]['episodes'] if airdateKey(episode['airdate']) < today)
+        episodes.extend((showID, episode) for episode in shows[showID]['episodes'] if episode['airdate'] and airdateKey(episode['airdate']) < today)
 
     episodes.sort(key=episodeAirdateKey, reverse=True)
 
