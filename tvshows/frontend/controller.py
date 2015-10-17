@@ -57,8 +57,8 @@ def getShowsOverview():
 
     today = date.today().strftime('%Y-%m-%d')
     for show in shows:
-        show['unseenEpisodes'] = [episode for episode in show['episodes'] if airdateKey(episode['airdate']) < today and episode['airdate'] != '0000-00-00']
-        show['upcomingEpisodes'] = [episode for episode in show['episodes'] if airdateKey(episode['airdate']) >= today and episode['airdate'] != '0000-00-00']
+        show['unseenEpisodes'] = [episode for episode in show['episodes'] if episode['airdate'] and airdateKey(episode['airdate']) < today and episode['airdate'] != '0000-00-00']
+        show['upcomingEpisodes'] = [episode for episode in show['episodes'] if episode['airdate'] and airdateKey(episode['airdate']) >= today and episode['airdate'] != '0000-00-00']
 
     unseen = [show for show in shows if len(show['unseenEpisodes']) > 0]
     upcoming = [show for show in shows if len(show['upcomingEpisodes']) > 0 and (len(show['unseenEpisodes']) == 0 or (show['upcomingEpisodes'][0]['season'] == show['unseenEpisodes'][0]['season'] or (show['unseenEpisodes'][0]['episode'] > 1 and show['upcomingEpisodes'][0]['season'] <= show['unseenEpisodes'][0]['season'] + 1)))]
