@@ -20,9 +20,9 @@ def downloadLink(show, episode):
     # because they are not included in release names most of the time
     # Also remove everything that is not alphanumeric or whitespace (such has apostrophes)
     strippedName = re.sub(r'\(.+?\)|([^\s\w])+', '', show['name']).strip()
-    searchString = '%s %s 720p category:tv' % (strippedName, episodeNumber(episode))
+    searchString = '%s %s' % (strippedName, episodeNumber(episode))
 
-    return 'https://kickass.to/usearch/%s/?field=seeders&sorder=desc' % urllib.quote(searchString)
+    return 'https://thepiratebay.gd/search/%s/0/99/208' % urllib.quote(searchString)
 
 
 def addic7edLink(show, episode):
