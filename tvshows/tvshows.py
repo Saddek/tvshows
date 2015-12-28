@@ -4,9 +4,9 @@ from datetime import timedelta
 from flask import Flask, request, session
 from flask.ext.babel import Babel, lazy_gettext
 from flask.ext.login import LoginManager, current_user
+from logstash_formatter import LogstashFormatterV1
 
 import errno
-import logstash
 import os
 
 from .frontend import frontend
@@ -89,10 +89,7 @@ if not app.debug:
 
     app.logger.setLevel(logging.INFO)
 
-    file_handler = TimedRotatingFileHandler(os.path.join(logsDir, 'error.log'), when='midnight', backupCount=5)
-    file_handler.setLevel(logging.WARNING)
-
-    logstash_handler = logstash.TCPLogstashHandler('localhost', 5229, message_type=None, version=1) # no message type, let the logstash server decide
+    file_handler = TimedRotatingFileHandler(os.path.join(logsDir, 'access.log'), when='midnight', backupCount=5)
+    file_handler.setFormatter(LogstashFormatterV1())
 
     app.logger.addHandler(file_handler)
-    app.logger.addHandler(logstash_handler)
