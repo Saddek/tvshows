@@ -13,7 +13,7 @@ from .frontend import frontend
 from .api import api
 from .user import User
 from .database import SeriesDatabase
-from . import customfilters
+import customfilters
 
 class LoggingFlask(Flask):
     def log_exception(self, exc_info):
