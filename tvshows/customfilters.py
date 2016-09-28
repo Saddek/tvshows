@@ -22,7 +22,7 @@ def downloadLink(show, episode):
     strippedName = re.sub(r'\(.+?\)|([^\s\w])+', '', show['name']).strip()
     searchString = '%s %s 720p' % (strippedName, episodeNumber(episode))
 
-    return 'https://thepiratebay.gd/search/%s/0/99/0' % urllib.quote(searchString)
+    return 'https://thepiratebay.org/search/%s/0/99/0' % urllib.quote(searchString)
 
 
 def addic7edLink(show, episode):
